@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { db } from '../lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { formatCurrency } from '../lib/utils';
+import { Order } from '../types';
 import { 
   ShieldCheck, 
   Truck, 
@@ -50,23 +51,25 @@ export default function CheckoutPage() {
     setLoading(true);
 
     try {
-      const orderData = {
+      const orderData: Omit<Order, 'id' | 'createdAt'> = {
         userId: user.uid,
-        items: cart.map(item => ({
+        customerInfo: formData,
+        products: cart.map(item => ({
           productId: item.id,
-          name: item.name,
+          title: item.title,
           price: item.price,
           quantity: item.quantity,
-          image: item.image
+          image: item.images[0]
         })),
-        total: subtotal,
-        status: 'pending',
-        shippingDetails: formData,
+        totalPrice: subtotal,
+        orderStatus: 'pending',
         paymentMethod: 'COD',
-        createdAt: serverTimestamp()
       };
 
-      const docRef = await addDoc(collection(db, 'orders'), orderData);
+      const docRef = await addDoc(collection(db, 'orders'), {
+        ...orderData,
+        createdAt: serverTimestamp()
+      });
       setOrderId(docRef.id);
       setOrderComplete(true);
       clearCart();
@@ -281,10 +284,10 @@ export default function CheckoutPage() {
               {cart.map((item) => (
                 <div key={item.id} className="flex gap-4">
                   <div className="w-20 h-20 bg-white border border-warm-beige flex-shrink-0">
-                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                    <img src={item.images[0]} alt={item.title} className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 space-y-1">
-                    <h4 className="text-sm font-display text-near-black line-clamp-1">{item.name}</h4>
+                    <h4 className="text-sm font-display text-near-black line-clamp-1">{item.title}</h4>
                     <p className="text-[10px] text-gray-666 uppercase tracking-widest">{item.category}</p>
                     <div className="flex justify-between items-center pt-1">
                       <p className="text-[11px] font-bold text-gray-a0">QTY: {item.quantity}</p>

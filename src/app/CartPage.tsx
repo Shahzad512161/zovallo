@@ -48,7 +48,7 @@ export default function CartPage() {
                 className="flex flex-col sm:flex-row gap-6 p-6 bg-white border border-warm-beige group transition-all hover:shadow-md"
               >
                 <Link to={`/product/${item.id}`} className="w-32 aspect-square bg-cream overflow-hidden flex-shrink-0">
-                  <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img src={item.images[0]} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 </Link>
                 
                 <div className="flex-1 flex flex-col justify-between py-1">
@@ -56,7 +56,7 @@ export default function CartPage() {
                     <div>
                       <p className="text-[10px] font-bold text-gray-a0 uppercase tracking-widest mb-1">{item.category}</p>
                       <Link to={`/product/${item.id}`}>
-                        <h3 className="text-lg font-display text-near-black hover:text-gold transition-colors">{item.name}</h3>
+                        <h3 className="text-lg font-display text-near-black hover:text-gold transition-colors">{item.title}</h3>
                       </Link>
                     </div>
                     <p className="text-lg font-light text-near-black">{formatCurrency(item.price)}</p>

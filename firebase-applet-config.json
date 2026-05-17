@@ -1,10 +1,9 @@
 {
-  "projectId": "ethereal-bond-m8gvj",
-  "appId": "1:210889054092:web:82a5732f090ae4516ca8a9",
-  "apiKey": "AIzaSyAdH2SkEpTWJjsdlgEkqsc-F3tj2H3XRCI",
-  "authDomain": "ethereal-bond-m8gvj.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-c8f570f9-607e-407f-9f36-964009329fc2",
-  "storageBucket": "ethereal-bond-m8gvj.firebasestorage.app",
-  "messagingSenderId": "210889054092",
-  "measurementId": ""
+  "apiKey": "AIzaSyCllsMAeEfwf5KDNHsECrUZrcD5YfDdVgE",
+  "authDomain": "zovallo.firebaseapp.com",
+  "projectId": "zovallo",
+  "storageBucket": "zovallo.firebasestorage.app",
+  "messagingSenderId": "16353576871",
+  "appId": "1:16353576871:web:e6a59b5e610573789f5882",
+  "measurementId": "G-95YTHK46EX"
 }

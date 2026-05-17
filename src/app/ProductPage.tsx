@@ -10,7 +10,7 @@ export default function ProductPage() {
   const { productId } = useParams();
   const product = PRODUCTS.find(p => p.id === productId);
   const [quantity, setQuantity] = useState(1);
-  const [activeImage, setActiveImage] = useState(product?.image || '');
+  const [activeImage, setActiveImage] = useState(product?.images[0] || '');
   const [activeTab, setActiveTab] = useState<'specs' | 'delivery' | 'reviews'>('specs');
 
   const relatedProducts = useMemo(() => {
@@ -31,10 +31,10 @@ export default function ProductPage() {
 
   // Ensure activeImage is set if it hasn't been yet (e.g. on mount or product change)
   useMemo(() => {
-    setActiveImage(product.image);
-  }, [product.id]);
+    if (product) setActiveImage(product.images[0]);
+  }, [product?.id]);
 
-  const gallery = product.images || [product.image];
+  const gallery = product.images;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-20">
@@ -46,7 +46,7 @@ export default function ProductPage() {
         <ChevronRight className="w-3 h-3" />
         <Link to={`/category/${product.category.toLowerCase().replace(/\s+/g, '-')}`} className="hover:text-near-black transition-colors">{product.category}</Link>
         <ChevronRight className="w-3 h-3" />
-        <span className="text-near-black">{product.name}</span>
+        <span className="text-near-black">{product.title}</span>
       </nav>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
@@ -55,7 +55,7 @@ export default function ProductPage() {
           <div className="aspect-square bg-cream overflow-hidden">
             <img 
               src={activeImage} 
-              alt={product.name} 
+              alt={product.title} 
               className="w-full h-full object-cover"
               referrerPolicy="no-referrer"
             />
@@ -67,7 +67,7 @@ export default function ProductPage() {
                 onClick={() => setActiveImage(img)}
                 className={`aspect-square bg-cream overflow-hidden border-2 transition-all ${activeImage === img ? 'border-walnut' : 'border-transparent opacity-60 hover:opacity-100'}`}
               >
-                <img src={img} alt={`${product.name} ${idx + 1}`} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                <img src={img} alt={`${product.title} ${idx + 1}`} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
               </button>
             ))}
           </div>
@@ -88,7 +88,7 @@ export default function ProductPage() {
               </div>
             </div>
             <h1 className="text-4xl md:text-5xl font-display text-near-black leading-tight tracking-tight">
-              {product.name}
+              {product.title}
             </h1>
             <div className="flex items-center gap-4">
               <p className="text-2xl font-light text-walnut">£{product.price.toLocaleString()}</p>
@@ -103,16 +103,6 @@ export default function ProductPage() {
             <p className="text-gray-666 font-light leading-relaxed">
               {product.description}
             </p>
-            {product.features && (
-              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-8">
-                {product.features.map((feature, idx) => (
-                  <li key={idx} className="flex items-center gap-3 text-[12px] text-near-black font-medium">
-                    <span className="w-1.5 h-1.5 bg-mint-400 rounded-full" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-            )}
           </div>
 
           <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
@@ -207,7 +197,7 @@ export default function ProductPage() {
           {activeTab === 'specs' && (
             <div className="max-w-3xl">
               <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-6">
-                {product.specs ? Object.entries(product.specs).map(([key, value]) => (
+                {product.specifications ? Object.entries(product.specifications).map(([key, value]) => (
                   <div key={key} className="space-y-1">
                     <dt className="text-[10px] font-bold uppercase tracking-widest text-walnut">{key}</dt>
                     <dd className="text-sm font-medium text-near-black">{value}</dd>

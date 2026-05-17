@@ -14,8 +14,8 @@ export function ProductCard({ product }: ProductCardProps) {
     <div className="group bg-white border border-warm-beige p-4 flex flex-col h-full hover:shadow-lg transition-all duration-300">
       <div className="bg-cream aspect-square w-full mb-4 flex items-center justify-center relative overflow-hidden">
         <img 
-          src={product.image} 
-          alt={product.name}
+          src={product.images[0]} 
+          alt={product.title}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
         />
         {product.featured && (
@@ -30,7 +30,7 @@ export function ProductCard({ product }: ProductCardProps) {
           <p className="text-[10px] text-gray-a0 uppercase tracking-widest mb-1">{product.category}</p>
           <Link to={`/product/${product.id}`}>
             <h4 className="text-sm font-semibold text-near-black group-hover:text-gold transition-colors truncate">
-              {product.name}
+              {product.title}
             </h4>
           </Link>
         </div>

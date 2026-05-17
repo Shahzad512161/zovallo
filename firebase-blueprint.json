@@ -13,26 +13,64 @@
       },
       "required": ["uid", "email"]
     },
+    "Category": {
+      "title": "Category",
+      "description": "Product categories",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "slug": { "type": "string" },
+        "description": { "type": "string" },
+        "image": { "type": "string" }
+      },
+      "required": ["name", "slug"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Furniture product details",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "slug": { "type": "string" },
+        "description": { "type": "string" },
+        "category": { "type": "string" },
+        "images": { "type": "array" },
+        "price": { "type": "number" },
+        "stock": { "type": "number" },
+        "specifications": { "type": "object" },
+        "featured": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "slug", "price", "category"]
+    },
     "Order": {
       "title": "Order",
       "description": "Store order details",
       "type": "object",
       "properties": {
         "userId": { "type": "string" },
-        "items": { "type": "array" },
-        "total": { "type": "number" },
-        "status": { "type": "string" },
-        "shippingDetails": { "type": "object" },
+        "customerInfo": { "type": "object" },
+        "products": { "type": "array" },
+        "totalPrice": { "type": "number" },
+        "orderStatus": { "type": "string" },
         "paymentMethod": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["userId", "items", "total"]
+      "required": ["userId", "products", "totalPrice"]
     }
   },
   "firestore": {
     "users/{userId}": {
       "schema": "User",
       "description": "User profiles collection"
+    },
+    "categories/{categoryId}": {
+      "schema": "Category",
+      "description": "Product categories collection"
+    },
+    "products/{productId}": {
+      "schema": "Product",
+      "description": "Products collection"
     },
     "orders/{orderId}": {
       "schema": "Order",

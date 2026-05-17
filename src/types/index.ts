@@ -1,12 +1,10 @@
-export type Category = 
-  | 'Sofa Sets'
-  | 'Dining Tables'
-  | 'Beds'
-  | 'Mattresses'
-  | 'Acoustic Wall Panels'
-  | 'Coffee Tables'
-  | 'Office Chairs'
-  | 'Wardrobes';
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  image?: string;
+}
 
 export interface Review {
   id: string;
@@ -18,32 +16,23 @@ export interface Review {
 
 export interface Product {
   id: string;
-  name: string;
+  title: string;
+  slug: string;
   description: string;
   price: number;
-  category: Category;
-  image: string;
-  images?: string[];
-  features?: string[];
-  specs?: Record<string, string>;
+  category: string;
+  images: string[];
   stock: number;
-  featured?: boolean;
+  specifications: Record<string, string>;
+  featured: boolean;
+  createdAt: any;
   reviews?: Review[];
 }
 
 export interface Order {
   id: string;
   userId: string;
-  items: {
-    productId: string;
-    name: string;
-    price: number;
-    quantity: number;
-    image: string;
-  }[];
-  total: number;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered';
-  shippingDetails: {
+  customerInfo: {
     fullName: string;
     email: string;
     phone: string;
@@ -53,6 +42,15 @@ export interface Order {
     postalCode: string;
     notes?: string;
   };
+  products: {
+    productId: string;
+    title: string;
+    price: number;
+    quantity: number;
+    image: string;
+  }[];
+  totalPrice: number;
+  orderStatus: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   paymentMethod: 'COD';
   createdAt: any;
 }
@@ -60,6 +58,7 @@ export interface Order {
 export interface User {
   uid: string;
   email: string;
-  name: string;
+  displayName: string;
   role: 'user' | 'admin';
+  createdAt: any;
 }
