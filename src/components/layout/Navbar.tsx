@@ -8,7 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const { totalItems, subtotal } = useCart();
-  const { user, logout } = useAuth();
+  const { user, profile, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -23,8 +23,13 @@ export function Navbar() {
   return (
     <nav className="fixed top-0 w-full z-50 shadow-sm">
       {/* Header 01: Announcement Bar */}
-      <div className="bg-walnut text-cream text-[10px] sm:text-[11px] py-2 text-center tracking-[0.15em] font-medium uppercase px-4">
-        Free Delivery Across UK | Cash On Delivery Available | Premium Furniture Collection
+      <div className="bg-walnut text-cream text-[10px] sm:text-[11px] py-2 text-center tracking-[0.15em] font-medium uppercase px-4 flex justify-center items-center gap-4">
+        <span>Free Delivery Across UK | Cash On Delivery Available | Premium Furniture Collection</span>
+        {isAdmin && (
+          <Link to="/admin" className="bg-gold text-near-black px-2 py-0.5 rounded text-[9px] font-bold hover:bg-white transition-colors ml-4">
+            GO TO ADMIN PANEL
+          </Link>
+        )}
       </div>
 
       {/* Header 02: Main Header */}
