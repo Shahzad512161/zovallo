@@ -12,12 +12,31 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["uid", "email"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Store order details",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "items": { "type": "array" },
+        "total": { "type": "number" },
+        "status": { "type": "string" },
+        "shippingDetails": { "type": "object" },
+        "paymentMethod": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "items", "total"]
     }
   },
   "firestore": {
     "users/{userId}": {
       "schema": "User",
       "description": "User profiles collection"
+    },
+    "orders/{orderId}": {
+      "schema": "Order",
+      "description": "Orders collection"
     }
   }
 }

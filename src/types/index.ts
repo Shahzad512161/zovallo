@@ -31,35 +31,35 @@ export interface Product {
   reviews?: Review[];
 }
 
+export interface Order {
+  id: string;
+  userId: string;
+  items: {
+    productId: string;
+    name: string;
+    price: number;
+    quantity: number;
+    image: string;
+  }[];
+  total: number;
+  status: 'pending' | 'processing' | 'shipped' | 'delivered';
+  shippingDetails: {
+    fullName: string;
+    email: string;
+    phone: string;
+    country: string;
+    city: string;
+    address: string;
+    postalCode: string;
+    notes?: string;
+  };
+  paymentMethod: 'COD';
+  createdAt: any;
+}
+
 export interface User {
   uid: string;
   email: string;
   name: string;
   role: 'user' | 'admin';
-}
-
-export interface OrderItem {
-  productId: string;
-  name: string;
-  price: number;
-  quantity: number;
-  image: string;
-}
-
-export interface Order {
-  id: string;
-  userId: string;
-  items: OrderItem[];
-  total: number;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-  shippingAddress: {
-    fullName: string;
-    email: string;
-    phone: string;
-    address: string;
-    city: string;
-    postcode: string;
-  };
-  paymentMethod: 'Cash on Delivery';
-  createdAt: any;
 }

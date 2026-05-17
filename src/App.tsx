@@ -13,6 +13,7 @@ import ProductPage from './app/ProductPage';
 import CartPage from './app/CartPage';
 import LoginPage from './app/LoginPage';
 import RegisterPage from './app/RegisterPage';
+import CheckoutPage from './app/CheckoutPage';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
@@ -55,7 +56,7 @@ export default function App() {
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/checkout" element={
                   <ProtectedRoute>
-                    <Placeholder title="Checkout" />
+                    <CheckoutPage />
                   </ProtectedRoute>
                 } />
                 <Route path="/admin" element={
