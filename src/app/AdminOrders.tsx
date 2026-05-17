@@ -18,6 +18,8 @@ import { collection, getDocs, updateDoc, doc, query, orderBy } from 'firebase/fi
 import { db } from '../lib/firebase';
 import { formatCurrency } from '../lib/utils';
 import { Order } from '../types';
+import { LoadingSpinner } from '../components/ui/Loading';
+import { EmptyState } from '../components/ui/EmptyState';
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -137,7 +139,24 @@ export default function AdminOrders() {
                 </thead>
                 <tbody className="divide-y divide-warm-beige">
                   {loading ? (
-                    <tr><td colSpan={5} className="px-6 py-12 text-center text-gold text-[10px] uppercase font-bold tracking-widest">Scanning ledger...</td></tr>
+                    <tr>
+                      <td colSpan={5} className="px-6 py-24">
+                        <div className="flex flex-col items-center justify-center gap-4">
+                          <LoadingSpinner />
+                          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gold text-center">Scanning ledger...</p>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : filteredOrders.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="px-6 py-24">
+                        <EmptyState 
+                          icon={Package}
+                          title="No Orders Found"
+                          description="We couldn't find any orders matching your current filters."
+                        />
+                      </td>
+                    </tr>
                   ) : filteredOrders.map((order) => (
                     <tr 
                       key={order.id} 

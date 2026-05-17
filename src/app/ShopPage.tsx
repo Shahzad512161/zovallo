@@ -1,16 +1,27 @@
 import { PRODUCTS, CATEGORIES } from '../data/dummyData';
 import { ProductCard } from '../components/ui/ProductCard';
 import { useState, useMemo, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { useParams, useSearchParams } from 'react-router-dom';
+import { Search, SlidersHorizontal, X, PackageOpen } from 'lucide-react';
+import { EmptyState } from '../components/ui/EmptyState';
+import { SEO } from '../components/SEO';
 
 export default function ShopPage() {
   const { categoryId } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000]);
   const [sortBy, setSortBy] = useState('latest');
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+
+  // Sync search from URL
+  useEffect(() => {
+    const query = searchParams.get('search');
+    if (query !== null) {
+      setSearchQuery(query);
+    }
+  }, [searchParams]);
 
   // Sync category from URL
   useEffect(() => {
@@ -60,6 +71,10 @@ export default function ShopPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+      <SEO 
+        title={selectedCategory === 'All' ? 'Shop All' : `Shop ${selectedCategory}`}
+        description={`Explore our curated selection of ${selectedCategory.toLowerCase()} pieces. Premium furniture designed for comfort and crafted to last.`}
+      />
       {/* Page Header */}
       <div className="text-center space-y-4 mb-8">
         <h1 className="text-4xl md:text-5xl font-display text-near-black tracking-tight">
@@ -159,7 +174,7 @@ export default function ShopPage() {
           </div>
 
           {/* Products Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
             {filteredProducts.map((product) => (
               <ProductCard 
                 key={product.id} 
@@ -169,24 +184,18 @@ export default function ShopPage() {
           </div>
           
           {filteredProducts.length === 0 && (
-            <div className="text-center py-32 border border-dashed border-warm-beige space-y-6">
-              <div className="w-20 h-20 bg-cream rounded-full flex items-center justify-center mx-auto">
-                <Search className="w-8 h-8 text-gray-a0" />
-              </div>
-              <div className="space-y-2">
-                <p className="text-xl font-display text-near-black">No matches found</p>
-                <p className="text-sm text-gray-666 font-light">Try adjusting your filters or searching for something else.</p>
-              </div>
-              <button 
-                onClick={() => {
+            <div className="py-20 border border-dashed border-warm-beige">
+              <EmptyState 
+                icon={PackageOpen}
+                title="No matches found"
+                description="We couldn't find any products matching your current filters. Try adjusting your search or clearing the filters."
+                actionText="Clear all filters"
+                onAction={() => {
                   setSelectedCategory('All');
                   setSearchQuery('');
                   setPriceRange([0, 5000]);
                 }}
-                className="text-[11px] font-bold uppercase tracking-widest text-walnut underline underline-offset-4"
-              >
-                Clear all filters
-              </button>
+              />
             </div>
           )}
         </div>

@@ -17,11 +17,15 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    @apply bg-cream text-charcoal font-sans antialiased;
+    @apply bg-cream text-charcoal font-sans antialiased text-base leading-relaxed;
   }
   
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display font-medium text-near-black tracking-tight;
+    @apply font-display font-medium text-near-black tracking-tight leading-tight;
   }
 }

@@ -13,6 +13,8 @@ import {
 import { collection, getDocs, doc, updateDoc, query, orderBy } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { User } from '../types';
+import { LoadingSpinner } from '../components/ui/Loading';
+import { EmptyState } from '../components/ui/EmptyState';
 
 export default function AdminUsers() {
   const [users, setUsers] = useState<User[]>([]);

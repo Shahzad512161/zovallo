@@ -15,6 +15,7 @@ import { doc, getDoc, setDoc, addDoc, collection, serverTimestamp, getDocs, orde
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../lib/firebase';
 import { Product, Category } from '../types';
+import { LoadingSpinner } from '../components/ui/Loading';
 
 export default function AdminProductForm() {
   const { productId } = useParams();
@@ -25,6 +26,7 @@ export default function AdminProductForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<{ [key: number]: number }>({});
   const [categories, setCategories] = useState<Category[]>([]);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<Partial<Product>>({
     title: '',
@@ -154,24 +156,25 @@ export default function AdminProductForm() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-sm font-bold uppercase tracking-widest text-gold">Syncing Specifications...</div>
+      <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+        <LoadingSpinner />
+        <div className="text-xs font-bold uppercase tracking-widest text-gold animate-pulse">Syncing Specifications...</div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-12">
-      <div className="flex items-center justify-between border-b border-warm-beige pb-8">
-        <div className="flex items-center gap-6">
-          <Link to="/admin/products" className="p-3 bg-white border border-warm-beige hover:bg-gold transition-colors block">
-            <ArrowLeft className="w-5 h-5 text-near-black" />
+    <div className="max-w-5xl mx-auto space-y-8 sm:space-y-12">
+      <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-warm-beige pb-8 gap-6">
+        <div className="flex items-center gap-4 sm:gap-6">
+          <Link to="/admin/products" className="p-3 bg-white border border-warm-beige hover:bg-gold hover:text-white transition-colors block shrink-0">
+            <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-3xl font-display text-near-black uppercase tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-display text-near-black uppercase tracking-tight">
               {isEdit ? 'Curate Artpiece' : 'Introduce Masterpiece'}
             </h1>
-            <p className="text-gray-400 text-sm mt-1">Refining the physical essence of your collection.</p>
+            <p className="text-gray-400 text-xs sm:text-sm mt-1">Refining the physical essence of your collection.</p>
           </div>
         </div>
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-400">
@@ -179,64 +182,73 @@ export default function AdminProductForm() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-        <div className="lg:col-span-2 space-y-12">
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
+        <div className="lg:col-span-2 space-y-8 sm:space-y-12">
           {/* Core Identity */}
-          <section className="bg-white border border-warm-beige p-10 space-y-8">
+          <section className="bg-white border border-warm-beige p-6 sm:p-10 space-y-8 shadow-sm">
             <div className="flex items-center gap-3 border-l-4 border-gold pl-4">
               <Info className="w-5 h-5 text-gold" />
-              <h2 className="text-lg font-display text-near-black uppercase">Core Identity</h2>
+              <h2 className="text-base sm:text-lg font-display text-near-black uppercase">Core Identity</h2>
             </div>
             
             <div className="space-y-6">
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-walnut">Master Title</label>
+              <div className="space-y-2">
+                <label htmlFor="title" className="text-[10px] font-bold uppercase tracking-widest text-walnut block">Master Title</label>
                 <input 
+                  id="title"
                   required
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
-                  className="w-full bg-cream border border-warm-beige py-4 px-6 text-base font-display focus:border-gold outline-none"
+                  className="w-full bg-cream border border-warm-beige py-4 px-6 text-xl sm:text-2xl font-display focus:border-gold outline-none transition-colors"
                   placeholder="e.g. Royal Oak Dining Table"
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-walnut">Internal Slug</label>
+                <div className="space-y-2">
+                  <label htmlFor="slug" className="text-[10px] font-bold uppercase tracking-widest text-walnut block">Internal Slug</label>
                   <input 
+                    id="slug"
                     required
                     name="slug"
                     value={formData.slug}
                     onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value.toLowerCase().replace(/\s+/g, '-') }))}
-                    className="w-full bg-cream border border-warm-beige py-3 px-4 text-sm font-mono focus:border-gold outline-none"
+                    className="w-full bg-cream border border-warm-beige py-3 px-4 text-sm font-mono focus:border-gold outline-none transition-colors"
                     placeholder="royal-oak-table"
                   />
                 </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-walnut">Collection Hierarchy</label>
-                  <select 
-                    required
-                    name="category"
-                    value={formData.category}
-                    onChange={handleChange}
-                    className="w-full bg-cream border border-warm-beige py-3 px-4 text-sm focus:border-gold outline-none appearance-none"
-                  >
-                    <option value="">Select Category</option>
-                    {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
-                  </select>
+                <div className="space-y-2">
+                  <label htmlFor="category" className="text-[10px] font-bold uppercase tracking-widest text-walnut block">Collection Hierarchy</label>
+                  <div className="relative">
+                    <select 
+                      id="category"
+                      required
+                      name="category"
+                      value={formData.category}
+                      onChange={handleChange}
+                      className="w-full bg-cream border border-warm-beige py-3 px-4 text-sm focus:border-gold outline-none appearance-none transition-colors"
+                    >
+                      <option value="">Select Category</option>
+                      {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+                    </select>
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                      <ChevronRight className="w-4 h-4 rotate-90 text-gray-400" />
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-walnut">Physical Narrative</label>
+              <div className="space-y-2">
+                <label htmlFor="description" className="text-[10px] font-bold uppercase tracking-widest text-walnut block">Physical Narrative</label>
                 <textarea 
+                  id="description"
                   required
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
                   rows={6}
-                  className="w-full bg-cream border border-warm-beige py-4 px-6 text-sm leading-relaxed focus:border-gold outline-none resize-none"
+                  className="w-full bg-cream border border-warm-beige py-4 px-6 text-sm leading-relaxed focus:border-gold outline-none resize-none transition-colors"
                   placeholder="Describe the craftsmanship, material, and soul of this piece..."
                 />
               </div>
@@ -244,22 +256,23 @@ export default function AdminProductForm() {
           </section>
 
           {/* Visual Assets */}
-          <section className="bg-white border border-warm-beige p-10 space-y-8">
+          <section className="bg-white border border-warm-beige p-6 sm:p-10 space-y-8 shadow-sm">
             <div className="flex items-center gap-3 border-l-4 border-gold pl-4">
               <ImageIcon className="w-5 h-5 text-gold" />
-              <h2 className="text-lg font-display text-near-black uppercase">Visual Assets</h2>
+              <h2 className="text-base sm:text-lg font-display text-near-black uppercase">Visual Assets</h2>
             </div>
             
             <div className="space-y-6">
               {formData.images?.map((img, idx) => (
-                <div key={idx} className="p-6 bg-cream/50 border border-warm-beige space-y-4">
+                <div key={idx} className="p-4 sm:p-6 bg-cream/50 border border-warm-beige space-y-4">
                   <div className="flex justify-between items-center">
                     <label className="text-[9px] font-bold uppercase tracking-widest text-walnut">Perspective {idx + 1}</label>
                     {formData.images!.length > 1 && (
                       <button 
                         type="button" 
                         onClick={() => removeImageField(idx)}
-                        className="text-gray-400 hover:text-red-500 transition-colors"
+                        className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                        aria-label="Remove image"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -268,16 +281,16 @@ export default function AdminProductForm() {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <span className="text-[8px] font-bold uppercase text-gray-400">Direct URL</span>
+                      <span className="text-[8px] font-bold uppercase text-gray-400 block">Direct URL</span>
                       <input 
                         value={img}
                         onChange={(e) => handleImageChange(idx, e.target.value)}
-                        className="w-full bg-white border border-warm-beige py-2 px-4 text-xs focus:border-gold outline-none"
+                        className="w-full bg-white border border-warm-beige py-2 px-4 text-xs focus:border-gold outline-none transition-colors"
                         placeholder="https://images.unsplash.com/..."
                       />
                     </div>
                     <div className="space-y-2">
-                      <span className="text-[8px] font-bold uppercase text-gray-400">Upload Image</span>
+                      <span className="text-[8px] font-bold uppercase text-gray-400 block">Upload Image</span>
                       <div className="relative">
                         <input 
                           type="file"
@@ -288,7 +301,7 @@ export default function AdminProductForm() {
                         />
                         <label 
                           htmlFor={`file-upload-${idx}`}
-                          className="w-full bg-white border border-warm-beige py-2 px-4 text-[10px] font-bold uppercase tracking-widest text-near-black hover:bg-gold hover:text-white transition-all transition-colors cursor-pointer flex items-center justify-center gap-2"
+                          className="w-full bg-white border border-warm-beige py-2 px-4 text-[10px] font-bold uppercase tracking-widest text-near-black hover:bg-gold hover:text-white transition-all transition-colors cursor-pointer flex items-center justify-center gap-2 h-[34px]"
                         >
                           <Plus className="w-3 h-3" /> Choose File
                         </label>
@@ -306,8 +319,8 @@ export default function AdminProductForm() {
                   )}
 
                   {img && (
-                    <div className="w-24 h-24 border border-warm-beige relative group">
-                      <img src={img} alt={`Preview ${idx + 1}`} className="w-full h-full object-cover" />
+                    <div className="w-24 h-24 sm:w-32 sm:h-32 border border-warm-beige relative group overflow-hidden">
+                      <img src={img} alt={`Preview ${idx + 1}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                       <div className="absolute inset-0 bg-near-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <ImageIcon className="w-6 h-6 text-white" />
                       </div>
@@ -318,7 +331,7 @@ export default function AdminProductForm() {
               <button 
                 type="button" 
                 onClick={addImageField}
-                className="w-full border-2 border-dashed border-warm-beige py-4 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:border-gold hover:text-gold transition-all flex items-center justify-center gap-2"
+                className="w-full border-2 border-dashed border-warm-beige py-6 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:border-gold hover:text-gold transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
               >
                 <Plus className="w-4 h-4" /> Add Perspective Angle
               </button>

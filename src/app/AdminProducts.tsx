@@ -16,6 +16,7 @@ import { db } from '../lib/firebase';
 import { formatCurrency } from '../lib/utils';
 import { Product } from '../types';
 import { Link } from 'react-router-dom';
+import { LoadingSpinner } from '../components/ui/Loading';
 
 export default function AdminProducts() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -133,7 +134,12 @@ export default function AdminProducts() {
             <tbody className="divide-y divide-warm-beige">
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="px-8 py-12 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-gold">Synchronizing Inventory...</td>
+                  <td colSpan={5} className="px-8 py-24">
+                    <div className="flex flex-col items-center justify-center gap-4">
+                      <LoadingSpinner />
+                      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gold">Synchronizing Inventory...</p>
+                    </div>
+                  </td>
                 </tr>
               ) : paginatedProducts.length === 0 ? (
                 <tr>

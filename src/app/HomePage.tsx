@@ -3,12 +3,17 @@ import { ProductCard } from '../components/ui/ProductCard';
 import { Button } from '../components/ui/Button';
 import { Link } from 'react-router-dom';
 import { Truck, ShieldCheck, CreditCard, Award, Star, Quote } from 'lucide-react';
+import { SEO } from '../components/SEO';
 
 export default function HomePage() {
   const featuredProducts = PRODUCTS.filter(p => p.featured);
 
   return (
     <div className="space-y-24 pb-24">
+      <SEO 
+        title="Home"
+        description="Discover our masterfully crafted autumnal collection, blending traditional joinery with modern silhouettes for the contemporary home."
+      />
       {/* Hero Section */}
       <section className="relative h-[85vh] flex items-center justify-start overflow-hidden px-8 lg:px-24">
         <img 

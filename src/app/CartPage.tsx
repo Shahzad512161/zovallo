@@ -1,29 +1,22 @@
 import { Link } from 'react-router-dom';
-import { Minus, Plus, Trash2, ArrowLeft, ShieldCheck, Truck } from 'lucide-react';
+import { Minus, Plus, Trash2, ArrowLeft, ShieldCheck, Truck, ShoppingBag } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { formatCurrency } from '../lib/utils';
+import { EmptyState } from '../components/ui/EmptyState';
 
 export default function CartPage() {
   const { cart, removeFromCart, updateQuantity, subtotal } = useCart();
 
   if (cart.length === 0) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center space-y-8">
-        <div className="inline-flex items-center justify-center w-24 h-24 bg-cream rounded-full mb-4">
-          <Trash2 className="w-10 h-10 text-gray-a0" />
-        </div>
-        <div className="space-y-4">
-          <h2 className="text-3xl font-display text-near-black">Your Cart is Empty</h2>
-          <p className="text-gray-666 font-light max-w-sm mx-auto">
-            Looks like you haven't added any premium furniture to your cart yet.
-          </p>
-        </div>
-        <Link 
-          to="/shop" 
-          className="inline-block bg-near-black text-white px-10 py-4 text-[11px] font-bold uppercase tracking-widest hover:bg-gold transition-all duration-300"
-        >
-          Explore Collections
-        </Link>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <EmptyState 
+          icon={ShoppingBag}
+          title="Your Cart is Empty"
+          description="Looks like you haven't added any premium furniture to your cart yet. Explore our masterfully crafted autumnal collection."
+          actionText="Explore Collections"
+          actionLink="/shop"
+        />
       </div>
     );
   }

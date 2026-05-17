@@ -4,6 +4,7 @@ import { ChevronRight, Star, Minus, Plus, Truck, ShieldCheck, RefreshCw, Shoppin
 import { PRODUCTS } from '../data/dummyData';
 import { ProductCard } from '../components/ui/ProductCard';
 import { useCart } from '../context/CartContext';
+import { SEO } from '../components/SEO';
 
 export default function ProductPage() {
   const { addToCart } = useCart();
@@ -21,6 +22,7 @@ export default function ProductPage() {
   if (!product) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center pt-20 space-y-4">
+        <SEO title="Product Not Found" description="The furniture piece you are looking for does not exist in our catalog." />
         <h2 className="text-2xl font-display text-near-black">Product Not Found</h2>
         <Link to="/shop" className="text-walnut underline underline-offset-4 font-bold uppercase text-xs tracking-widest">
           Back to Shop
@@ -38,6 +40,11 @@ export default function ProductPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-20">
+      <SEO 
+        title={product.title}
+        description={product.description}
+        image={product.images[0]}
+      />
       {/* Breadcrumbs */}
       <nav className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest text-gray-a0">
         <Link to="/" className="hover:text-near-black transition-colors">Home</Link>
@@ -56,18 +63,26 @@ export default function ProductPage() {
             <img 
               src={activeImage} 
               alt={product.title} 
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover transition-opacity duration-300"
               referrerPolicy="no-referrer"
+              loading="eager"
             />
           </div>
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-4 gap-3 sm:gap-4">
             {gallery.map((img, idx) => (
               <button 
                 key={idx}
                 onClick={() => setActiveImage(img)}
-                className={`aspect-square bg-cream overflow-hidden border-2 transition-all ${activeImage === img ? 'border-walnut' : 'border-transparent opacity-60 hover:opacity-100'}`}
+                aria-label={`View image ${idx + 1}`}
+                className={`aspect-square bg-cream overflow-hidden border-2 transition-all focus:outline-none focus:ring-2 focus:ring-gold ${activeImage === img ? 'border-walnut' : 'border-transparent opacity-60 hover:opacity-100'}`}
               >
-                <img src={img} alt={`${product.title} ${idx + 1}`} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                <img 
+                  src={img} 
+                  alt={`${product.title} perspective ${idx + 1}`} 
+                  className="w-full h-full object-cover" 
+                  referrerPolicy="no-referrer" 
+                  loading="lazy"
+                />
               </button>
             ))}
           </div>
@@ -76,61 +91,63 @@ export default function ProductPage() {
         {/* Right: Info */}
         <div className="flex flex-col space-y-8">
           <div className="space-y-4">
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-4">
                <span className="bg-light-mint px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-mint-700">
                 {product.category}
               </span>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1" aria-label="4 out of 5 stars">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className={`w-3 h-3 ${i < 4 ? 'fill-gold text-gold' : 'text-warm-beige'}`} />
                 ))}
                 <span className="text-[10px] font-bold text-gray-a0 ml-1">(12 Reviews)</span>
               </div>
             </div>
-            <h1 className="text-4xl md:text-5xl font-display text-near-black leading-tight tracking-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-display text-near-black leading-tight tracking-tight">
               {product.title}
             </h1>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-4">
               <p className="text-2xl font-light text-walnut">£{product.price.toLocaleString()}</p>
               <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-mint-700 bg-mint-50 px-2 py-0.5 rounded-full">
-                <div className="w-1.5 h-1.5 bg-mint-400 rounded-full animate-pulse" />
+                <div className={`w-1.5 h-1.5 rounded-full ${product.stock > 0 ? 'bg-mint-400 animate-pulse' : 'bg-red-400'}`} />
                 {product.stock > 0 ? `In Stock (${product.stock})` : 'Out of Stock'}
               </div>
             </div>
           </div>
 
           <div className="space-y-4">
-            <p className="text-gray-666 font-light leading-relaxed">
+            <p className="text-gray-666 font-light leading-relaxed max-w-2xl">
               {product.description}
             </p>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
-            <div className="flex items-center border border-warm-beige h-12">
+            <div className="flex items-center border border-warm-beige h-12 w-full sm:w-auto">
               <button 
                 onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                className="w-12 h-full flex items-center justify-center hover:bg-cream transition-colors"
+                aria-label="Decrease quantity"
+                className="w-12 h-full flex items-center justify-center hover:bg-cream transition-colors border-r border-warm-beige"
               >
                 <Minus className="w-4 h-4" />
               </button>
-              <span className="w-12 h-full flex items-center justify-center text-sm font-bold border-x border-warm-beige bg-white">
+              <span className="w-12 h-full flex items-center justify-center text-sm font-bold bg-white">
                 {quantity}
               </span>
               <button 
                 onClick={() => setQuantity(q => q + 1)}
-                className="w-12 h-full flex items-center justify-center hover:bg-cream transition-colors"
+                aria-label="Increase quantity"
+                className="w-12 h-full flex items-center justify-center hover:bg-cream transition-colors border-l border-warm-beige"
               >
                 <Plus className="w-4 h-4" />
               </button>
             </div>
             <button 
               onClick={() => product && addToCart(product, quantity)}
-              className="flex-1 w-full sm:w-auto bg-near-black text-white h-12 text-[11px] font-bold uppercase tracking-widest hover:bg-gold transition-all duration-300 flex items-center justify-center gap-2 px-8"
+              className="flex-1 w-full sm:w-auto bg-near-black text-white h-12 text-[11px] font-bold uppercase tracking-widest hover:bg-gold transition-all duration-300 flex items-center justify-center gap-2 px-8 shadow-sm active:scale-95"
             >
               <ShoppingBag className="w-4 h-4" />
               Add to Cart
             </button>
-            <button className="flex-1 w-full sm:w-auto border-2 border-near-black text-near-black h-12 text-[11px] font-bold uppercase tracking-widest hover:bg-near-black hover:text-white transition-all duration-300">
+            <button className="flex-1 w-full sm:w-auto border-2 border-near-black text-near-black h-12 text-[11px] font-bold uppercase tracking-widest hover:bg-near-black hover:text-white transition-all duration-300 active:scale-95">
               Buy Now
             </button>
           </div>

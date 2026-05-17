@@ -6,6 +6,7 @@ import { db } from '../lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { formatCurrency } from '../lib/utils';
 import { Order } from '../types';
+import { SEO } from '../components/SEO';
 import { 
   ShieldCheck, 
   Truck, 
@@ -17,7 +18,8 @@ import {
   Phone,
   Mail,
   User,
-  MessageSquare
+  MessageSquare,
+  AlertCircle
 } from 'lucide-react';
 
 export default function CheckoutPage() {
@@ -28,6 +30,7 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     fullName: user?.displayName || '',
@@ -42,12 +45,28 @@ export default function CheckoutPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    if (validationError) setValidationError(null);
+  };
+
+  const validateForm = () => {
+    const phoneRegex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/;
+    if (!phoneRegex.test(formData.phone)) {
+      setValidationError('Please enter a valid phone number.');
+      return false;
+    }
+    if (formData.address.length < 10) {
+      setValidationError('Please provide a complete street address.');
+      return false;
+    }
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
     
+    if (!validateForm()) return;
+
     setLoading(true);
 
     try {
@@ -75,7 +94,7 @@ export default function CheckoutPage() {
       clearCart();
     } catch (error) {
       console.error('Error placing order:', error);
-      alert('Failed to place order. Please try again.');
+      setValidationError('Failed to place order. Please check your connection and try again.');
     } finally {
       setLoading(false);
     }
@@ -128,6 +147,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <SEO title="Secure Checkout" description="Finalize your luxury furniture order with LUXWOOD. Secure delivery and handling guaranteed." />
       <div className="flex flex-col lg:flex-row gap-16">
         {/* Checkout Form */}
         <div className="flex-1 space-y-12">
@@ -139,56 +159,71 @@ export default function CheckoutPage() {
             </Link>
           </div>
 
+          {validationError && (
+            <div role="alert" className="bg-red-50 border border-red-100 text-red-700 px-4 py-3 flex items-center gap-3 text-sm">
+              <AlertCircle className="w-5 h-5 flex-shrink-0" />
+              <p>{validationError}</p>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-10">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-walnut block">Full Name</label>
+                <label htmlFor="fullName" className="text-[10px] font-bold uppercase tracking-widest text-walnut block">Full Name</label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-a0" />
                   <input 
+                    id="fullName"
                     name="fullName"
                     required
+                    autoComplete="name"
                     value={formData.fullName}
                     onChange={handleChange}
-                    className="w-full bg-cream border border-warm-beige py-3 pl-10 pr-4 text-sm outline-none focus:border-gold"
+                    className="w-full bg-cream border border-warm-beige py-3 pl-10 pr-4 text-sm outline-none focus:border-gold transition-colors"
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-walnut block">Email Address</label>
+                <label htmlFor="email" className="text-[10px] font-bold uppercase tracking-widest text-walnut block">Email Address</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-a0" />
                   <input 
+                    id="email"
                     name="email"
                     type="email"
                     required
+                    autoComplete="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full bg-cream border border-warm-beige py-3 pl-10 pr-4 text-sm outline-none focus:border-gold"
+                    className="w-full bg-cream border border-warm-beige py-3 pl-10 pr-4 text-sm outline-none focus:border-gold transition-colors"
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-walnut block">Phone Number</label>
+                <label htmlFor="phone" className="text-[10px] font-bold uppercase tracking-widest text-walnut block">Phone Number</label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-a0" />
                   <input 
+                    id="phone"
                     name="phone"
+                    type="tel"
                     required
+                    autoComplete="tel"
                     value={formData.phone}
                     onChange={handleChange}
                     placeholder="+44 000 000 0000"
-                    className="w-full bg-cream border border-warm-beige py-3 pl-10 pr-4 text-sm outline-none focus:border-gold"
+                    className="w-full bg-cream border border-warm-beige py-3 pl-10 pr-4 text-sm outline-none focus:border-gold transition-colors"
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-walnut block">Country</label>
+                <label htmlFor="country" className="text-[10px] font-bold uppercase tracking-widest text-walnut block">Country</label>
                 <select 
+                  id="country"
                   name="country"
                   value={formData.country}
                   onChange={handleChange}
-                  className="w-full bg-cream border border-warm-beige py-3 px-4 text-sm outline-none focus:border-gold"
+                  className="w-full bg-cream border border-warm-beige py-3 px-4 text-sm outline-none focus:border-gold transition-colors appearance-none"
                 >
                   <option>United Kingdom</option>
                   <option>Ireland</option>
@@ -197,50 +232,57 @@ export default function CheckoutPage() {
                 </select>
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-walnut block">City</label>
+                <label htmlFor="city" className="text-[10px] font-bold uppercase tracking-widest text-walnut block">City</label>
                 <input 
+                  id="city"
                   name="city"
                   required
+                  autoComplete="address-level2"
                   value={formData.city}
                   onChange={handleChange}
-                  className="w-full bg-cream border border-warm-beige py-3 px-4 text-sm outline-none focus:border-gold"
+                  className="w-full bg-cream border border-warm-beige py-3 px-4 text-sm outline-none focus:border-gold transition-colors"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-walnut block">Postal Code</label>
+                <label htmlFor="postalCode" className="text-[10px] font-bold uppercase tracking-widest text-walnut block">Postal Code</label>
                 <input 
+                  id="postalCode"
                   name="postalCode"
                   required
+                  autoComplete="postal-code"
                   value={formData.postalCode}
                   onChange={handleChange}
-                  className="w-full bg-cream border border-warm-beige py-3 px-4 text-sm outline-none focus:border-gold"
+                  className="w-full bg-cream border border-warm-beige py-3 px-4 text-sm outline-none focus:border-gold transition-colors"
                 />
               </div>
               <div className="md:col-span-2 space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-walnut block">Street Address</label>
+                <label htmlFor="address" className="text-[10px] font-bold uppercase tracking-widest text-walnut block">Street Address</label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-3 w-4 h-4 text-gray-a0" />
                   <textarea 
+                    id="address"
                     name="address"
                     required
+                    autoComplete="street-address"
                     rows={2}
                     value={formData.address}
                     onChange={handleChange}
-                    className="w-full bg-cream border border-warm-beige py-3 pl-10 pr-4 text-sm outline-none focus:border-gold resize-none"
+                    className="w-full bg-cream border border-warm-beige py-3 pl-10 pr-4 text-sm outline-none focus:border-gold resize-none transition-colors"
                   />
                 </div>
               </div>
               <div className="md:col-span-2 space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-walnut block">Order Notes (Optional)</label>
+                <label htmlFor="notes" className="text-[10px] font-bold uppercase tracking-widest text-walnut block">Order Notes (Optional)</label>
                 <div className="relative">
                   <MessageSquare className="absolute left-3 top-3 w-4 h-4 text-gray-a0" />
                   <textarea 
+                    id="notes"
                     name="notes"
                     rows={3}
                     value={formData.notes}
                     onChange={handleChange}
                     placeholder="E.g. Building floor, gate code, etc."
-                    className="w-full bg-cream border border-warm-beige py-3 pl-10 pr-4 text-sm outline-none focus:border-gold resize-none"
+                    className="w-full bg-cream border border-warm-beige py-3 pl-10 pr-4 text-sm outline-none focus:border-gold resize-none transition-colors"
                   />
                 </div>
               </div>

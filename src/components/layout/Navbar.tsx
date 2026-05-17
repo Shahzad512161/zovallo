@@ -45,14 +45,24 @@ export function Navbar() {
 
         {/* Center: Search Bar */}
         <div className="flex-1 max-w-2xl hidden md:block">
-          <div className="relative group">
+          <form 
+            onSubmit={(e) => {
+              e.preventDefault();
+              const query = (e.currentTarget.elements.namedItem('q') as HTMLInputElement).value;
+              if (query.trim()) {
+                navigate(`/shop?search=${encodeURIComponent(query.trim())}`);
+              }
+            }}
+            className="relative group"
+          >
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-a0 group-focus-within:text-gold transition-colors" />
             <input 
+              name="q"
               type="text" 
               placeholder="Search for sofas, beds, dining tables..." 
               className="w-full bg-[#F5F5F2] border border-transparent rounded-full py-2.5 pl-11 pr-4 text-[13px] focus:bg-white focus:border-gold focus:ring-4 focus:ring-gold/5 outline-none transition-all placeholder:text-gray-a0/70"
             />
-          </div>
+          </form>
         </div>
 
         {/* Right: Icons */}

@@ -13,6 +13,7 @@ import {
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { Category } from '../types';
+import { Skeleton } from '../components/ui/Loading';
 
 export default function AdminCategories() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -120,9 +121,19 @@ export default function AdminCategories() {
 
       {/* Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[1,2,3,4].map(i => (
-            <div key={i} className="bg-white border border-warm-beige h-64" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {[1,2,3,4,5,6,7,8].map(i => (
+            <div key={i} className="bg-white border border-warm-beige group overflow-hidden">
+              <Skeleton className="aspect-[4/3] w-full" />
+              <div className="p-6 space-y-4">
+                <Skeleton className="h-6 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+                <div className="space-y-2">
+                  <Skeleton className="h-3 w-full" />
+                  <Skeleton className="h-3 w-full" />
+                </div>
+              </div>
+            </div>
           ))}
         </div>
       ) : (
