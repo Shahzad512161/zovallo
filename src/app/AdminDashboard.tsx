@@ -9,6 +9,7 @@ import {
   Calendar,
   Filter
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { collection, getDocs, query, limit, orderBy } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { formatCurrency } from '../lib/utils';
@@ -68,7 +69,7 @@ export default function AdminDashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="text-sm font-bold uppercase tracking-widest animate-pulse">Loading Analytics...</div>
+        <div className="text-sm font-bold uppercase tracking-widest text-gold">Loading Analytics...</div>
       </div>
     );
   }
@@ -201,6 +202,3 @@ export default function AdminDashboard() {
     </div>
   );
 }
-
-// Missing Link import
-import { Link } from 'react-router-dom';

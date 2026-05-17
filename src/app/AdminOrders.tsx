@@ -122,7 +122,7 @@ export default function AdminOrders() {
                 </thead>
                 <tbody className="divide-y divide-warm-beige">
                   {loading ? (
-                    <tr><td colSpan={5} className="px-6 py-12 text-center animate-pulse text-[10px] uppercase font-bold tracking-widest">Scanning ledger...</td></tr>
+                    <tr><td colSpan={5} className="px-6 py-12 text-center text-gold text-[10px] uppercase font-bold tracking-widest">Scanning ledger...</td></tr>
                   ) : filteredOrders.map((order) => (
                     <tr 
                       key={order.id} 

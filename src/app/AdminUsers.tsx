@@ -98,7 +98,7 @@ export default function AdminUsers() {
             </thead>
             <tbody className="divide-y divide-warm-beige">
               {loading ? (
-                <tr><td colSpan={5} className="px-8 py-12 text-center animate-pulse text-[10px] uppercase font-bold tracking-widest">Accessing records...</td></tr>
+                <tr><td colSpan={5} className="px-8 py-12 text-center text-gold text-[10px] uppercase font-bold tracking-widest">Accessing records...</td></tr>
               ) : filteredUsers.length === 0 ? (
                 <tr><td colSpan={5} className="px-8 py-12 text-center text-gray-400 text-sm">No customers found in your database.</td></tr>
               ) : (

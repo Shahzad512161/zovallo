@@ -23,6 +23,9 @@ export default function AdminProducts() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
   useEffect(() => {
     fetchProducts();
   }, []);
@@ -58,7 +61,17 @@ export default function AdminProducts() {
     return matchesSearch && matchesCategory;
   });
 
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   const categories = ['All', ...Array.from(new Set(products.map(p => p.category)))];
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory]);
 
   return (
     <div className="space-y-10">
@@ -120,14 +133,14 @@ export default function AdminProducts() {
             <tbody className="divide-y divide-warm-beige">
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="px-8 py-12 text-center text-[10px] font-bold uppercase tracking-[0.2em] animate-pulse">Synchronizing Inventory...</td>
+                  <td colSpan={5} className="px-8 py-12 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-gold">Synchronizing Inventory...</td>
                 </tr>
-              ) : filteredProducts.length === 0 ? (
+              ) : paginatedProducts.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-8 py-12 text-center text-gray-400 text-sm">No products matched your search criteria.</td>
                 </tr>
               ) : (
-                filteredProducts.map((p) => (
+                paginatedProducts.map((p) => (
                   <tr key={p.id} className="hover:bg-cream/20 transition-colors">
                     <td className="px-8 py-6">
                       <div className="flex items-center gap-4">
@@ -195,13 +208,24 @@ export default function AdminProducts() {
         {/* Pagination Info */}
         <div className="p-8 bg-cream/30 border-t border-warm-beige flex items-center justify-between">
           <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
-            Showing {filteredProducts.length} of {products.length} masterpieces
+            Showing {Math.min(filteredProducts.length, (currentPage - 1) * itemsPerPage + 1)}-{Math.min(filteredProducts.length, currentPage * itemsPerPage)} of {filteredProducts.length} masterpieces
           </p>
           <div className="flex gap-2">
-            <button className="p-2 bg-white border border-warm-beige text-gray-400 disabled:opacity-50">
+            <button 
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="p-2 bg-white border border-warm-beige text-gray-400 disabled:opacity-50 hover:bg-cream transition-colors"
+            >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <button className="p-2 bg-white border border-warm-beige text-near-black hover:bg-gold transition-colors">
+            <div className="flex items-center px-4 text-[10px] font-bold uppercase tracking-widest border border-warm-beige bg-white">
+              Page {currentPage} of {totalPages || 1}
+            </div>
+            <button 
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages || totalPages === 0}
+              className="p-2 bg-white border border-warm-beige text-near-black hover:bg-gold transition-colors disabled:opacity-50"
+            >
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>

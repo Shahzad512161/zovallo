@@ -41,5 +41,20 @@ export const orderService = {
     );
     const snapshot = await getDocs(q);
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Order));
+  },
+
+  async getAllOrders() {
+    const q = query(
+      collection(db, COLLECTION_NAME),
+      orderBy('createdAt', 'desc')
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Order));
+  },
+
+  async updateOrderStatus(id: string, status: Order['orderStatus']) {
+    const docRef = doc(db, COLLECTION_NAME, id);
+    const { updateDoc } = await import('firebase/firestore');
+    await updateDoc(docRef, { orderStatus: status });
   }
 };

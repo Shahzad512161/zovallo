@@ -12,7 +12,8 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { doc, getDoc, setDoc, addDoc, collection, serverTimestamp, getDocs, orderBy, query } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { db, storage } from '../lib/firebase';
 import { Product, Category } from '../types';
 
 export default function AdminProductForm() {
@@ -22,6 +23,7 @@ export default function AdminProductForm() {
 
   const [loading, setLoading] = useState(isEdit);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<{ [key: number]: number }>({});
   const [categories, setCategories] = useState<Category[]>([]);
 
   const [formData, setFormData] = useState<Partial<Product>>({
@@ -85,6 +87,34 @@ export default function AdminProductForm() {
     setFormData(prev => ({ ...prev, images: newImages }));
   };
 
+  const handleFileUpload = async (index: number, file: File) => {
+    if (!file) return;
+
+    const storageRef = ref(storage, `products/${Date.now()}-${file.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on('state_changed', 
+      (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setUploadProgress(prev => ({ ...prev, [index]: progress }));
+      }, 
+      (error) => {
+        console.error("Upload error:", error);
+        alert("Failed to upload image");
+      }, 
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          handleImageChange(index, downloadURL);
+          setUploadProgress(prev => {
+            const newState = { ...prev };
+            delete newState[index];
+            return newState;
+          });
+        });
+      }
+    );
+  };
+
   const addImageField = () => {
     setFormData(prev => ({ ...prev, images: [...(prev.images || []), ''] }));
   };
@@ -125,7 +155,7 @@ export default function AdminProductForm() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="text-sm font-bold uppercase tracking-widest animate-pulse">Syncing Specifications...</div>
+        <div className="text-sm font-bold uppercase tracking-widest text-gold">Syncing Specifications...</div>
       </div>
     );
   }
@@ -222,24 +252,66 @@ export default function AdminProductForm() {
             
             <div className="space-y-6">
               {formData.images?.map((img, idx) => (
-                <div key={idx} className="flex gap-4">
-                  <div className="flex-1 space-y-1">
-                    <label className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Perspective {idx + 1}</label>
-                    <input 
-                      value={img}
-                      onChange={(e) => handleImageChange(idx, e.target.value)}
-                      className="w-full bg-cream border border-warm-beige py-3 px-4 text-xs focus:border-gold outline-none"
-                      placeholder="https://images.unsplash.com/..."
-                    />
+                <div key={idx} className="p-6 bg-cream/50 border border-warm-beige space-y-4">
+                  <div className="flex justify-between items-center">
+                    <label className="text-[9px] font-bold uppercase tracking-widest text-walnut">Perspective {idx + 1}</label>
+                    {formData.images!.length > 1 && (
+                      <button 
+                        type="button" 
+                        onClick={() => removeImageField(idx)}
+                        className="text-gray-400 hover:text-red-500 transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
-                  {formData.images!.length > 1 && (
-                    <button 
-                      type="button" 
-                      onClick={() => removeImageField(idx)}
-                      className="self-end p-3 text-gray-300 hover:text-red-500 transition-colors"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <span className="text-[8px] font-bold uppercase text-gray-400">Direct URL</span>
+                      <input 
+                        value={img}
+                        onChange={(e) => handleImageChange(idx, e.target.value)}
+                        className="w-full bg-white border border-warm-beige py-2 px-4 text-xs focus:border-gold outline-none"
+                        placeholder="https://images.unsplash.com/..."
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <span className="text-[8px] font-bold uppercase text-gray-400">Upload Image</span>
+                      <div className="relative">
+                        <input 
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => e.target.files?.[0] && handleFileUpload(idx, e.target.files[0])}
+                          className="hidden"
+                          id={`file-upload-${idx}`}
+                        />
+                        <label 
+                          htmlFor={`file-upload-${idx}`}
+                          className="w-full bg-white border border-warm-beige py-2 px-4 text-[10px] font-bold uppercase tracking-widest text-near-black hover:bg-gold hover:text-white transition-all transition-colors cursor-pointer flex items-center justify-center gap-2"
+                        >
+                          <Plus className="w-3 h-3" /> Choose File
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  {uploadProgress[idx] !== undefined && (
+                    <div className="w-full h-1 bg-warm-beige rounded-full overflow-hidden mt-2">
+                      <div 
+                        className="h-full bg-gold transition-all duration-300"
+                        style={{ width: `${uploadProgress[idx]}%` }}
+                      />
+                    </div>
+                  )}
+
+                  {img && (
+                    <div className="w-24 h-24 border border-warm-beige relative group">
+                      <img src={img} alt={`Preview ${idx + 1}`} className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-near-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <ImageIcon className="w-6 h-6 text-white" />
+                      </div>
+                    </div>
                   )}
                 </div>
               ))}
@@ -260,17 +332,54 @@ export default function AdminProductForm() {
               <h2 className="text-lg font-display text-near-black uppercase">Precise Specifications</h2>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {Object.entries(formData.specifications || {}).map(([key, value]) => (
-                <div key={key} className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-walnut">{key}</label>
-                  <input 
-                    value={value as string}
-                    onChange={(e) => handleSpecChange(key, e.target.value)}
-                    className="w-full bg-cream border border-warm-beige py-3 px-4 text-sm focus:border-gold outline-none"
-                  />
-                </div>
-              ))}
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {Object.entries(formData.specifications || {}).map(([key, value]) => (
+                  <div key={key} className="space-y-1 relative group">
+                    <div className="flex justify-between items-center">
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-walnut">{key}</label>
+                      <button 
+                        type="button" 
+                        onClick={() => {
+                          const newSpecs = { ...formData.specifications };
+                          delete (newSpecs as any)[key];
+                          setFormData(prev => ({ ...prev, specifications: newSpecs }));
+                        }}
+                        className="text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                    <input 
+                      value={value as string}
+                      onChange={(e) => handleSpecChange(key, e.target.value)}
+                      className="w-full bg-cream border border-warm-beige py-3 px-4 text-sm focus:border-gold outline-none"
+                    />
+                  </div>
+                ))}
+              </div>
+              
+              <div className="flex gap-4 p-6 bg-cream/30 border border-warm-beige border-dashed">
+                <input 
+                  type="text" 
+                  id="new-spec-key"
+                  placeholder="Spec Name (e.g. Weight)"
+                  className="flex-1 bg-white border border-warm-beige py-2 px-4 text-xs outline-none focus:border-gold"
+                />
+                <button 
+                  type="button"
+                  onClick={() => {
+                    const input = document.getElementById('new-spec-key') as HTMLInputElement;
+                    if (input.value) {
+                      handleSpecChange(input.value, '');
+                      input.value = '';
+                    }
+                  }}
+                  className="bg-near-black text-white px-6 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-gold transition-colors"
+                >
+                  Add Spec
+                </button>
+              </div>
             </div>
           </section>
         </div>

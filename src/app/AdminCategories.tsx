@@ -122,7 +122,7 @@ export default function AdminCategories() {
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[1,2,3,4].map(i => (
-            <div key={i} className="bg-white border border-warm-beige h-64 animate-pulse" />
+            <div key={i} className="bg-white border border-warm-beige h-64" />
           ))}
         </div>
       ) : (
