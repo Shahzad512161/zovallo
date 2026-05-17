@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   Search, 
   Filter, 
@@ -23,6 +24,7 @@ export default function AdminOrders() {
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [statusFilter, setStatusFilter] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchOrders();
@@ -44,8 +46,11 @@ export default function AdminOrders() {
   const updateStatus = async (id: string, newStatus: Order['orderStatus']) => {
     try {
       const docRef = doc(db, 'orders', id);
+      const { updateDoc } = await import('firebase/firestore');
       await updateDoc(docRef, { orderStatus: newStatus });
-      fetchOrders();
+      
+      setOrders(prev => prev.map(o => o.id === id ? { ...o, orderStatus: newStatus } : o));
+      
       if (selectedOrder?.id === id) {
         setSelectedOrder(prev => prev ? { ...prev, orderStatus: newStatus } : null);
       }
@@ -55,13 +60,21 @@ export default function AdminOrders() {
     }
   };
 
-  const filteredOrders = orders.filter(o => 
-    statusFilter === 'All' || o.orderStatus === statusFilter.toLowerCase()
-  );
+  const filteredOrders = orders.filter(o => {
+    const matchesStatus = statusFilter === 'All' || o.orderStatus === statusFilter.toLowerCase();
+    const query = searchQuery.toLowerCase();
+    const matchesSearch = 
+      o.id.toLowerCase().includes(query) || 
+      o.customerInfo.fullName.toLowerCase().includes(query) || 
+      o.customerInfo.email.toLowerCase().includes(query);
+    
+    return matchesStatus && matchesSearch;
+  });
 
   const stats = [
     { label: 'Pending', count: orders.filter(o => o.orderStatus === 'pending').length, color: 'text-gold' },
     { label: 'Processing', count: orders.filter(o => o.orderStatus === 'processing').length, color: 'text-near-black' },
+    { label: 'Shipped', count: orders.filter(o => o.orderStatus === 'shipped').length, color: 'text-blue-500' },
     { label: 'Delivered', count: orders.filter(o => o.orderStatus === 'delivered').length, color: 'text-mint-700' },
   ];
 
@@ -91,6 +104,8 @@ export default function AdminOrders() {
               <input 
                 type="text" 
                 placeholder="Search orders (ID, Customer, Email)..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-cream border-none py-2 pl-10 pr-4 text-xs focus:ring-1 focus:ring-gold"
               />
             </div>
@@ -169,9 +184,18 @@ export default function AdminOrders() {
                   <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Order Details</p>
                   <h3 className="text-xl font-display font-bold text-near-black">#{selectedOrder.id.slice(-8).toUpperCase()}</h3>
                 </div>
-                <button className="p-2 hover:bg-cream transition-colors text-gray-400" onClick={() => setSelectedOrder(null)}>
-                  <XCircle className="w-5 h-5" />
-                </button>
+                <div className="flex gap-2">
+                  <Link 
+                    to={`/admin/orders/${selectedOrder.id}`}
+                    className="p-2 hover:bg-cream transition-colors text-gray-400"
+                    title="View Full Intel"
+                  >
+                    <ExternalLink className="w-5 h-5" />
+                  </Link>
+                  <button className="p-2 hover:bg-cream transition-colors text-gray-400" onClick={() => setSelectedOrder(null)}>
+                    <XCircle className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
 
               <div className="space-y-6">
