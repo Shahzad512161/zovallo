@@ -5,6 +5,7 @@ import { ShoppingCart } from 'lucide-react';
 
 interface ProductCardProps {
   product: Product;
+  key?: string | number;
 }
 
 export function ProductCard({ product }: ProductCardProps) {
@@ -41,9 +42,17 @@ export function ProductCard({ product }: ProductCardProps) {
         {product.description}
       </p>
       
-      <button className="mt-auto w-full border border-warm-beige py-2 text-[11px] font-bold uppercase tracking-widest hover:bg-near-black hover:text-white transition-all duration-300">
-        Add to Bag
-      </button>
+      <div className="mt-auto space-y-2">
+        <button className="w-full bg-near-black text-white py-2.5 text-[10px] font-bold uppercase tracking-widest hover:bg-gold transition-all duration-300">
+          Add to Cart
+        </button>
+        <Link 
+          to={`/product/${product.id}`}
+          className="block w-full border border-warm-beige py-2.5 text-[10px] font-bold uppercase tracking-widest text-center hover:bg-cream transition-all duration-300"
+        >
+          View Details
+        </Link>
+      </div>
     </div>
   );
 }
