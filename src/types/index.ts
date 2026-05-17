@@ -8,6 +8,14 @@ export type Category =
   | 'Office Chairs'
   | 'Wardrobes';
 
+export interface Review {
+  id: string;
+  userName: string;
+  rating: number;
+  comment: string;
+  date: string;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -15,8 +23,12 @@ export interface Product {
   price: number;
   category: Category;
   image: string;
+  images?: string[];
+  features?: string[];
+  specs?: Record<string, string>;
   stock: number;
   featured?: boolean;
+  reviews?: Review[];
 }
 
 export interface User {

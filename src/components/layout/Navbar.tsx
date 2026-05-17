@@ -1,10 +1,24 @@
-import { ShoppingBag, User, Menu, X, Search } from 'lucide-react';
+import { ShoppingBag, User, Menu, X, Search, LogOut } from 'lucide-react';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { CATEGORIES } from '../../data/dummyData';
+import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const { totalItems, subtotal } = useCart();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/');
+    } catch (err) {
+      console.error('Logout failed', err);
+    }
+  };
 
   return (
     <nav className="fixed top-0 w-full z-50 shadow-sm">
@@ -38,19 +52,40 @@ export function Navbar() {
 
         {/* Right: Icons */}
         <div className="flex items-center space-x-3 sm:space-x-6">
-          <Link to="/auth" className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-near-black hover:text-gold transition-colors group">
-            <User className="w-5 h-5" />
-            <span className="hidden lg:inline">Account</span>
-          </Link>
+          {user ? (
+            <div className="flex items-center gap-3">
+              <div className="hidden lg:flex flex-col items-end">
+                <span className="text-[10px] font-bold text-near-black uppercase tracking-widest leading-none truncate max-w-[100px]">{user.displayName || 'Me'}</span>
+                <button 
+                  onClick={handleLogout}
+                  className="text-[9px] text-walnut font-bold uppercase tracking-widest hover:text-gold transition-colors"
+                >
+                  Logout
+                </button>
+              </div>
+              <div className="w-8 h-8 bg-cream border border-warm-beige rounded-full flex items-center justify-center">
+                <User className="w-4 h-4 text-near-black" />
+              </div>
+            </div>
+          ) : (
+            <Link to="/auth" className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-near-black hover:text-gold transition-colors group">
+              <User className="w-5 h-5" />
+              <span className="hidden lg:inline">Account</span>
+            </Link>
+          )}
           
           <div className="w-px h-6 bg-warm-beige hidden sm:block"></div>
 
           <Link to="/cart" className="relative flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-near-black hover:text-gold transition-colors group">
             <div className="relative">
               <ShoppingBag className="w-5 h-5" />
-              <span className="absolute -top-2 -right-2 bg-gold text-white text-[9px] font-bold px-1 rounded-full min-w-[15px] h-[15px] flex items-center justify-center">0</span>
+              {totalItems > 0 && (
+                <span className="absolute -top-2 -right-2 bg-gold text-white text-[9px] font-bold px-1 rounded-full min-w-[15px] h-[15px] flex items-center justify-center">
+                  {totalItems}
+                </span>
+              )}
             </div>
-            <span className="hidden lg:inline">Cart (£0.00)</span>
+            <span className="hidden lg:inline">Cart (£{subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })})</span>
           </Link>
 
           <button className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
@@ -109,8 +144,15 @@ export function Navbar() {
             </div>
 
             <div className="grid grid-cols-2 gap-4 pt-4 border-t border-warm-beige">
-              <Link to="/auth" onClick={() => setIsOpen(false)} className="bg-near-black text-white py-3 text-[11px] font-bold uppercase tracking-widest text-center">Account</Link>
-              <Link to="/cart" onClick={() => setIsOpen(false)} className="bg-warm-beige text-near-black py-3 text-[11px] font-bold uppercase tracking-widest text-center">Cart (0)</Link>
+              {user ? (
+                <div className="col-span-1 bg-near-black text-white py-3 text-[11px] font-bold uppercase tracking-widest text-center flex items-center justify-center gap-2 cursor-pointer" onClick={handleLogout}>
+                  <LogOut className="w-3.5 h-3.5" />
+                  Logout
+                </div>
+              ) : (
+                <Link to="/auth" onClick={() => setIsOpen(false)} className="bg-near-black text-white py-3 text-[11px] font-bold uppercase tracking-widest text-center">Account</Link>
+              )}
+              <Link to="/cart" onClick={() => setIsOpen(false)} className="bg-warm-beige text-near-black py-3 text-[11px] font-bold uppercase tracking-widest text-center">Cart ({totalItems})</Link>
             </div>
           </div>
         </div>

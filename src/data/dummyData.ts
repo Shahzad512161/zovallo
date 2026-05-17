@@ -16,12 +16,35 @@ export const PRODUCTS: Product[] = [
   {
     id: '1',
     name: 'Royal Velvet Sofa Set',
-    description: 'Luxurious velvet sofa set with walnut wood legs. Perfect for modern living rooms.',
+    description: 'Luxurious velvet sofa set with walnut wood legs. Perfect for modern living rooms. This premium set includes a 3-seater sofa and two matching armchairs, all upholstered in ultra-soft, stain-resistant velvet.',
     price: 1299.99,
     category: 'Sofa Sets',
     image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800',
+    images: [
+      'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800',
+      'https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&q=80&w=800',
+      'https://images.unsplash.com/photo-1550226844-27ce051475b4?auto=format&fit=crop&q=80&w=800'
+    ],
+    features: [
+      'Premium velvet upholstery',
+      'Solid walnut wood legs',
+      'High-density foam filling',
+      'Stain-resistant fabric',
+      'Hand-tufted details'
+    ],
+    specs: {
+      'Sofa Dimensions': '220cm x 95cm x 85cm',
+      'Armchair Dimensions': '90cm x 85cm x 85cm',
+      'Material': 'Velvet, Walnut Wood',
+      'Color': 'Royal Blue',
+      'Assembly': 'Minimal assembly required'
+    },
     stock: 5,
-    featured: true
+    featured: true,
+    reviews: [
+      { id: 'r1', userName: 'James W.', rating: 5, comment: 'Absolutely stunning sofa set. The blue is even more vibrant in person!', date: '2024-03-10' },
+      { id: 'r2', userName: 'Sarah L.', rating: 4, comment: 'Very comfortable and looks very high-end. Assembly was a bit tricky but worth it.', date: '2024-02-15' }
+    ]
   },
   {
     id: 's2',

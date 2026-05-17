@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Product } from '../../types';
 import { formatCurrency } from '../../lib/utils';
-import { ShoppingCart } from 'lucide-react';
+import { useCart } from '../../context/CartContext';
 
 interface ProductCardProps {
   product: Product;
@@ -9,6 +9,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const { addToCart } = useCart();
   return (
     <div className="group bg-white border border-warm-beige p-4 flex flex-col h-full hover:shadow-lg transition-all duration-300">
       <div className="bg-cream aspect-square w-full mb-4 flex items-center justify-center relative overflow-hidden">
@@ -43,7 +44,10 @@ export function ProductCard({ product }: ProductCardProps) {
       </p>
       
       <div className="mt-auto space-y-2">
-        <button className="w-full bg-near-black text-white py-2.5 text-[10px] font-bold uppercase tracking-widest hover:bg-gold transition-all duration-300">
+        <button 
+          onClick={() => addToCart(product, 1)}
+          className="w-full bg-near-black text-white py-2.5 text-[10px] font-bold uppercase tracking-widest hover:bg-gold transition-all duration-300"
+        >
           Add to Cart
         </button>
         <Link 
