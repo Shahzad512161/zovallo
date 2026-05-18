@@ -1,14 +1,14 @@
-import { 
-  doc, 
-  getDoc, 
-  setDoc, 
-  updateDoc, 
-  serverTimestamp 
-} from 'firebase/firestore';
-import { db } from '../lib/firebase';
-import { User } from '../types';
+import {
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  serverTimestamp,
+} from "firebase/firestore";
+import { db } from "../lib/firebase";
+import { User } from "../types";
 
-const COLLECTION_NAME = 'users';
+const COLLECTION_NAME = "users";
 
 export const userService = {
   async getUserProfile(uid: string) {
@@ -20,16 +20,16 @@ export const userService = {
     return null;
   },
 
-  async createUserProfile(user: Omit<User, 'createdAt'>) {
+  async createUserProfile(user: Omit<User, "createdAt">) {
     const docRef = doc(db, COLLECTION_NAME, user.uid);
     await setDoc(docRef, {
       ...user,
-      createdAt: serverTimestamp()
+      createdAt: serverTimestamp(),
     });
   },
 
   async updateUserProfile(uid: string, data: Partial<User>) {
     const docRef = doc(db, COLLECTION_NAME, uid);
     await updateDoc(docRef, data);
-  }
+  },
 };

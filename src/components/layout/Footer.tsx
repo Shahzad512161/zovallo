@@ -1,7 +1,7 @@
-import { Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import { categoryApi } from '../../services/categoryApi';
-import { Category } from '../../types';
+import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { categoryApi } from "../../services/categoryApi";
+import { Category } from "../../types";
 
 export function Footer() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -33,13 +33,16 @@ export function Footer() {
               </h2>
             </Link>
             <p className="text-[13px] text-gray-666 leading-relaxed max-w-xs font-light">
-              Crafting premium furniture for the modern home. Our pieces blend traditional joinery with timeless silhouettes.
+              Crafting premium furniture for the modern home. Our pieces blend
+              traditional joinery with timeless silhouettes.
             </p>
           </div>
 
           {/* Shop Collections - Dynamic Categories */}
           <div className="space-y-6">
-            <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-walnut">Shop Collections</h4>
+            <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-walnut">
+              Shop Collections
+            </h4>
             {loading ? (
               <div className="space-y-2">
                 <div className="h-3 bg-cream animate-pulse rounded w-24"></div>
@@ -48,9 +51,12 @@ export function Footer() {
               </div>
             ) : (
               <ul className="space-y-3 text-[13px] text-gray-666 font-light">
-                {categories.slice(0, 5).map(cat => (
+                {categories.slice(0, 5).map((cat) => (
                   <li key={cat.id}>
-                    <Link to={`/category/${cat.slug}`} className="hover:text-gold transition-colors">
+                    <Link
+                      to={`/category/${cat.slug}`}
+                      className="hover:text-gold transition-colors"
+                    >
                       {cat.name}
                     </Link>
                   </li>
@@ -61,26 +67,60 @@ export function Footer() {
 
           {/* Company */}
           <div className="space-y-6">
-            <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-walnut">Client Services</h4>
+            <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-walnut">
+              Client Services
+            </h4>
             <ul className="space-y-3 text-[13px] text-gray-666 font-light">
-              <li><Link to="/shipping" className="hover:text-gold transition-colors">Shipping Policy</Link></li>
-              <li><Link to="/returns" className="hover:text-gold transition-colors">Returns & Exchanges</Link></li>
-              <li><Link to="/contact" className="hover:text-gold transition-colors">Contact Us</Link></li>
-              <li><Link to="/admin" className="hover:text-gold transition-colors">Admin Portal</Link></li>
+              <li>
+                <Link
+                  to="/shipping"
+                  className="hover:text-gold transition-colors"
+                >
+                  Shipping Policy
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/returns"
+                  className="hover:text-gold transition-colors"
+                >
+                  Returns & Exchanges
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/contact"
+                  className="hover:text-gold transition-colors"
+                >
+                  Contact Us
+                </Link>
+              </li>
+              <li>
+                <Link to="/admin" className="hover:text-gold transition-colors">
+                  Admin Portal
+                </Link>
+              </li>
             </ul>
           </div>
 
           {/* Newsletter */}
           <div className="space-y-6">
-            <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-walnut">Journal</h4>
-            <p className="text-[13px] text-gray-666 font-light">Subscribe for design inspiration and early access to our seasonal edits.</p>
+            <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-walnut">
+              Journal
+            </h4>
+            <p className="text-[13px] text-gray-666 font-light">
+              Subscribe for design inspiration and early access to our seasonal
+              edits.
+            </p>
             <div className="flex border-b border-warm-beige pb-1 focus-within:border-gold transition-colors">
-              <input 
-                type="email" 
-                placeholder="Email address" 
+              <input
+                type="email"
+                placeholder="Email address"
                 className="bg-transparent px-0 py-2 text-[13px] text-near-black outline-none w-full placeholder:text-gray-a0 font-light"
               />
-              <button className="text-[11px] font-bold uppercase tracking-widest text-walnut hover:text-gold ml-2">JOIN</button>
+              <button className="text-[11px] font-bold uppercase tracking-widest text-walnut hover:text-gold ml-2">
+                JOIN
+              </button>
             </div>
           </div>
         </div>
@@ -101,7 +141,7 @@ export function Footer() {
               <span>UK Wide Logistics</span>
             </div>
           </div>
-          
+
           <p className="text-[10px] text-gray-a0 font-bold uppercase tracking-[0.15em]">
             © {new Date().getFullYear()} LUXWOOD FURNITURE LTD
           </p>

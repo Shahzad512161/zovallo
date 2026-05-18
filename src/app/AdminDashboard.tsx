@@ -1,27 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import { 
-  ShoppingBag, 
-  Package, 
-  Users, 
+import React, { useEffect, useState } from "react";
+import {
+  ShoppingBag,
+  Package,
+  Users,
   TrendingUp,
   ArrowUpRight,
   ArrowDownRight,
   Calendar,
   Filter,
-  RefreshCw
-} from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { formatCurrency } from '../lib/utils';
-import { Order } from '../types';
-import { dashboardApi } from '../services/dashboardApi';
-import { orderApi } from '../services/orderApi';
+  RefreshCw,
+} from "lucide-react";
+import { Link } from "react-router-dom";
+import { formatCurrency } from "../lib/utils";
+import { Order } from "../types";
+import { dashboardApi } from "../services/dashboardApi";
+import { orderApi } from "../services/orderApi";
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
     totalOrders: 0,
     totalProducts: 0,
     totalRevenue: 0,
-    totalCustomers: 0
+    totalCustomers: 0,
   });
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,7 +35,7 @@ export default function AdminDashboard() {
     try {
       const [statsData, recentOrdersData] = await Promise.all([
         dashboardApi.getStats(),
-        orderApi.getRecentOrders(5)
+        orderApi.getRecentOrders(5),
       ]);
 
       setStats(statsData);
@@ -54,10 +54,38 @@ export default function AdminDashboard() {
   };
 
   const cards = [
-    { label: 'Total Revenue', value: formatCurrency(stats.totalRevenue), icon: TrendingUp, color: 'bg-mint-50 text-mint-700', growth: '+12.5%', isUp: true },
-    { label: 'Total Orders', value: stats.totalOrders.toString(), icon: ShoppingBag, color: 'bg-gold/10 text-near-black', growth: '+8.2%', isUp: true },
-    { label: 'Total Products', value: stats.totalProducts.toString(), icon: Package, color: 'bg-near-black text-white', growth: '3 New', isUp: true },
-    { label: 'Total Customers', value: stats.totalCustomers.toString(), icon: Users, color: 'bg-warm-beige text-walnut', growth: '-2.4%', isUp: false },
+    {
+      label: "Total Revenue",
+      value: formatCurrency(stats.totalRevenue),
+      icon: TrendingUp,
+      color: "bg-mint-50 text-mint-700",
+      growth: "+12.5%",
+      isUp: true,
+    },
+    {
+      label: "Total Orders",
+      value: stats.totalOrders.toString(),
+      icon: ShoppingBag,
+      color: "bg-gold/10 text-near-black",
+      growth: "+8.2%",
+      isUp: true,
+    },
+    {
+      label: "Total Products",
+      value: stats.totalProducts.toString(),
+      icon: Package,
+      color: "bg-near-black text-white",
+      growth: "3 New",
+      isUp: true,
+    },
+    {
+      label: "Total Customers",
+      value: stats.totalCustomers.toString(),
+      icon: Users,
+      color: "bg-warm-beige text-walnut",
+      growth: "-2.4%",
+      isUp: false,
+    },
   ];
 
   if (loading) {
@@ -86,20 +114,22 @@ export default function AdminDashboard() {
           </p>
         </div>
         <div className="flex gap-2 sm:gap-3">
-          <button 
+          <button
             onClick={handleRefresh}
             disabled={refreshing}
             className="bg-white border border-warm-beige px-3 sm:px-4 py-2 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 hover:bg-cream transition-colors disabled:opacity-50"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw
+              className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`}
+            />
             <span className="hidden xs:inline">Refresh</span>
           </button>
           <button className="bg-white border border-warm-beige px-3 sm:px-4 py-2 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 hover:bg-cream transition-colors">
-            <Filter className="w-3.5 h-3.5" /> 
+            <Filter className="w-3.5 h-3.5" />
             <span className="hidden xs:inline">Filter</span>
           </button>
           <button className="bg-near-black text-white px-3 sm:px-4 py-2 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 hover:bg-gold transition-colors">
-            <Calendar className="w-3.5 h-3.5" /> 
+            <Calendar className="w-3.5 h-3.5" />
             <span className="hidden xs:inline">This Month</span>
           </button>
         </div>
@@ -108,14 +138,23 @@ export default function AdminDashboard() {
       {/* Stat Cards - Fully Responsive Grid */}
       <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {cards.map((card, idx) => (
-          <div key={idx} className="bg-white border border-warm-beige p-4 sm:p-6 relative overflow-hidden group hover:shadow-lg transition-shadow duration-300">
+          <div
+            key={idx}
+            className="bg-white border border-warm-beige p-4 sm:p-6 relative overflow-hidden group hover:shadow-lg transition-shadow duration-300"
+          >
             <div className="flex justify-between items-start relative z-10">
               <div className={`p-2 sm:p-3 rounded-lg ${card.color}`}>
                 <card.icon className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
-              <div className={`flex items-center gap-0.5 sm:gap-1 text-[9px] sm:text-[10px] font-bold ${card.isUp ? 'text-mint-700' : 'text-red-500'}`}>
-                {card.growth} 
-                {card.isUp ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+              <div
+                className={`flex items-center gap-0.5 sm:gap-1 text-[9px] sm:text-[10px] font-bold ${card.isUp ? "text-mint-700" : "text-red-500"}`}
+              >
+                {card.growth}
+                {card.isUp ? (
+                  <ArrowUpRight className="w-3 h-3" />
+                ) : (
+                  <ArrowDownRight className="w-3 h-3" />
+                )}
               </div>
             </div>
             <div className="mt-4 sm:mt-6 relative z-10">
@@ -139,14 +178,14 @@ export default function AdminDashboard() {
             <h3 className="text-sm sm:text-base font-bold uppercase tracking-widest text-near-black">
               Recent Orders
             </h3>
-            <Link 
-              to="/admin/orders" 
+            <Link
+              to="/admin/orders"
               className="text-[10px] font-bold uppercase tracking-widest text-gold hover:underline"
             >
               View All →
             </Link>
           </div>
-          
+
           {/* Responsive Table - Horizontal Scroll on Mobile */}
           <div className="overflow-x-auto">
             <table className="w-full min-w-[640px]">
@@ -172,25 +211,31 @@ export default function AdminDashboard() {
               <tbody className="divide-y divide-warm-beige">
                 {recentOrders.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-4 sm:px-6 py-12 text-center text-gray-400 text-sm">
+                    <td
+                      colSpan={5}
+                      className="px-4 sm:px-6 py-12 text-center text-gray-400 text-sm"
+                    >
                       No orders found
                     </td>
                   </tr>
                 ) : (
                   recentOrders.map((order) => (
-                    <tr key={order.id} className="hover:bg-cream/20 transition-colors">
+                    <tr
+                      key={order.id}
+                      className="hover:bg-cream/20 transition-colors"
+                    >
                       <td className="px-4 sm:px-6 py-4">
                         <span className="font-mono text-xs font-bold">
-                          #{order.id?.slice(-6).toUpperCase() || 'N/A'}
+                          #{order.id?.slice(-6).toUpperCase() || "N/A"}
                         </span>
                       </td>
                       <td className="px-4 sm:px-6 py-4">
                         <div className="flex flex-col">
                           <span className="text-sm font-bold text-near-black">
-                            {order.customerInfo?.fullName || 'Unknown'}
+                            {order.customerInfo?.fullName || "Unknown"}
                           </span>
                           <span className="text-[9px] sm:text-[10px] text-gray-400 uppercase tracking-tighter">
-                            {order.customerInfo?.city || 'N/A'}
+                            {order.customerInfo?.city || "N/A"}
                           </span>
                         </div>
                       </td>
@@ -200,18 +245,23 @@ export default function AdminDashboard() {
                         </span>
                       </td>
                       <td className="px-4 sm:px-6 py-4">
-                        <span className={`inline-block px-2 sm:px-3 py-1 text-[8px] sm:text-[9px] font-bold uppercase tracking-widest rounded-full whitespace-nowrap ${
-                          order.orderStatus === 'delivered' ? 'bg-mint-50 text-mint-700' :
-                          order.orderStatus === 'pending' ? 'bg-gold/10 text-walnut' :
-                          order.orderStatus === 'processing' ? 'bg-blue-50 text-blue-600' :
-                          'bg-gray-100 text-gray-400'
-                        }`}>
-                          {order.orderStatus || 'pending'}
+                        <span
+                          className={`inline-block px-2 sm:px-3 py-1 text-[8px] sm:text-[9px] font-bold uppercase tracking-widest rounded-full whitespace-nowrap ${
+                            order.orderStatus === "delivered"
+                              ? "bg-mint-50 text-mint-700"
+                              : order.orderStatus === "pending"
+                                ? "bg-gold/10 text-walnut"
+                                : order.orderStatus === "processing"
+                                  ? "bg-blue-50 text-blue-600"
+                                  : "bg-gray-100 text-gray-400"
+                          }`}
+                        >
+                          {order.orderStatus || "pending"}
                         </span>
                       </td>
                       <td className="px-4 sm:px-6 py-4 text-right">
-                        <Link 
-                          to={`/admin/orders/${order.id}`} 
+                        <Link
+                          to={`/admin/orders/${order.id}`}
                           className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-near-black hover:text-gold transition-colors"
                         >
                           Details
@@ -224,8 +274,6 @@ export default function AdminDashboard() {
             </table>
           </div>
         </div>
-
-         
       </div>
     </div>
   );

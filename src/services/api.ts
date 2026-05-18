@@ -1,26 +1,28 @@
 // services/api.ts
-import { 
-  collection, 
-  doc, 
-  getDocs, 
-  getDoc, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  query, 
-  where, 
+import {
+  collection,
+  doc,
+  getDocs,
+  getDoc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
   orderBy,
   serverTimestamp,
   QueryConstraint,
   DocumentData,
   FirestoreDataConverter,
   WithFieldValue,
-  DocumentReference
-} from 'firebase/firestore';
-import { db } from '../lib/firebase';
+  DocumentReference,
+} from "firebase/firestore";
+import { db } from "../lib/firebase";
 
 // Create a converter to handle type safety
-function createConverter<T extends { id?: string }>(): FirestoreDataConverter<T> {
+function createConverter<
+  T extends { id?: string },
+>(): FirestoreDataConverter<T> {
   return {
     toFirestore: (data: WithFieldValue<T>): DocumentData => {
       const { id, ...rest } = data as any;
@@ -29,7 +31,7 @@ function createConverter<T extends { id?: string }>(): FirestoreDataConverter<T>
     fromFirestore: (snapshot: any, options: any): T => {
       const data = snapshot.data(options);
       return { id: snapshot.id, ...data } as T;
-    }
+    },
   };
 }
 
@@ -52,13 +54,13 @@ export class BaseApiService<T extends { id?: string }> {
 
   async getAll(): Promise<T[]> {
     const snapshot = await getDocs(this.getCollection());
-    return snapshot.docs.map(doc => doc.data());
+    return snapshot.docs.map((doc) => doc.data());
   }
 
   async getWithConstraints(constraints: QueryConstraint[]): Promise<T[]> {
     const q = query(this.getCollection(), ...constraints);
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => doc.data());
+    return snapshot.docs.map((doc) => doc.data());
   }
 
   async getById(id: string): Promise<T | null> {
@@ -69,10 +71,10 @@ export class BaseApiService<T extends { id?: string }> {
     return null;
   }
 
-  async create(data: Omit<T, 'id'>): Promise<string> {
+  async create(data: Omit<T, "id">): Promise<string> {
     const docRef = await addDoc(this.getCollection(), {
       ...data,
-      createdAt: serverTimestamp()
+      createdAt: serverTimestamp(),
     } as any);
     return docRef.id;
   }

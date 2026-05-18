@@ -1,19 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap");
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Playfair Display", serif;
-  
-  --color-cream: #FDFBF7;
-  --color-warm-beige: #E8E4DB;
-  --color-walnut: #5C4033;
-  --color-gold: #D4AF37;
-  --color-olive: #8A9A5B;
-  --color-charcoal: #2C2C2C;
-  --color-near-black: #1A1A1A;
+
+  --color-cream: #fdfbf7;
+  --color-warm-beige: #e8e4db;
+  --color-walnut: #5c4033;
+  --color-gold: #d4af37;
+  --color-olive: #8a9a5b;
+  --color-charcoal: #2c2c2c;
+  --color-near-black: #1a1a1a;
   --color-gray-666: #666666;
-  --color-gray-a0: #A0A0A0;
+  --color-gray-a0: #a0a0a0;
 }
 
 @layer base {
@@ -24,13 +24,16 @@
   body {
     @apply bg-cream text-charcoal font-sans antialiased text-base leading-relaxed;
   }
-  
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-display font-medium text-near-black tracking-tight leading-tight;
   }
 }
-
-
 
 /* Extra small screens (below 480px) */
 @media (min-width: 480px) {

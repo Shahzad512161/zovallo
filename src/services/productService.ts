@@ -1,37 +1,44 @@
-import { 
-  collection, 
-  doc, 
-  getDoc, 
-  getDocs, 
-  setDoc, 
-  updateDoc, 
-  deleteDoc, 
-  query, 
-  where, 
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
   orderBy,
   serverTimestamp,
-  addDoc
-} from 'firebase/firestore';
-import { db } from '../lib/firebase';
-import { Product } from '../types';
+  addDoc,
+} from "firebase/firestore";
+import { db } from "../lib/firebase";
+import { Product } from "../types";
 
-const COLLECTION_NAME = 'products';
+const COLLECTION_NAME = "products";
 
 export const productService = {
   async getProducts() {
-    const q = query(collection(db, COLLECTION_NAME), orderBy('createdAt', 'desc'));
+    const q = query(
+      collection(db, COLLECTION_NAME),
+      orderBy("createdAt", "desc"),
+    );
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Product));
+    return snapshot.docs.map(
+      (doc) => ({ id: doc.id, ...doc.data() }) as Product,
+    );
   },
 
   async getFeaturedProducts() {
     const q = query(
-      collection(db, COLLECTION_NAME), 
-      where('featured', '==', true),
-      orderBy('createdAt', 'desc')
+      collection(db, COLLECTION_NAME),
+      where("featured", "==", true),
+      orderBy("createdAt", "desc"),
     );
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Product));
+    return snapshot.docs.map(
+      (doc) => ({ id: doc.id, ...doc.data() }) as Product,
+    );
   },
 
   async getProduct(id: string) {
@@ -44,7 +51,7 @@ export const productService = {
   },
 
   async getProductBySlug(slug: string) {
-    const q = query(collection(db, COLLECTION_NAME), where('slug', '==', slug));
+    const q = query(collection(db, COLLECTION_NAME), where("slug", "==", slug));
     const snapshot = await getDocs(q);
     if (!snapshot.empty) {
       const doc = snapshot.docs[0];
@@ -53,10 +60,10 @@ export const productService = {
     return null;
   },
 
-  async createProduct(product: Omit<Product, 'id' | 'createdAt'>) {
+  async createProduct(product: Omit<Product, "id" | "createdAt">) {
     const docRef = await addDoc(collection(db, COLLECTION_NAME), {
       ...product,
-      createdAt: serverTimestamp()
+      createdAt: serverTimestamp(),
     });
     return docRef.id;
   },
@@ -69,5 +76,5 @@ export const productService = {
   async deleteProduct(id: string) {
     const docRef = doc(db, COLLECTION_NAME, id);
     await deleteDoc(docRef);
-  }
+  },
 };

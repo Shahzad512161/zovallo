@@ -1,13 +1,20 @@
-import { useEffect, useState } from 'react';
-import { ProductCard } from '../components/ui/ProductCard';
-import { Button } from '../components/ui/Button';
-import { Link } from 'react-router-dom';
-import { Truck, ShieldCheck, CreditCard, Award, Star, Quote } from 'lucide-react';
-import { SEO } from '../components/SEO';
-import { productApi } from '../services/productApi';
-import { categoryApi } from '../services/categoryApi';
-import { Product, Category } from '../types';
-import { LoadingSpinner } from '../components/ui/Loading';
+import { useEffect, useState } from "react";
+import { ProductCard } from "../components/ui/ProductCard";
+import { Button } from "../components/ui/Button";
+import { Link } from "react-router-dom";
+import {
+  Truck,
+  ShieldCheck,
+  CreditCard,
+  Award,
+  Star,
+  Quote,
+} from "lucide-react";
+import { SEO } from "../components/SEO";
+import { productApi } from "../services/productApi";
+import { categoryApi } from "../services/categoryApi";
+import { Product, Category } from "../types";
+import { LoadingSpinner } from "../components/ui/Loading";
 
 export default function HomePage() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
@@ -25,13 +32,15 @@ export default function HomePage() {
       // Fetch all products for best sellers (not just featured)
       const [productsData, categoriesData] = await Promise.all([
         productApi.getAll(),
-        categoryApi.getAllCategories()
+        categoryApi.getAllCategories(),
       ]);
-      
+
       setAllProducts(productsData);
       // Get featured products (if any, otherwise show first 4 products)
-      const featured = productsData.filter(p => p.featured === true);
-      setFeaturedProducts(featured.length > 0 ? featured : productsData.slice(0, 4));
+      const featured = productsData.filter((p) => p.featured === true);
+      setFeaturedProducts(
+        featured.length > 0 ? featured : productsData.slice(0, 4),
+      );
       setCategories(categoriesData);
     } catch (error) {
       console.error("Error fetching home data:", error);
@@ -42,59 +51,71 @@ export default function HomePage() {
 
   // Get the actual category image from Firestore, or use a fallback
   const getCategoryImage = (category: Category): string => {
-    if (category.image && category.image.startsWith('data:image')) {
+    if (category.image && category.image.startsWith("data:image")) {
       return category.image; // Base64 image from Firestore
     }
-    if (category.image && category.image.startsWith('http')) {
+    if (category.image && category.image.startsWith("http")) {
       return category.image; // URL image
     }
     // Fallback images based on category name
     const fallbackImages: Record<string, string> = {
-      'Sofa Sets': 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800',
-      'Dining Tables': 'https://images.unsplash.com/photo-1577146333359-39f99d73010b?auto=format&fit=crop&q=80&w=800',
-      'Beds': 'https://images.unsplash.com/photo-1505691938895-1758d7eaa511?auto=format&fit=crop&q=80&w=800',
-      'Mattresses': 'https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&q=80&w=800',
-      'Acoustic Wall Panels': 'https://images.unsplash.com/photo-1615876234586-44c13824bba3?auto=format&fit=crop&q=80&w=800',
-      'Coffee Tables': 'https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&q=80&w=800',
-      'Office Chairs': 'https://images.unsplash.com/photo-1505797149-43b00fe1eeac?auto=format&fit=crop&q=80&w=800',
-      'Wardrobes': 'https://images.unsplash.com/photo-1595428774223-ef52624120ec?auto=format&fit=crop&q=80&w=800'
+      "Sofa Sets":
+        "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800",
+      "Dining Tables":
+        "https://images.unsplash.com/photo-1577146333359-39f99d73010b?auto=format&fit=crop&q=80&w=800",
+      Beds: "https://images.unsplash.com/photo-1505691938895-1758d7eaa511?auto=format&fit=crop&q=80&w=800",
+      Mattresses:
+        "https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&q=80&w=800",
+      "Acoustic Wall Panels":
+        "https://images.unsplash.com/photo-1615876234586-44c13824bba3?auto=format&fit=crop&q=80&w=800",
+      "Coffee Tables":
+        "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&q=80&w=800",
+      "Office Chairs":
+        "https://images.unsplash.com/photo-1505797149-43b00fe1eeac?auto=format&fit=crop&q=80&w=800",
+      Wardrobes:
+        "https://images.unsplash.com/photo-1595428774223-ef52624120ec?auto=format&fit=crop&q=80&w=800",
     };
-    return fallbackImages[category.name] || 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&q=80&w=800';
+    return (
+      fallbackImages[category.name] ||
+      "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&q=80&w=800"
+    );
   };
 
   const getCategorySubtitle = (categoryName: string): string => {
     const subtitles: Record<string, string> = {
-      'Sofa Sets': 'Living Area',
-      'Dining Tables': 'The Feast',
-      'Beds': 'Nightly Rest',
-      'Mattresses': 'Sleep',
-      'Acoustic Wall Panels': 'Acoustics',
-      'Coffee Tables': 'Centerpiece',
-      'Office Chairs': 'Workspace',
-      'Wardrobes': 'Storage'
+      "Sofa Sets": "Living Area",
+      "Dining Tables": "The Feast",
+      Beds: "Nightly Rest",
+      Mattresses: "Sleep",
+      "Acoustic Wall Panels": "Acoustics",
+      "Coffee Tables": "Centerpiece",
+      "Office Chairs": "Workspace",
+      Wardrobes: "Storage",
     };
-    return subtitles[categoryName] || 'Collection';
+    return subtitles[categoryName] || "Collection";
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[600px]">
         <LoadingSpinner />
-        <span className="ml-3 text-[10px] font-bold uppercase tracking-widest text-gold">Loading Experience...</span>
+        <span className="ml-3 text-[10px] font-bold uppercase tracking-widest text-gold">
+          Loading Experience...
+        </span>
       </div>
     );
   }
 
   return (
     <div className="space-y-24 pb-24">
-      <SEO 
+      <SEO
         title="Home"
         description="Discover our masterfully crafted autumnal collection, blending traditional joinery with modern silhouettes for the contemporary home."
       />
       {/* Hero Section */}
       <section className="relative h-[85vh] flex items-center justify-start overflow-hidden px-8 lg:px-24">
-        <img 
-          src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&q=80&w=2000" 
+        <img
+          src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&q=80&w=2000"
           alt="Home Hero"
           className="absolute inset-0 w-full h-full object-cover"
         />
@@ -105,20 +126,30 @@ export default function HomePage() {
               New Season Arrival
             </span>
             <h1 className="text-5xl md:text-7xl text-white font-display font-medium leading-[1.05]">
-              The Walnut <br /> & <span className="text-gold italic">Olive</span> Edit
+              The Walnut <br /> &{" "}
+              <span className="text-gold italic">Olive</span> Edit
             </h1>
             <p className="text-lg text-cream/80 max-w-md font-light leading-relaxed">
-              Discover our masterfully crafted autumnal collection, blending traditional joinery with modern silhouettes for the contemporary home.
+              Discover our masterfully crafted autumnal collection, blending
+              traditional joinery with modern silhouettes for the contemporary
+              home.
             </p>
           </div>
           <div className="flex flex-wrap gap-4 pt-4">
             <Link to="/shop">
-              <Button size="lg" className="bg-white text-near-black hover:bg-gold px-10 border-none shadow-xl">
+              <Button
+                size="lg"
+                className="bg-white text-near-black hover:bg-gold px-10 border-none shadow-xl"
+              >
                 Explore Collection
               </Button>
             </Link>
             <Link to="/about">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-near-black px-10">
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-white text-white hover:bg-white hover:text-near-black px-10"
+              >
                 View Lookbook
               </Button>
             </Link>
@@ -130,26 +161,32 @@ export default function HomePage() {
       <section className="max-w-7xl mx-auto px-6 lg:px-8 space-y-16">
         <div className="flex flex-col md:flex-row justify-between items-end gap-6 text-center md:text-left">
           <div className="space-y-3">
-            <h3 className="text-[12px] font-bold uppercase tracking-[0.2em] text-gray-a0">Best Selling Products</h3>
-            <h2 className="text-4xl font-display text-near-black">Pieces Destined to Last</h2>
+            <h3 className="text-[12px] font-bold uppercase tracking-[0.2em] text-gray-a0">
+              Best Selling Products
+            </h3>
+            <h2 className="text-4xl font-display text-near-black">
+              Pieces Destined to Last
+            </h2>
             <div className="w-16 h-0.5 bg-gold mx-auto md:mx-0" />
           </div>
-          <Link to="/shop" className="text-[12px] font-bold uppercase tracking-widest text-walnut hover:text-gold transition-colors underline underline-offset-4">
+          <Link
+            to="/shop"
+            className="text-[12px] font-bold uppercase tracking-widest text-walnut hover:text-gold transition-colors underline underline-offset-4"
+          >
             Shop All Collections →
           </Link>
         </div>
-        
+
         {featuredProducts.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-400">No products found. Add some products in the admin panel.</p>
+            <p className="text-gray-400">
+              No products found. Add some products in the admin panel.
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {featuredProducts.slice(0, 4).map((product) => (
-              <ProductCard 
-                key={product.id} 
-                product={product} 
-              />
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
         )}
@@ -162,29 +199,45 @@ export default function HomePage() {
             <div className="w-16 h-16 bg-cream border border-warm-beige flex items-center justify-center mx-auto">
               <Award className="w-8 h-8 text-walnut" />
             </div>
-            <h4 className="text-[12px] font-bold uppercase tracking-widest text-near-black">Premium Quality</h4>
-            <p className="text-[13px] text-gray-666 font-light leading-relaxed">Hand-selected materials for lasting elegance.</p>
+            <h4 className="text-[12px] font-bold uppercase tracking-widest text-near-black">
+              Premium Quality
+            </h4>
+            <p className="text-[13px] text-gray-666 font-light leading-relaxed">
+              Hand-selected materials for lasting elegance.
+            </p>
           </div>
           <div className="space-y-4">
             <div className="w-16 h-16 bg-cream border border-warm-beige flex items-center justify-center mx-auto">
               <CreditCard className="w-8 h-8 text-walnut" />
             </div>
-            <h4 className="text-[12px] font-bold uppercase tracking-widest text-near-black">Cash On Delivery</h4>
-            <p className="text-[13px] text-gray-666 font-light leading-relaxed">Secure payment upon your satisfaction.</p>
+            <h4 className="text-[12px] font-bold uppercase tracking-widest text-near-black">
+              Cash On Delivery
+            </h4>
+            <p className="text-[13px] text-gray-666 font-light leading-relaxed">
+              Secure payment upon your satisfaction.
+            </p>
           </div>
           <div className="space-y-4">
             <div className="w-16 h-16 bg-cream border border-warm-beige flex items-center justify-center mx-auto">
               <Truck className="w-8 h-8 text-walnut" />
             </div>
-            <h4 className="text-[12px] font-bold uppercase tracking-widest text-near-black">Fast Delivery</h4>
-            <p className="text-[13px] text-gray-666 font-light leading-relaxed">UK-wide logistics to your doorstep.</p>
+            <h4 className="text-[12px] font-bold uppercase tracking-widest text-near-black">
+              Fast Delivery
+            </h4>
+            <p className="text-[13px] text-gray-666 font-light leading-relaxed">
+              UK-wide logistics to your doorstep.
+            </p>
           </div>
           <div className="space-y-4">
             <div className="w-16 h-16 bg-cream border border-warm-beige flex items-center justify-center mx-auto">
               <ShieldCheck className="w-8 h-8 text-walnut" />
             </div>
-            <h4 className="text-[12px] font-bold uppercase tracking-widest text-near-black">Secure Checkout</h4>
-            <p className="text-[13px] text-gray-666 font-light leading-relaxed">Your data protected by industry standards.</p>
+            <h4 className="text-[12px] font-bold uppercase tracking-widest text-near-black">
+              Secure Checkout
+            </h4>
+            <p className="text-[13px] text-gray-666 font-light leading-relaxed">
+              Your data protected by industry standards.
+            </p>
           </div>
         </div>
       </section>
@@ -193,18 +246,24 @@ export default function HomePage() {
       <section className="bg-warm-beige/30 py-24 px-6 lg:px-8 border-y border-warm-beige">
         <div className="max-w-7xl mx-auto space-y-16">
           <div className="text-center space-y-3">
-            <h2 className="text-4xl font-display text-near-black tracking-tight">Featured Collections</h2>
-            <p className="text-gray-666 font-light">Explore a world of textures, finishes, and timeless designs.</p>
+            <h2 className="text-4xl font-display text-near-black tracking-tight">
+              Featured Collections
+            </h2>
+            <p className="text-gray-666 font-light">
+              Explore a world of textures, finishes, and timeless designs.
+            </p>
           </div>
-          
+
           {categories.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-400">No categories found. Add some categories in the admin panel.</p>
+              <p className="text-gray-400">
+                No categories found. Add some categories in the admin panel.
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
               {categories.slice(0, 5).map((category) => (
-                <CategoryCard 
+                <CategoryCard
                   key={category.id}
                   title={category.name}
                   image={getCategoryImage(category)}
@@ -219,17 +278,23 @@ export default function HomePage() {
 
       {/* Featured Collection Banner */}
       <section className="relative h-[60vh] flex items-center justify-center overflow-hidden mx-6 lg:mx-8 bg-walnut">
-        <img 
-          src="https://images.unsplash.com/photo-1538688525198-9b88f6f53126?auto=format&fit=crop&q=80&w=2000" 
+        <img
+          src="https://images.unsplash.com/photo-1538688525198-9b88f6f53126?auto=format&fit=crop&q=80&w=2000"
           alt="Collection Banner"
           className="absolute inset-0 w-full h-full object-cover opacity-60 grayscale"
         />
         <div className="relative z-10 text-center space-y-6 px-4">
-          <span className="text-[11px] font-bold text-gold uppercase tracking-[0.4em] block">Limited Edition</span>
+          <span className="text-[11px] font-bold text-gold uppercase tracking-[0.4em] block">
+            Limited Edition
+          </span>
           <h2 className="text-4xl md:text-6xl text-white font-display font-medium leading-tight max-w-3xl">
-            The Heritage Walnut <br/> <span className="italic">Artisan</span> Collection
+            The Heritage Walnut <br /> <span className="italic">Artisan</span>{" "}
+            Collection
           </h2>
-          <Button size="lg" className="bg-white text-near-black hover:bg-gold px-12 border-none">
+          <Button
+            size="lg"
+            className="bg-white text-near-black hover:bg-gold px-12 border-none"
+          >
             DISCOVER THE STORY
           </Button>
         </div>
@@ -241,15 +306,23 @@ export default function HomePage() {
           {[1, 2, 3].map((i) => (
             <div key={i} className="space-y-6 text-center md:text-left">
               <div className="flex justify-center md:justify-start space-x-1">
-                {[1, 2, 3, 4, 5].map(s => <Star key={s} className="w-3 h-3 text-gold fill-gold" />)}
+                {[1, 2, 3, 4, 5].map((s) => (
+                  <Star key={s} className="w-3 h-3 text-gold fill-gold" />
+                ))}
               </div>
               <Quote className="w-8 h-8 text-warm-beige mx-auto md:mx-0" />
               <p className="text-[15px] text-near-black font-light italic leading-relaxed">
-                "The attention to detail in their walnut collection is simply unmatched. It has transformed my apartment into a sanctuary of style."
+                "The attention to detail in their walnut collection is simply
+                unmatched. It has transformed my apartment into a sanctuary of
+                style."
               </p>
               <div className="space-y-1">
-                <p className="text-[11px] font-bold uppercase tracking-widest text-walnut">Eleanor Vance</p>
-                <p className="text-[10px] text-gray-a0 uppercase tracking-widest">Interior Architect</p>
+                <p className="text-[11px] font-bold uppercase tracking-widest text-walnut">
+                  Eleanor Vance
+                </p>
+                <p className="text-[10px] text-gray-a0 uppercase tracking-widest">
+                  Interior Architect
+                </p>
               </div>
             </div>
           ))}
@@ -260,16 +333,21 @@ export default function HomePage() {
       <section className="bg-near-black text-white py-24 px-6 lg:px-8 flex items-center justify-center text-center">
         <div className="max-w-3xl space-y-8">
           <div className="space-y-3">
-            <h3 className="text-[11px] font-bold uppercase tracking-[0.4em] text-gold">Join the Collective</h3>
-            <h2 className="text-4xl md:text-5xl font-display font-medium tracking-tight">Signature Style, Delivered.</h2>
+            <h3 className="text-[11px] font-bold uppercase tracking-[0.4em] text-gold">
+              Join the Collective
+            </h3>
+            <h2 className="text-4xl md:text-5xl font-display font-medium tracking-tight">
+              Signature Style, Delivered.
+            </h2>
             <p className="text-cream/60 font-light max-w-lg mx-auto">
-              Subscribe for exclusive design inspiration, seasonal collection reveals, and artisanal insights.
+              Subscribe for exclusive design inspiration, seasonal collection
+              reveals, and artisanal insights.
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto border-b border-white/20 pb-2 focus-within:border-gold transition-colors">
-            <input 
-              type="email" 
-              placeholder="Your email address" 
+            <input
+              type="email"
+              placeholder="Your email address"
               className="bg-transparent px-0 py-3 text-[14px] outline-none flex-grow placeholder:text-white/20 font-light"
             />
             <button className="text-[11px] font-bold uppercase tracking-[0.2em] text-gold hover:text-white transition-colors">
@@ -282,12 +360,25 @@ export default function HomePage() {
   );
 }
 
-function CategoryCard({ title, image, link, subtitle }: { title: string; image: string; link: string; subtitle: string }) {
+function CategoryCard({
+  title,
+  image,
+  link,
+  subtitle,
+}: {
+  title: string;
+  image: string;
+  link: string;
+  subtitle: string;
+}) {
   return (
-    <Link to={link} className="relative aspect-[3/4] group overflow-hidden bg-walnut block rounded-lg">
-      <img 
-        src={image} 
-        alt={title} 
+    <Link
+      to={link}
+      className="relative aspect-[3/4] group overflow-hidden bg-walnut block rounded-lg"
+    >
+      <img
+        src={image}
+        alt={title}
         className="w-full h-full object-cover group-hover:scale-105 transition-all duration-1000 opacity-80 group-hover:opacity-100"
         loading="lazy"
       />

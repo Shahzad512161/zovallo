@@ -3,28 +3,34 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { Navbar } from './components/layout/Navbar';
-import { Footer } from './components/layout/Footer';
-import HomePage from './app/HomePage';
-import ShopPage from './app/ShopPage';
-import ProductPage from './app/ProductPage';
-import CartPage from './app/CartPage';
-import LoginPage from './app/LoginPage';
-import RegisterPage from './app/RegisterPage';
-import CheckoutPage from './app/CheckoutPage';
-import AdminDashboard from './app/AdminDashboard';
-import AdminCategories from './app/AdminCategories';
-import AdminProducts from './app/AdminProducts';
-import AdminOrders from './app/AdminOrders';
-import AdminOrderDetail from './app/AdminOrderDetail';
-import AdminUsers from './app/AdminUsers';
-import AdminProductForm from './app/AdminProductForm';
-import { CartProvider } from './context/CartContext';
-import { AuthProvider, useAuth } from './context/AuthContext';
-import { AdminLayout } from './components/admin/AdminLayout';
-import UserProfile from './app/UserProfile';
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
+import { Navbar } from "./components/layout/Navbar";
+import { Footer } from "./components/layout/Footer";
+import HomePage from "./app/HomePage";
+import ShopPage from "./app/ShopPage";
+import ProductPage from "./app/ProductPage";
+import CartPage from "./app/CartPage";
+import LoginPage from "./app/LoginPage";
+import RegisterPage from "./app/RegisterPage";
+import CheckoutPage from "./app/CheckoutPage";
+import AdminDashboard from "./app/AdminDashboard";
+import AdminCategories from "./app/AdminCategories";
+import AdminProducts from "./app/AdminProducts";
+import AdminOrders from "./app/AdminOrders";
+import AdminOrderDetail from "./app/AdminOrderDetail";
+import AdminUsers from "./app/AdminUsers";
+import AdminProductForm from "./app/AdminProductForm";
+import { CartProvider } from "./context/CartContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import { AdminLayout } from "./components/admin/AdminLayout";
+import UserProfile from "./app/UserProfile";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -56,7 +62,9 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
 // Placeholder components for future implementation
 const Placeholder = ({ title }: { title: string }) => (
   <div className="flex items-center justify-center min-h-[400px] bg-cream/30 border-2 border-dashed border-warm-beige m-8">
-    <h2 className="text-xl font-display text-gray-400 uppercase tracking-[0.2em]">{title} Coming Soon</h2>
+    <h2 className="text-xl font-display text-gray-400 uppercase tracking-[0.2em]">
+      {title} Coming Soon
+    </h2>
   </div>
 );
 
@@ -68,82 +76,127 @@ export default function App() {
           <div className="flex flex-col min-h-screen">
             <Routes>
               {/* Admin Routes Area - MUST COME FIRST before the wildcard route */}
-              <Route path="/admin" element={
-                <AdminRoute>
-                  <AdminDashboard />
-                </AdminRoute>
-              } />
-              <Route path="/admin/categories" element={
-                <AdminRoute>
-                  <AdminCategories />
-                </AdminRoute>
-              } />
-              <Route path="/admin/products" element={
-                <AdminRoute>
-                  <AdminProducts />
-                </AdminRoute>
-              } />
-              <Route path="/admin/products/new" element={
-                <AdminRoute>
-                  <AdminProductForm />
-                </AdminRoute>
-              } />
-              <Route path="/admin/products/edit/:productId" element={
-                <AdminRoute>
-                  <AdminProductForm />
-                </AdminRoute>
-              } />
-              <Route path="/admin/orders" element={
-                <AdminRoute>
-                  <AdminOrders />
-                </AdminRoute>
-              } />
-              <Route path="/admin/orders/:orderId" element={
-                <AdminRoute>
-                  <AdminOrderDetail />
-                </AdminRoute>
-              } />
-              <Route path="/admin/customers" element={
-                <AdminRoute>
-                  <AdminUsers />
-                </AdminRoute>
-              } />
-              <Route path="/admin/settings" element={
-                <AdminRoute>
-                  <Placeholder title="Admin Settings" />
-                </AdminRoute>
-              } />
+              <Route
+                path="/admin"
+                element={
+                  <AdminRoute>
+                    <AdminDashboard />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/categories"
+                element={
+                  <AdminRoute>
+                    <AdminCategories />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/products"
+                element={
+                  <AdminRoute>
+                    <AdminProducts />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/products/new"
+                element={
+                  <AdminRoute>
+                    <AdminProductForm />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/products/edit/:productId"
+                element={
+                  <AdminRoute>
+                    <AdminProductForm />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/orders"
+                element={
+                  <AdminRoute>
+                    <AdminOrders />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/orders/:orderId"
+                element={
+                  <AdminRoute>
+                    <AdminOrderDetail />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/customers"
+                element={
+                  <AdminRoute>
+                    <AdminUsers />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/settings"
+                element={
+                  <AdminRoute>
+                    <Placeholder title="Admin Settings" />
+                  </AdminRoute>
+                }
+              />
 
               {/* Customer Routes Area - with wildcard */}
-              <Route path="*" element={
-                <>
-                  <Navbar />
-                  <main className="flex-grow pt-40">
-                    <Routes>
-                      <Route path="/" element={<HomePage />} />
-                      <Route path="/shop" element={<ShopPage />} />
-                      <Route path="/category/:categoryId" element={<ShopPage />} />
-                      <Route path="/product/:productId" element={<ProductPage />} />
-                      <Route path="/cart" element={<CartPage />} />
-                      <Route path="/auth" element={<LoginPage />} />
-                      <Route path="/register" element={<RegisterPage />} />
-                      <Route path="/checkout" element={
-                        <ProtectedRoute>
-                          <CheckoutPage />
-                        </ProtectedRoute>
-                      } />
-                      <Route path="/profile" element={
-  <ProtectedRoute>
-    <UserProfile />
-  </ProtectedRoute>
-} />
-                      <Route path="/about" element={<Placeholder title="Our Story" />} />
-                      <Route path="*" element={<Navigate to="/" replace />} />
-                    </Routes>
-                  </main>
-                  <Footer />
-                </>
-              } />
+              <Route
+                path="*"
+                element={
+                  <>
+                    <Navbar />
+                    <main className="flex-grow pt-40">
+                      <Routes>
+                        <Route path="/" element={<HomePage />} />
+                        <Route path="/shop" element={<ShopPage />} />
+                        <Route
+                          path="/category/:categoryId"
+                          element={<ShopPage />}
+                        />
+                        <Route
+                          path="/product/:productId"
+                          element={<ProductPage />}
+                        />
+                        <Route path="/cart" element={<CartPage />} />
+                        <Route path="/auth" element={<LoginPage />} />
+                        <Route path="/register" element={<RegisterPage />} />
+                        <Route
+                          path="/checkout"
+                          element={
+                            <ProtectedRoute>
+                              <CheckoutPage />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route
+                          path="/profile"
+                          element={
+                            <ProtectedRoute>
+                              <UserProfile />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route
+                          path="/about"
+                          element={<Placeholder title="Our Story" />}
+                        />
+                        <Route path="*" element={<Navigate to="/" replace />} />
+                      </Routes>
+                    </main>
+                    <Footer />
+                  </>
+                }
+              />
             </Routes>
           </div>
         </Router>

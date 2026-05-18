@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { userApi } from '../services/userApi';
-import { orderApi } from '../services/orderApi';
-import { Order } from '../types';
-import { formatCurrency } from '../lib/utils';
-import html2pdf from 'html2pdf.js';
+import React, { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
+import { userApi } from "../services/userApi";
+import { orderApi } from "../services/orderApi";
+import { Order } from "../types";
+import { formatCurrency } from "../lib/utils";
+import html2pdf from "html2pdf.js";
 
-import { SEO } from '../components/SEO';
-import { 
-  User, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Package, 
+import { SEO } from "../components/SEO";
+import {
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Package,
   ShoppingBag,
-  Edit2, 
-  Save, 
+  Edit2,
+  Save,
   X,
   Camera,
   CheckCircle,
@@ -27,13 +27,13 @@ import {
   Eye,
   Download,
   Printer,
-  XCircle
-} from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
-import { updateProfile } from 'firebase/auth';
-import { auth, storage } from '../lib/firebase';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { User as UserProfileType } from '../types';
+  XCircle,
+} from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { updateProfile } from "firebase/auth";
+import { auth, storage } from "../lib/firebase";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { User as UserProfileType } from "../types";
 
 interface UserProfileData {
   displayName: string;
@@ -54,19 +54,19 @@ export default function UserProfile() {
   const [editing, setEditing] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState<'orders' | 'profile'>('orders');
+  const [activeTab, setActiveTab] = useState<"orders" | "profile">("orders");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [showOrderModal, setShowOrderModal] = useState(false);
 
   const [formData, setFormData] = useState<UserProfileData>({
-    displayName: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
-    postalCode: '',
-    country: 'United Kingdom',
-    avatar: ''
+    displayName: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    postalCode: "",
+    country: "United Kingdom",
+    avatar: "",
   });
 
   useEffect(() => {
@@ -80,25 +80,25 @@ export default function UserProfile() {
     const userProfile = profile as UserProfileType | null;
     if (userProfile) {
       setFormData({
-        displayName: userProfile.displayName || user?.displayName || '',
-        email: user?.email || '',
-        phone: userProfile.phone || '',
-        address: userProfile.address || '',
-        city: userProfile.city || '',
-        postalCode: userProfile.postalCode || '',
-        country: userProfile.country || 'United Kingdom',
-        avatar: userProfile.avatar || ''
+        displayName: userProfile.displayName || user?.displayName || "",
+        email: user?.email || "",
+        phone: userProfile.phone || "",
+        address: userProfile.address || "",
+        city: userProfile.city || "",
+        postalCode: userProfile.postalCode || "",
+        country: userProfile.country || "United Kingdom",
+        avatar: userProfile.avatar || "",
       });
     } else if (user) {
       setFormData({
-        displayName: user.displayName || '',
-        email: user.email || '',
-        phone: '',
-        address: '',
-        city: '',
-        postalCode: '',
-        country: 'United Kingdom',
-        avatar: ''
+        displayName: user.displayName || "",
+        email: user.email || "",
+        phone: "",
+        address: "",
+        city: "",
+        postalCode: "",
+        country: "United Kingdom",
+        avatar: "",
       });
     }
   };
@@ -120,13 +120,13 @@ export default function UserProfile() {
     const file = e.target.files?.[0];
     if (!file || !user) return;
 
-    if (!file.type.startsWith('image/')) {
-      alert('Please upload an image file');
+    if (!file.type.startsWith("image/")) {
+      alert("Please upload an image file");
       return;
     }
 
     if (file.size > 2 * 1024 * 1024) {
-      alert('Image must be less than 2MB');
+      alert("Image must be less than 2MB");
       return;
     }
 
@@ -136,7 +136,9 @@ export default function UserProfile() {
       const storageRef = ref(storage, fileName);
       const uploadTask = uploadBytesResumable(storageRef, file);
 
-      uploadTask.on('state_changed', null, 
+      uploadTask.on(
+        "state_changed",
+        null,
         (error) => {
           console.error("Upload error:", error);
           alert("Failed to upload avatar");
@@ -144,10 +146,12 @@ export default function UserProfile() {
         async () => {
           const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
           await updateProfile(user, { photoURL: downloadURL });
-          await userApi.updateUserProfile(user.uid, { avatar: downloadURL } as any);
-          setFormData(prev => ({ ...prev, avatar: downloadURL }));
+          await userApi.updateUserProfile(user.uid, {
+            avatar: downloadURL,
+          } as any);
+          setFormData((prev) => ({ ...prev, avatar: downloadURL }));
           alert("Avatar updated successfully!");
-        }
+        },
       );
     } catch (error) {
       console.error("Error uploading avatar:", error);
@@ -157,8 +161,12 @@ export default function UserProfile() {
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSaveProfile = async () => {
@@ -172,7 +180,7 @@ export default function UserProfile() {
         address: formData.address,
         city: formData.city,
         postalCode: formData.postalCode,
-        country: formData.country
+        country: formData.country,
       } as any);
       setEditing(false);
       alert("Profile updated successfully!");
@@ -186,13 +194,13 @@ export default function UserProfile() {
 
   const getOrderStatusIcon = (status: string) => {
     switch (status) {
-      case 'delivered':
+      case "delivered":
         return <CheckCircle className="w-5 h-5 text-mint-700" />;
-      case 'pending':
+      case "pending":
         return <Clock className="w-5 h-5 text-gold" />;
-      case 'processing':
+      case "processing":
         return <Package className="w-5 h-5 text-blue-500" />;
-      case 'shipped':
+      case "shipped":
         return <Truck className="w-5 h-5 text-walnut" />;
       default:
         return <AlertCircle className="w-5 h-5 text-gray-400" />;
@@ -201,25 +209,25 @@ export default function UserProfile() {
 
   const getOrderStatusColor = (status: string) => {
     switch (status) {
-      case 'delivered':
-        return 'bg-mint-50 text-mint-700 border-mint-200';
-      case 'pending':
-        return 'bg-gold/10 text-walnut border-gold/20';
-      case 'processing':
-        return 'bg-blue-50 text-blue-600 border-blue-100';
-      case 'shipped':
-        return 'bg-walnut/10 text-walnut border-walnut/20';
+      case "delivered":
+        return "bg-mint-50 text-mint-700 border-mint-200";
+      case "pending":
+        return "bg-gold/10 text-walnut border-gold/20";
+      case "processing":
+        return "bg-blue-50 text-blue-600 border-blue-100";
+      case "shipped":
+        return "bg-walnut/10 text-walnut border-walnut/20";
       default:
-        return 'bg-gray-50 text-gray-500 border-gray-200';
+        return "bg-gray-50 text-gray-500 border-gray-200";
     }
   };
 
   const printOrder = () => {
     if (!selectedOrder) return;
 
-    const printWindow = window.open('', '_blank');
+    const printWindow = window.open("", "_blank");
     if (!printWindow) {
-      alert('Please allow pop-ups to print the invoice');
+      alert("Please allow pop-ups to print the invoice");
       return;
     }
 
@@ -326,7 +334,7 @@ export default function UserProfile() {
             <div class="info-box">
               <h3>Order Details</h3>
               <p><strong>Order #:</strong> ${selectedOrder.id.slice(-8).toUpperCase()}</p>
-              <p><strong>Date:</strong> ${selectedOrder.createdAt?.toDate().toLocaleDateString('en-GB')}</p>
+              <p><strong>Date:</strong> ${selectedOrder.createdAt?.toDate().toLocaleDateString("en-GB")}</p>
               <p><strong>Status:</strong> ${selectedOrder.orderStatus.toUpperCase()}</p>
             </div>
             <div class="info-box">
@@ -345,7 +353,9 @@ export default function UserProfile() {
           <table class="products-table">
             <thead><tr><th>Product</th><th>Title</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
             <tbody>
-              ${selectedOrder.products.map(p => `
+              ${selectedOrder.products
+                .map(
+                  (p) => `
                 <tr>
                   <td><img src="${p.image}" class="product-image" onerror="this.style.display='none'" /></td>
                   <td><strong>${p.title}</strong></td>
@@ -353,7 +363,9 @@ export default function UserProfile() {
                   <td>${formatCurrency(p.price)}</td>
                   <td>${formatCurrency(p.price * p.quantity)}</td>
                 </tr>
-              `).join('')}
+              `,
+                )
+                .join("")}
             </tbody>
           </table>
           <div class="totals">
@@ -377,41 +389,41 @@ export default function UserProfile() {
   };
 
   const downloadOrderAsPDF = () => {
-  if (!selectedOrder) return;
-  
-  // Create a temporary div with the invoice HTML
-  const element = document.createElement('div');
-  element.innerHTML = getInvoiceHTML();
-  element.style.padding = '20px';
-  element.style.backgroundColor = 'white';
-  element.style.fontFamily = 'Arial, sans-serif';
-  
-  // PDF options
-  const opt = {
-    margin: [0.5, 0.5, 0.5, 0.5], // top, right, bottom, left in inches
-    filename: `Order_${selectedOrder.id.slice(-8).toUpperCase()}.pdf`,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { 
-      scale: 2, 
-      useCORS: true,
-      letterRendering: true
-    },
-    jsPDF: { 
-      unit: 'in', 
-      format: 'a4', 
-      orientation: 'portrait' 
-    }
-  };
-  
-  // Generate and download PDF
-  html2pdf().set(opt).from(element).save();
-};
+    if (!selectedOrder) return;
 
-// Helper function to generate invoice HTML
-const getInvoiceHTML = () => {
-  if (!selectedOrder) return '';
-  
-  return `
+    // Create a temporary div with the invoice HTML
+    const element = document.createElement("div");
+    element.innerHTML = getInvoiceHTML();
+    element.style.padding = "20px";
+    element.style.backgroundColor = "white";
+    element.style.fontFamily = "Arial, sans-serif";
+
+    // PDF options
+    const opt = {
+      margin: [0.5, 0.5, 0.5, 0.5], // top, right, bottom, left in inches
+      filename: `Order_${selectedOrder.id.slice(-8).toUpperCase()}.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        letterRendering: true,
+      },
+      jsPDF: {
+        unit: "in",
+        format: "a4",
+        orientation: "portrait",
+      },
+    };
+
+    // Generate and download PDF
+    html2pdf().set(opt).from(element).save();
+  };
+
+  // Helper function to generate invoice HTML
+  const getInvoiceHTML = () => {
+    if (!selectedOrder) return "";
+
+    return `
     <!DOCTYPE html>
     <html>
     <head>
@@ -463,7 +475,9 @@ const getInvoiceHTML = () => {
       <table>
         <thead><tr><th>Product</th><th>Title</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
         <tbody>
-          ${selectedOrder.products.map(p => `
+          ${selectedOrder.products
+            .map(
+              (p) => `
             <tr>
               <td><img src="${p.image}" class="product-img" onerror="this.style.display='none'" /></td>
               <td><strong>${p.title}</strong></td>
@@ -471,7 +485,9 @@ const getInvoiceHTML = () => {
               <td>${formatCurrency(p.price)}</td>
               <td>${formatCurrency(p.price * p.quantity)}</td>
             </tr>
-          `).join('')}
+          `,
+            )
+            .join("")}
         </tbody>
       </table>
       
@@ -487,16 +503,25 @@ const getInvoiceHTML = () => {
     </body>
     </html>
   `;
-};
+  };
 
   if (!user) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center px-4">
         <div className="text-center space-y-4">
           <AlertCircle className="w-16 h-16 text-gray-300 mx-auto" />
-          <h2 className="text-2xl font-display text-near-black">Please Login</h2>
-          <p className="text-gray-500">You need to be logged in to view your profile</p>
-          <Link to="/auth" className="inline-block bg-near-black text-white px-8 py-3 text-[11px] font-bold uppercase tracking-widest hover:bg-gold transition-colors">Login to Account</Link>
+          <h2 className="text-2xl font-display text-near-black">
+            Please Login
+          </h2>
+          <p className="text-gray-500">
+            You need to be logged in to view your profile
+          </p>
+          <Link
+            to="/auth"
+            className="inline-block bg-near-black text-white px-8 py-3 text-[11px] font-bold uppercase tracking-widest hover:bg-gold transition-colors"
+          >
+            Login to Account
+          </Link>
         </div>
       </div>
     );
@@ -504,8 +529,11 @@ const getInvoiceHTML = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-      <SEO title="My Profile" description="Manage your account, view orders, and update personal information" />
-      
+      <SEO
+        title="My Profile"
+        description="Manage your account, view orders, and update personal information"
+      />
+
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Sidebar */}
         <aside className="lg:w-80 space-y-6">
@@ -513,29 +541,71 @@ const getInvoiceHTML = () => {
             <div className="relative inline-block">
               <div className="w-24 h-24 mx-auto bg-cream rounded-full overflow-hidden border-4 border-gold/30">
                 {formData.avatar || user.photoURL ? (
-                  <img src={formData.avatar || user.photoURL || ''} alt={formData.displayName} className="w-full h-full object-cover" />
+                  <img
+                    src={formData.avatar || user.photoURL || ""}
+                    alt={formData.displayName}
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gold/10"><User className="w-10 h-10 text-walnut" /></div>
+                  <div className="w-full h-full flex items-center justify-center bg-gold/10">
+                    <User className="w-10 h-10 text-walnut" />
+                  </div>
                 )}
               </div>
-              <label htmlFor="avatar-upload" className="absolute bottom-0 right-0 p-1.5 bg-near-black rounded-full cursor-pointer hover:bg-gold transition-colors">
+              <label
+                htmlFor="avatar-upload"
+                className="absolute bottom-0 right-0 p-1.5 bg-near-black rounded-full cursor-pointer hover:bg-gold transition-colors"
+              >
                 <Camera className="w-3 h-3 text-white" />
-                <input id="avatar-upload" type="file" accept="image/*" onChange={handleAvatarUpload} disabled={uploadingAvatar} className="hidden" />
+                <input
+                  id="avatar-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarUpload}
+                  disabled={uploadingAvatar}
+                  className="hidden"
+                />
               </label>
             </div>
-            {uploadingAvatar && <p className="text-[10px] text-gold mt-2">Uploading...</p>}
-            <h3 className="text-lg font-display text-near-black mt-4">{formData.displayName || 'User'}</h3>
+            {uploadingAvatar && (
+              <p className="text-[10px] text-gold mt-2">Uploading...</p>
+            )}
+            <h3 className="text-lg font-display text-near-black mt-4">
+              {formData.displayName || "User"}
+            </h3>
             <p className="text-xs text-gray-500">{formData.email}</p>
             <div className="mt-4 pt-4 border-t border-warm-beige">
-              <button onClick={logout} className="w-full flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest text-red-500 hover:text-red-700"> <LogOut className="w-3 h-3" /> Logout </button>
+              <button
+                onClick={logout}
+                className="w-full flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest text-red-500 hover:text-red-700"
+              >
+                {" "}
+                <LogOut className="w-3 h-3" /> Logout{" "}
+              </button>
             </div>
           </div>
 
           <div className="bg-cream/30 border border-warm-beige rounded-lg p-6">
-            <h4 className="text-[10px] font-bold uppercase tracking-widest text-walnut mb-4">Account Summary</h4>
+            <h4 className="text-[10px] font-bold uppercase tracking-widest text-walnut mb-4">
+              Account Summary
+            </h4>
             <div className="space-y-3">
-              <div className="flex justify-between text-sm"><span className="text-gray-600">Total Orders</span><span className="font-bold text-near-black">{orders.length}</span></div>
-              <div className="flex justify-between text-sm"><span className="text-gray-600">Member Since</span><span className="font-bold text-near-black">{user.metadata.creationTime ? new Date(user.metadata.creationTime).toLocaleDateString('en-GB') : 'N/A'}</span></div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Total Orders</span>
+                <span className="font-bold text-near-black">
+                  {orders.length}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Member Since</span>
+                <span className="font-bold text-near-black">
+                  {user.metadata.creationTime
+                    ? new Date(user.metadata.creationTime).toLocaleDateString(
+                        "en-GB",
+                      )
+                    : "N/A"}
+                </span>
+              </div>
             </div>
           </div>
         </aside>
@@ -543,43 +613,115 @@ const getInvoiceHTML = () => {
         {/* Main Content */}
         <div className="flex-1">
           <div className="flex gap-2 border-b border-warm-beige mb-6">
-            <button onClick={() => setActiveTab('orders')} className={`px-6 py-3 text-[10px] font-bold uppercase tracking-widest transition-all duration-300 ${activeTab === 'orders' ? 'text-gold border-b-2 border-gold' : 'text-gray-400 hover:text-near-black'}`}><ShoppingBag className="w-4 h-4 inline mr-2" /> My Orders</button>
-            <button onClick={() => setActiveTab('profile')} className={`px-6 py-3 text-[10px] font-bold uppercase tracking-widest transition-all duration-300 ${activeTab === 'profile' ? 'text-gold border-b-2 border-gold' : 'text-gray-400 hover:text-near-black'}`}><User className="w-4 h-4 inline mr-2" /> Profile Settings</button>
+            <button
+              onClick={() => setActiveTab("orders")}
+              className={`px-6 py-3 text-[10px] font-bold uppercase tracking-widest transition-all duration-300 ${activeTab === "orders" ? "text-gold border-b-2 border-gold" : "text-gray-400 hover:text-near-black"}`}
+            >
+              <ShoppingBag className="w-4 h-4 inline mr-2" /> My Orders
+            </button>
+            <button
+              onClick={() => setActiveTab("profile")}
+              className={`px-6 py-3 text-[10px] font-bold uppercase tracking-widest transition-all duration-300 ${activeTab === "profile" ? "text-gold border-b-2 border-gold" : "text-gray-400 hover:text-near-black"}`}
+            >
+              <User className="w-4 h-4 inline mr-2" /> Profile Settings
+            </button>
           </div>
 
           {/* Orders Tab */}
-          {activeTab === 'orders' && (
+          {activeTab === "orders" && (
             <div className="space-y-4">
               {loading ? (
-                <div className="flex items-center justify-center py-12"><div className="text-center"><div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin mx-auto mb-3"></div><p className="text-[10px] font-bold uppercase tracking-widest text-gold">Loading orders...</p></div></div>
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-center">
+                    <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-gold">
+                      Loading orders...
+                    </p>
+                  </div>
+                </div>
               ) : orders.length === 0 ? (
-                <div className="text-center py-12 bg-cream/20 border border-warm-beige rounded-lg"><Package className="w-16 h-16 text-gray-300 mx-auto mb-4" /><h3 className="text-lg font-display text-near-black mb-2">No Orders Yet</h3><p className="text-gray-500 mb-6">You haven't placed any orders yet.</p><Link to="/shop" className="inline-block bg-near-black text-white px-6 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-gold transition-colors">Start Shopping</Link></div>
+                <div className="text-center py-12 bg-cream/20 border border-warm-beige rounded-lg">
+                  <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-lg font-display text-near-black mb-2">
+                    No Orders Yet
+                  </h3>
+                  <p className="text-gray-500 mb-6">
+                    You haven't placed any orders yet.
+                  </p>
+                  <Link
+                    to="/shop"
+                    className="inline-block bg-near-black text-white px-6 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-gold transition-colors"
+                  >
+                    Start Shopping
+                  </Link>
+                </div>
               ) : (
                 orders.map((order) => (
-                  <div key={order.id} className="bg-white border border-warm-beige rounded-lg p-6 hover:shadow-md transition-shadow">
+                  <div
+                    key={order.id}
+                    className="bg-white border border-warm-beige rounded-lg p-6 hover:shadow-md transition-shadow"
+                  >
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 pb-4 border-b border-warm-beige">
                       <div>
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Order #{order.id.slice(-8).toUpperCase()}</p>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                          Order #{order.id.slice(-8).toUpperCase()}
+                        </p>
                         <div className="flex items-center gap-4 mt-1">
-                          <span className="flex items-center gap-1 text-[10px] text-gray-500"><Calendar className="w-3 h-3" />{order.createdAt?.toDate().toLocaleDateString('en-GB')}</span>
-                          <span className="text-sm font-bold text-near-black">{formatCurrency(order.totalPrice)}</span>
+                          <span className="flex items-center gap-1 text-[10px] text-gray-500">
+                            <Calendar className="w-3 h-3" />
+                            {order.createdAt
+                              ?.toDate()
+                              .toLocaleDateString("en-GB")}
+                          </span>
+                          <span className="text-sm font-bold text-near-black">
+                            {formatCurrency(order.totalPrice)}
+                          </span>
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
-                        <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest ${getOrderStatusColor(order.orderStatus)}`}>
-                          {getOrderStatusIcon(order.orderStatus)}{order.orderStatus}
+                        <div
+                          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest ${getOrderStatusColor(order.orderStatus)}`}
+                        >
+                          {getOrderStatusIcon(order.orderStatus)}
+                          {order.orderStatus}
                         </div>
-                        <button onClick={() => { setSelectedOrder(order); setShowOrderModal(true); }} className="text-[10px] font-bold uppercase tracking-widest text-gold hover:underline flex items-center gap-1"><Eye className="w-3 h-3" /> View Details</button>
+                        <button
+                          onClick={() => {
+                            setSelectedOrder(order);
+                            setShowOrderModal(true);
+                          }}
+                          className="text-[10px] font-bold uppercase tracking-widest text-gold hover:underline flex items-center gap-1"
+                        >
+                          <Eye className="w-3 h-3" /> View Details
+                        </button>
                       </div>
                     </div>
                     <div className="space-y-3">
                       {order.products.slice(0, 2).map((item, idx) => (
                         <div key={idx} className="flex items-center gap-4">
-                          <div className="w-12 h-12 bg-cream border border-warm-beige rounded overflow-hidden shrink-0"><img src={item.image} alt={item.title} className="w-full h-full object-cover" /></div>
-                          <div className="flex-1"><p className="text-sm font-medium text-near-black">{item.title}</p><p className="text-[10px] text-gray-500">Qty: {item.quantity} × {formatCurrency(item.price)}</p></div>
+                          <div className="w-12 h-12 bg-cream border border-warm-beige rounded overflow-hidden shrink-0">
+                            <img
+                              src={item.image}
+                              alt={item.title}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-near-black">
+                              {item.title}
+                            </p>
+                            <p className="text-[10px] text-gray-500">
+                              Qty: {item.quantity} ×{" "}
+                              {formatCurrency(item.price)}
+                            </p>
+                          </div>
                         </div>
                       ))}
-                      {order.products.length > 2 && <p className="text-[10px] text-gray-400">+{order.products.length - 2} more items</p>}
+                      {order.products.length > 2 && (
+                        <p className="text-[10px] text-gray-400">
+                          +{order.products.length - 2} more items
+                        </p>
+                      )}
                     </div>
                   </div>
                 ))
@@ -588,29 +730,166 @@ const getInvoiceHTML = () => {
           )}
 
           {/* Profile Tab */}
-          {activeTab === 'profile' && (
+          {activeTab === "profile" && (
             <div className="bg-white border border-warm-beige rounded-lg p-6">
               <div className="flex justify-between items-center mb-6 pb-4 border-b border-warm-beige">
-                <h3 className="text-lg font-display text-near-black">Personal Information</h3>
+                <h3 className="text-lg font-display text-near-black">
+                  Personal Information
+                </h3>
                 {!editing ? (
-                  <button onClick={() => setEditing(true)} className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gold hover:text-walnut"><Edit2 className="w-3 h-3" /> Edit Profile</button>
+                  <button
+                    onClick={() => setEditing(true)}
+                    className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gold hover:text-walnut"
+                  >
+                    <Edit2 className="w-3 h-3" /> Edit Profile
+                  </button>
                 ) : (
                   <div className="flex gap-2">
-                    <button onClick={() => setEditing(false)} className="p-2 text-gray-400 hover:text-red-500"><X className="w-4 h-4" /></button>
-                    <button onClick={handleSaveProfile} disabled={saving} className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-mint-700"><Save className="w-3 h-3" />{saving ? 'Saving...' : 'Save'}</button>
+                    <button
+                      onClick={() => setEditing(false)}
+                      className="p-2 text-gray-400 hover:text-red-500"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={handleSaveProfile}
+                      disabled={saving}
+                      className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-mint-700"
+                    >
+                      <Save className="w-3 h-3" />
+                      {saving ? "Saving..." : "Save"}
+                    </button>
                   </div>
                 )}
               </div>
               <div className="space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div><label className="text-[10px] font-bold uppercase tracking-widest text-walnut block mb-1">Full Name</label>{editing ? <input type="text" name="displayName" value={formData.displayName} onChange={handleInputChange} className="w-full bg-cream border border-warm-beige py-2 px-4 text-sm focus:border-gold outline-none rounded" /> : <p className="text-sm text-near-black py-2">{formData.displayName || 'Not set'}</p>}</div>
-                  <div><label className="text-[10px] font-bold uppercase tracking-widest text-walnut block mb-1">Email Address</label><p className="text-sm text-near-black py-2">{formData.email}</p></div>
-                  <div><label className="text-[10px] font-bold uppercase tracking-widest text-walnut block mb-1">Phone Number</label>{editing ? <input type="tel" name="phone" value={formData.phone} onChange={handleInputChange} placeholder="+44 7123 456789" className="w-full bg-cream border border-warm-beige py-2 px-4 text-sm focus:border-gold outline-none rounded" /> : <p className="text-sm text-near-black py-2">{formData.phone || 'Not set'}</p>}</div>
-                  <div><label className="text-[10px] font-bold uppercase tracking-widest text-walnut block mb-1">Country</label>{editing ? <select name="country" value={formData.country} onChange={handleInputChange} className="w-full bg-cream border border-warm-beige py-2 px-4 text-sm focus:border-gold outline-none rounded"><option>United Kingdom</option><option>Ireland</option><option>France</option><option>Germany</option><option>United States</option></select> : <p className="text-sm text-near-black py-2">{formData.country}</p>}</div>
-                  <div><label className="text-[10px] font-bold uppercase tracking-widest text-walnut block mb-1">City</label>{editing ? <input type="text" name="city" value={formData.city} onChange={handleInputChange} placeholder="London" className="w-full bg-cream border border-warm-beige py-2 px-4 text-sm focus:border-gold outline-none rounded" /> : <p className="text-sm text-near-black py-2">{formData.city || 'Not set'}</p>}</div>
-                  <div><label className="text-[10px] font-bold uppercase tracking-widest text-walnut block mb-1">Postal Code</label>{editing ? <input type="text" name="postalCode" value={formData.postalCode} onChange={handleInputChange} placeholder="SW1A 1AA" className="w-full bg-cream border border-warm-beige py-2 px-4 text-sm focus:border-gold outline-none rounded" /> : <p className="text-sm text-near-black py-2">{formData.postalCode || 'Not set'}</p>}</div>
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-walnut block mb-1">
+                      Full Name
+                    </label>
+                    {editing ? (
+                      <input
+                        type="text"
+                        name="displayName"
+                        value={formData.displayName}
+                        onChange={handleInputChange}
+                        className="w-full bg-cream border border-warm-beige py-2 px-4 text-sm focus:border-gold outline-none rounded"
+                      />
+                    ) : (
+                      <p className="text-sm text-near-black py-2">
+                        {formData.displayName || "Not set"}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-walnut block mb-1">
+                      Email Address
+                    </label>
+                    <p className="text-sm text-near-black py-2">
+                      {formData.email}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-walnut block mb-1">
+                      Phone Number
+                    </label>
+                    {editing ? (
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        placeholder="+44 7123 456789"
+                        className="w-full bg-cream border border-warm-beige py-2 px-4 text-sm focus:border-gold outline-none rounded"
+                      />
+                    ) : (
+                      <p className="text-sm text-near-black py-2">
+                        {formData.phone || "Not set"}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-walnut block mb-1">
+                      Country
+                    </label>
+                    {editing ? (
+                      <select
+                        name="country"
+                        value={formData.country}
+                        onChange={handleInputChange}
+                        className="w-full bg-cream border border-warm-beige py-2 px-4 text-sm focus:border-gold outline-none rounded"
+                      >
+                        <option>United Kingdom</option>
+                        <option>Ireland</option>
+                        <option>France</option>
+                        <option>Germany</option>
+                        <option>United States</option>
+                      </select>
+                    ) : (
+                      <p className="text-sm text-near-black py-2">
+                        {formData.country}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-walnut block mb-1">
+                      City
+                    </label>
+                    {editing ? (
+                      <input
+                        type="text"
+                        name="city"
+                        value={formData.city}
+                        onChange={handleInputChange}
+                        placeholder="London"
+                        className="w-full bg-cream border border-warm-beige py-2 px-4 text-sm focus:border-gold outline-none rounded"
+                      />
+                    ) : (
+                      <p className="text-sm text-near-black py-2">
+                        {formData.city || "Not set"}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-walnut block mb-1">
+                      Postal Code
+                    </label>
+                    {editing ? (
+                      <input
+                        type="text"
+                        name="postalCode"
+                        value={formData.postalCode}
+                        onChange={handleInputChange}
+                        placeholder="SW1A 1AA"
+                        className="w-full bg-cream border border-warm-beige py-2 px-4 text-sm focus:border-gold outline-none rounded"
+                      />
+                    ) : (
+                      <p className="text-sm text-near-black py-2">
+                        {formData.postalCode || "Not set"}
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <div><label className="text-[10px] font-bold uppercase tracking-widest text-walnut block mb-1">Address</label>{editing ? <textarea name="address" value={formData.address} onChange={handleInputChange} rows={3} placeholder="Your full street address" className="w-full bg-cream border border-warm-beige py-2 px-4 text-sm focus:border-gold outline-none rounded resize-none" /> : <p className="text-sm text-near-black py-2">{formData.address || 'Not set'}</p>}</div>
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-walnut block mb-1">
+                    Address
+                  </label>
+                  {editing ? (
+                    <textarea
+                      name="address"
+                      value={formData.address}
+                      onChange={handleInputChange}
+                      rows={3}
+                      placeholder="Your full street address"
+                      className="w-full bg-cream border border-warm-beige py-2 px-4 text-sm focus:border-gold outline-none rounded resize-none"
+                    />
+                  ) : (
+                    <p className="text-sm text-near-black py-2">
+                      {formData.address || "Not set"}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           )}
@@ -620,42 +899,224 @@ const getInvoiceHTML = () => {
       {/* Order Details Modal */}
       {showOrderModal && selectedOrder && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center px-4 py-6">
-          <div className="absolute inset-0 bg-near-black/80 backdrop-blur-sm" onClick={() => setShowOrderModal(false)} />
+          <div
+            className="absolute inset-0 bg-near-black/80 backdrop-blur-sm"
+            onClick={() => setShowOrderModal(false)}
+          />
           <div className="bg-white max-w-3xl w-full max-h-[85vh] overflow-y-auto relative z-10 shadow-2xl border border-warm-beige rounded-lg">
             <div className="sticky top-0 bg-white border-b border-warm-beige p-5 flex justify-between items-center">
-              <h3 className="text-xl font-display text-near-black">Order Details</h3>
+              <h3 className="text-xl font-display text-near-black">
+                Order Details
+              </h3>
               <div className="flex gap-2">
-                <button onClick={downloadOrderAsPDF} className="p-2 text-gray-500 hover:text-gold transition-colors" title="Download PDF"><Download className="w-5 h-5" /></button>
-                <button onClick={printOrder} className="p-2 text-gray-500 hover:text-gold transition-colors" title="Print"><Printer className="w-5 h-5" /></button>
-                <button onClick={() => setShowOrderModal(false)} className="p-2 text-gray-500 hover:text-red-500 transition-colors"><XCircle className="w-5 h-5" /></button>
+                <button
+                  onClick={downloadOrderAsPDF}
+                  className="p-2 text-gray-500 hover:text-gold transition-colors"
+                  title="Download PDF"
+                >
+                  <Download className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={printOrder}
+                  className="p-2 text-gray-500 hover:text-gold transition-colors"
+                  title="Print"
+                >
+                  <Printer className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => setShowOrderModal(false)}
+                  className="p-2 text-gray-500 hover:text-red-500 transition-colors"
+                >
+                  <XCircle className="w-5 h-5" />
+                </button>
               </div>
             </div>
             <div className="p-6 space-y-6">
               {/* Order Header */}
               <div className="bg-cream/30 p-5 rounded-lg">
                 <div className="flex flex-wrap justify-between gap-4">
-                  <div><p className="text-[10px] font-bold uppercase text-gray-400">Order Reference</p><p className="text-lg font-mono font-bold text-near-black">#{selectedOrder.id.slice(-8).toUpperCase()}</p></div>
-                  <div><p className="text-[10px] font-bold uppercase text-gray-400">Order Date</p><p className="text-sm font-medium">{selectedOrder.createdAt?.toDate().toLocaleDateString('en-GB')} at {selectedOrder.createdAt?.toDate().toLocaleTimeString('en-GB')}</p></div>
-                  <div><p className="text-[10px] font-bold uppercase text-gray-400">Order Status</p><div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold ${getOrderStatusColor(selectedOrder.orderStatus)}`}>{getOrderStatusIcon(selectedOrder.orderStatus)}{selectedOrder.orderStatus}</div></div>
+                  <div>
+                    <p className="text-[10px] font-bold uppercase text-gray-400">
+                      Order Reference
+                    </p>
+                    <p className="text-lg font-mono font-bold text-near-black">
+                      #{selectedOrder.id.slice(-8).toUpperCase()}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold uppercase text-gray-400">
+                      Order Date
+                    </p>
+                    <p className="text-sm font-medium">
+                      {selectedOrder.createdAt
+                        ?.toDate()
+                        .toLocaleDateString("en-GB")}{" "}
+                      at{" "}
+                      {selectedOrder.createdAt
+                        ?.toDate()
+                        .toLocaleTimeString("en-GB")}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold uppercase text-gray-400">
+                      Order Status
+                    </p>
+                    <div
+                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold ${getOrderStatusColor(selectedOrder.orderStatus)}`}
+                    >
+                      {getOrderStatusIcon(selectedOrder.orderStatus)}
+                      {selectedOrder.orderStatus}
+                    </div>
+                  </div>
                 </div>
               </div>
 
               {/* Customer Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div><h4 className="text-[10px] font-bold uppercase text-walnut mb-3">Customer Information</h4><div className="space-y-2 text-sm"><p><span className="font-bold">Name:</span> {selectedOrder.customerInfo.fullName}</p><p><span className="font-bold">Email:</span> {selectedOrder.customerInfo.email}</p><p><span className="font-bold">Phone:</span> {selectedOrder.customerInfo.phone}</p></div></div>
-                <div><h4 className="text-[10px] font-bold uppercase text-walnut mb-3">Shipping Address</h4><div className="space-y-2 text-sm"><p>{selectedOrder.customerInfo.address}</p><p>{selectedOrder.customerInfo.city}, {selectedOrder.customerInfo.postalCode}</p><p>{selectedOrder.customerInfo.country}</p></div></div>
+                <div>
+                  <h4 className="text-[10px] font-bold uppercase text-walnut mb-3">
+                    Customer Information
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    <p>
+                      <span className="font-bold">Name:</span>{" "}
+                      {selectedOrder.customerInfo.fullName}
+                    </p>
+                    <p>
+                      <span className="font-bold">Email:</span>{" "}
+                      {selectedOrder.customerInfo.email}
+                    </p>
+                    <p>
+                      <span className="font-bold">Phone:</span>{" "}
+                      {selectedOrder.customerInfo.phone}
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  <h4 className="text-[10px] font-bold uppercase text-walnut mb-3">
+                    Shipping Address
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    <p>{selectedOrder.customerInfo.address}</p>
+                    <p>
+                      {selectedOrder.customerInfo.city},{" "}
+                      {selectedOrder.customerInfo.postalCode}
+                    </p>
+                    <p>{selectedOrder.customerInfo.country}</p>
+                  </div>
+                </div>
               </div>
 
               {/* Products Table */}
-              <div><h4 className="text-[10px] font-bold uppercase text-walnut mb-4">Order Items</h4><div className="overflow-x-auto"><table className="w-full"><thead><tr className="border-b border-warm-beige"><th className="text-left py-3 text-[10px] font-bold uppercase text-gray-400">Product</th><th className="text-left py-3 text-[10px] font-bold uppercase text-gray-400">Title</th><th className="text-center py-3 text-[10px] font-bold uppercase text-gray-400">Qty</th><th className="text-right py-3 text-[10px] font-bold uppercase text-gray-400">Price</th><th className="text-right py-3 text-[10px] font-bold uppercase text-gray-400">Total</th></tr></thead><tbody>{selectedOrder.products.map((item, idx) => (<tr key={idx} className="border-b border-warm-beige"><td className="py-3"><div className="w-12 h-12 bg-cream border border-warm-beige rounded overflow-hidden"><img src={item.image} alt={item.title} className="w-full h-full object-cover" /></div></td><td className="py-3"><p className="text-sm font-medium text-near-black">{item.title}</p></td><td className="py-3 text-center text-sm">{item.quantity}</td><td className="py-3 text-right text-sm">{formatCurrency(item.price)}</td><td className="py-3 text-right text-sm font-medium">{formatCurrency(item.price * item.quantity)}</td></tr>))}</tbody></table></div></div>
+              <div>
+                <h4 className="text-[10px] font-bold uppercase text-walnut mb-4">
+                  Order Items
+                </h4>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-warm-beige">
+                        <th className="text-left py-3 text-[10px] font-bold uppercase text-gray-400">
+                          Product
+                        </th>
+                        <th className="text-left py-3 text-[10px] font-bold uppercase text-gray-400">
+                          Title
+                        </th>
+                        <th className="text-center py-3 text-[10px] font-bold uppercase text-gray-400">
+                          Qty
+                        </th>
+                        <th className="text-right py-3 text-[10px] font-bold uppercase text-gray-400">
+                          Price
+                        </th>
+                        <th className="text-right py-3 text-[10px] font-bold uppercase text-gray-400">
+                          Total
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selectedOrder.products.map((item, idx) => (
+                        <tr key={idx} className="border-b border-warm-beige">
+                          <td className="py-3">
+                            <div className="w-12 h-12 bg-cream border border-warm-beige rounded overflow-hidden">
+                              <img
+                                src={item.image}
+                                alt={item.title}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          </td>
+                          <td className="py-3">
+                            <p className="text-sm font-medium text-near-black">
+                              {item.title}
+                            </p>
+                          </td>
+                          <td className="py-3 text-center text-sm">
+                            {item.quantity}
+                          </td>
+                          <td className="py-3 text-right text-sm">
+                            {formatCurrency(item.price)}
+                          </td>
+                          <td className="py-3 text-right text-sm font-medium">
+                            {formatCurrency(item.price * item.quantity)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
 
               {/* Totals */}
-              <div className="border-t border-warm-beige pt-4"><div className="space-y-2 text-right"><div className="flex justify-end gap-8"><span className="text-gray-600">Subtotal:</span><span className="font-medium">{formatCurrency(selectedOrder.totalPrice)}</span></div><div className="flex justify-end gap-8"><span className="text-gray-600">Delivery:</span><span className="text-mint-700 font-bold">FREE</span></div><div className="flex justify-end gap-8 pt-2 border-t border-warm-beige"><span className="text-lg font-bold text-near-black">Grand Total:</span><span className="text-2xl font-bold text-gold">{formatCurrency(selectedOrder.totalPrice)}</span></div></div></div>
+              <div className="border-t border-warm-beige pt-4">
+                <div className="space-y-2 text-right">
+                  <div className="flex justify-end gap-8">
+                    <span className="text-gray-600">Subtotal:</span>
+                    <span className="font-medium">
+                      {formatCurrency(selectedOrder.totalPrice)}
+                    </span>
+                  </div>
+                  <div className="flex justify-end gap-8">
+                    <span className="text-gray-600">Delivery:</span>
+                    <span className="text-mint-700 font-bold">FREE</span>
+                  </div>
+                  <div className="flex justify-end gap-8 pt-2 border-t border-warm-beige">
+                    <span className="text-lg font-bold text-near-black">
+                      Grand Total:
+                    </span>
+                    <span className="text-2xl font-bold text-gold">
+                      {formatCurrency(selectedOrder.totalPrice)}
+                    </span>
+                  </div>
+                </div>
+              </div>
 
               {/* Payment Method */}
-              <div className="bg-mint-50 p-4 rounded-lg text-center"><p className="text-sm font-medium text-mint-700">✓ Cash on Delivery (COD) - Pay when your order arrives</p></div>
+              <div className="bg-mint-50 p-4 rounded-lg text-center">
+                <p className="text-sm font-medium text-mint-700">
+                  ✓ Cash on Delivery (COD) - Pay when your order arrives
+                </p>
+              </div>
             </div>
-            <div className="sticky bottom-0 bg-cream/30 border-t border-warm-beige p-5 flex gap-3 justify-end"><button onClick={downloadOrderAsPDF} className="flex items-center gap-2 px-5 py-2 border border-warm-beige text-[10px] font-bold uppercase tracking-widest hover:bg-white"><Download className="w-3 h-3" /> Download PDF</button><button onClick={printOrder} className="flex items-center gap-2 px-5 py-2 bg-near-black text-white text-[10px] font-bold uppercase tracking-widest hover:bg-gold"><Printer className="w-3 h-3" /> Print Invoice</button><button onClick={() => setShowOrderModal(false)} className="px-5 py-2 border-2 border-near-black text-[10px] font-bold uppercase tracking-widest hover:bg-near-black hover:text-white">Close</button></div>
+            <div className="sticky bottom-0 bg-cream/30 border-t border-warm-beige p-5 flex gap-3 justify-end">
+              <button
+                onClick={downloadOrderAsPDF}
+                className="flex items-center gap-2 px-5 py-2 border border-warm-beige text-[10px] font-bold uppercase tracking-widest hover:bg-white"
+              >
+                <Download className="w-3 h-3" /> Download PDF
+              </button>
+              <button
+                onClick={printOrder}
+                className="flex items-center gap-2 px-5 py-2 bg-near-black text-white text-[10px] font-bold uppercase tracking-widest hover:bg-gold"
+              >
+                <Printer className="w-3 h-3" /> Print Invoice
+              </button>
+              <button
+                onClick={() => setShowOrderModal(false)}
+                className="px-5 py-2 border-2 border-near-black text-[10px] font-bold uppercase tracking-widest hover:bg-near-black hover:text-white"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

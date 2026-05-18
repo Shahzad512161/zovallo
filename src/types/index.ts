@@ -50,8 +50,8 @@ export interface Order {
     image: string;
   }[];
   totalPrice: number;
-  orderStatus: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-  paymentMethod: 'COD';
+  orderStatus: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+  paymentMethod: "COD";
   createdAt: any;
 }
 
@@ -59,6 +59,6 @@ export interface User {
   uid: string;
   email: string;
   displayName: string;
-  role: 'user' | 'admin';
+  role: "user" | "admin";
   createdAt: any;
 }

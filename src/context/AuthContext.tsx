@@ -1,12 +1,12 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { 
-  User as FirebaseUser, 
-  onAuthStateChanged, 
-  signOut 
-} from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import { auth, db } from '../lib/firebase';
-import { User as UserProfile } from '../types';
+import React, { createContext, useContext, useEffect, useState } from "react";
+import {
+  User as FirebaseUser,
+  onAuthStateChanged,
+  signOut,
+} from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../lib/firebase";
+import { User as UserProfile } from "../types";
 
 interface AuthContextType {
   user: FirebaseUser | null;
@@ -27,19 +27,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const checkIsAdmin = (email: string | null | undefined): boolean => {
     if (!email) return false;
     // Check if email is exactly admin@zovallo.com OR starts with admin
-    return email === 'admin@zovallo.com' || email.toLowerCase().startsWith('admin');
+    return (
+      email === "admin@zovallo.com" || email.toLowerCase().startsWith("admin")
+    );
   };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
-      
+
       if (currentUser) {
         try {
           // Try to fetch user profile from Firestore
-          const docRef = doc(db, 'users', currentUser.uid);
+          const docRef = doc(db, "users", currentUser.uid);
           const docSnap = await getDoc(docRef);
-          
+
           if (docSnap.exists()) {
             setProfile(docSnap.data() as UserProfile);
           } else {
@@ -47,10 +49,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const isAdminUser = checkIsAdmin(currentUser.email);
             const basicProfile = {
               uid: currentUser.uid,
-              email: currentUser.email || '',
-              displayName: currentUser.displayName || '',
-              role: isAdminUser ? 'admin' : 'user',
-              createdAt: new Date()
+              email: currentUser.email || "",
+              displayName: currentUser.displayName || "",
+              role: isAdminUser ? "admin" : "user",
+              createdAt: new Date(),
             } as UserProfile;
             setProfile(basicProfile);
           }
@@ -59,16 +61,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // Set basic profile even if Firestore fails
           setProfile({
             uid: currentUser.uid,
-            email: currentUser.email || '',
-            displayName: currentUser.displayName || '',
-            role: checkIsAdmin(currentUser.email) ? 'admin' : 'user',
-            createdAt: new Date()
+            email: currentUser.email || "",
+            displayName: currentUser.displayName || "",
+            role: checkIsAdmin(currentUser.email) ? "admin" : "user",
+            createdAt: new Date(),
           } as UserProfile);
         }
       } else {
         setProfile(null);
       }
-      
+
       setLoading(false);
     });
 
@@ -84,27 +86,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   // Check if user is admin based on email OR profile role
-  const isAdmin = checkIsAdmin(user?.email) || profile?.role === 'admin';
+  const isAdmin = checkIsAdmin(user?.email) || profile?.role === "admin";
 
   const value = {
     user,
     profile,
     loading,
     isAdmin,
-    logout
+    logout,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }

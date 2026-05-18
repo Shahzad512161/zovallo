@@ -1,10 +1,19 @@
 // services/userApi.ts
-import { doc, getDoc, setDoc, updateDoc, collection, getDocs, query, orderBy } from 'firebase/firestore';
-import { db } from '../lib/firebase';
-import { User } from '../types';
+import {
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  collection,
+  getDocs,
+  query,
+  orderBy,
+} from "firebase/firestore";
+import { db } from "../lib/firebase";
+import { User } from "../types";
 
 class UserApiService {
-  private collectionName = 'users';
+  private collectionName = "users";
 
   async getUserProfile(uid: string): Promise<User | null> {
     try {
@@ -20,12 +29,12 @@ class UserApiService {
     }
   }
 
-  async createUserProfile(user: Omit<User, 'createdAt'>): Promise<void> {
+  async createUserProfile(user: Omit<User, "createdAt">): Promise<void> {
     try {
       const docRef = doc(db, this.collectionName, user.uid);
       await setDoc(docRef, {
         ...user,
-        createdAt: new Date()
+        createdAt: new Date(),
       });
     } catch (error) {
       console.error("Error creating user profile:", error);
@@ -45,13 +54,18 @@ class UserApiService {
 
   async getAllUsers(): Promise<User[]> {
     try {
-      const q = query(collection(db, this.collectionName), orderBy('createdAt', 'desc'));
+      const q = query(
+        collection(db, this.collectionName),
+        orderBy("createdAt", "desc"),
+      );
       const snapshot = await getDocs(q);
       if (snapshot.empty) {
-        console.log('No users found');
+        console.log("No users found");
         return [];
       }
-      return snapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() } as User));
+      return snapshot.docs.map(
+        (doc) => ({ uid: doc.id, ...doc.data() }) as User,
+      );
     } catch (error) {
       console.error("Error fetching all users:", error);
       return [];
