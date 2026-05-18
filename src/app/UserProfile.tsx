@@ -6,6 +6,7 @@ import { Order } from "../types";
 import { formatCurrency } from "../lib/utils";
 import html2pdf from "html2pdf.js";
 
+
 import { SEO } from "../components/SEO";
 import {
   User,
@@ -255,7 +256,7 @@ export default function UserProfile() {
       jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
     };
 
-    html2pdf().set(opt).from(element).save();
+    html2pdf().set(opt as any).from(element).save();
   };
 
   const getInvoiceHTML = () => {

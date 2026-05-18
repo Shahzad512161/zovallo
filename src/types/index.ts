@@ -1,17 +1,16 @@
-export interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string;
-  image?: string;
-}
-
-export interface Review {
-  id: string;
-  userName: string;
-  rating: number;
-  comment: string;
-  date: string;
+// src/types/index.ts
+export interface User {
+  uid: string;
+  email: string;
+  displayName?: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  postalCode?: string;
+  country?: string;
+  avatar?: string;
+  role?: 'admin' | 'user';
+  createdAt?: Date | any;
 }
 
 export interface Product {
@@ -23,10 +22,28 @@ export interface Product {
   category: string;
   images: string[];
   stock: number;
-  specifications: Record<string, string>;
+  specifications?: Record<string, string>;
   featured: boolean;
-  createdAt: any;
+  createdAt?: any;
+  updatedAt?: any;
   reviews?: Review[];
+}
+
+export interface Review {
+  id: string;
+  userName: string;
+  rating: number;
+  comment: string;
+  date: string;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  image?: string;
+  createdAt?: any;
 }
 
 export interface Order {
@@ -36,29 +53,21 @@ export interface Order {
     fullName: string;
     email: string;
     phone: string;
-    country: string;
-    city: string;
     address: string;
+    city: string;
     postalCode: string;
+    country: string;
     notes?: string;
   };
-  products: {
+  products: Array<{
     productId: string;
     title: string;
     price: number;
     quantity: number;
     image: string;
-  }[];
+  }>;
   totalPrice: number;
-  orderStatus: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
-  paymentMethod: "COD";
-  createdAt: any;
-}
-
-export interface User {
-  uid: string;
-  email: string;
-  displayName: string;
-  role: "user" | "admin";
-  createdAt: any;
+  orderStatus: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  paymentMethod: string;
+  createdAt?: any;
 }
