@@ -112,11 +112,17 @@ export default function ShopPage() {
     return result;
   }, [products, selectedCategory, searchQuery, priceRange, sortBy]);
 
+  // Reset price range max based on products
+  const maxPrice = useMemo(() => {
+    if (products.length === 0) return 5000;
+    return Math.max(...products.map(p => p.price), 5000);
+  }, [products]);
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[600px]">
+      <div className="flex items-center justify-center min-h-[400px] sm:min-h-[600px]">
         <LoadingSpinner />
-        <span className="ml-3 text-[10px] font-bold uppercase tracking-widest text-gold">
+        <span className="ml-3 text-[8px] sm:text-[10px] font-bold uppercase tracking-widest text-gold">
           Loading Collection...
         </span>
       </div>
@@ -126,58 +132,64 @@ export default function ShopPage() {
   const categoryNames = ["All", ...categories.map((c) => c.name)];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+    <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-8 sm:py-10 md:py-12 space-y-6 sm:space-y-8">
       <SEO
         title={
           selectedCategory === "All" ? "Shop All" : `Shop ${selectedCategory}`
         }
         description={`Explore our curated selection of ${selectedCategory.toLowerCase()} pieces. Premium furniture designed for comfort and crafted to last.`}
       />
-      {/* Page Header */}
-      <div className="text-center space-y-4 mb-8">
-        <h1 className="text-4xl md:text-5xl font-display text-near-black tracking-tight">
+      
+      {/* Page Header - Responsive */}
+      <div className="text-center space-y-2 sm:space-y-3 md:space-y-4 mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-display text-near-black tracking-tight px-2">
           {selectedCategory === "All"
             ? "Shop All Collections"
             : selectedCategory}
         </h1>
-        <p className="text-gray-666 font-light max-w-2xl mx-auto">
+        <p className="text-gray-666 font-light text-sm sm:text-base max-w-2xl mx-auto px-4">
           Discover our curated selection of premium furniture pieces, designed
           for comfort and crafted to last.
         </p>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8">
+      <div className="flex flex-col lg:flex-row gap-6 md:gap-8">
+        
         {/* Filters Sidebar (Desktop) */}
-        <aside className="hidden lg:block w-64 space-y-8 flex-shrink-0">
-          <div className="space-y-6">
+        <aside className="hidden lg:block w-64 space-y-6 md:space-y-8 flex-shrink-0">
+          <div className="space-y-5 md:space-y-6">
             {/* Search */}
-            <div className="space-y-3">
-              <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-walnut">
+            <div className="space-y-2 md:space-y-3">
+              <h4 className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] text-walnut">
                 Search
               </h4>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-a0" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 md:w-4 md:h-4 text-gray-a0" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Keyword..."
-                  className="w-full bg-cream border border-warm-beige py-2 pl-10 pr-4 text-xs outline-none focus:border-gold"
+                  className="w-full bg-cream border border-warm-beige py-2 pl-9 md:pl-10 pr-3 md:pr-4 text-xs outline-none focus:border-gold rounded"
                 />
               </div>
             </div>
 
             {/* Categories */}
-            <div className="space-y-3">
-              <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-walnut">
+            <div className="space-y-2 md:space-y-3">
+              <h4 className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] text-walnut">
                 Categories
               </h4>
-              <div className="space-y-1">
+              <div className="space-y-0.5 md:space-y-1">
                 {categoryNames.map((cat) => (
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
-                    className={`block w-full text-left text-[12px] py-1.5 px-3 transition-colors ${selectedCategory === cat ? "bg-near-black text-white" : "hover:bg-cream text-gray-666"}`}
+                    className={`block w-full text-left text-[11px] md:text-[12px] py-1.5 px-2 md:px-3 transition-colors rounded ${
+                      selectedCategory === cat 
+                        ? "bg-near-black text-white" 
+                        : "hover:bg-cream text-gray-666"
+                    }`}
                   >
                     {cat}
                   </button>
@@ -186,21 +198,21 @@ export default function ShopPage() {
             </div>
 
             {/* Price Range */}
-            <div className="space-y-4">
-              <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-walnut">
+            <div className="space-y-3 md:space-y-4">
+              <h4 className="text-[10px] md:text-[11px] font-bold uppercase tracking-[0.2em] text-walnut">
                 Price Range
               </h4>
-              <div className="space-y-4">
+              <div className="space-y-3 md:space-y-4">
                 <input
                   type="range"
                   min="0"
-                  max="5000"
+                  max={maxPrice}
                   step="100"
                   value={priceRange[1]}
                   onChange={(e) => setPriceRange([0, parseInt(e.target.value)])}
-                  className="w-full accent-walnut"
+                  className="w-full accent-walnut h-1.5"
                 />
-                <div className="flex justify-between text-[11px] font-bold text-gray-666">
+                <div className="flex justify-between text-[10px] md:text-[11px] font-bold text-gray-666">
                   <span>£0</span>
                   <span>£{priceRange[1]}</span>
                 </div>
@@ -210,30 +222,31 @@ export default function ShopPage() {
         </aside>
 
         {/* Main Content */}
-        <div className="flex-1 space-y-8">
-          {/* Controls Bar */}
-          <div className="flex flex-col sm:flex-row justify-between items-center bg-white border-y border-warm-beige py-4 px-4 gap-4">
-            <div className="flex items-center gap-4 w-full sm:w-auto">
+        <div className="flex-1 min-w-0 space-y-6 md:space-y-8">
+          
+          {/* Controls Bar - Responsive */}
+          <div className="flex flex-col xs:flex-row justify-between items-center bg-white border-y border-warm-beige py-3 sm:py-4 px-3 sm:px-4 gap-3 sm:gap-4">
+            <div className="flex items-center gap-3 sm:gap-4 w-full xs:w-auto justify-between xs:justify-start">
               <button
                 onClick={() => setShowMobileFilters(true)}
-                className="lg:hidden flex items-center gap-2 border border-warm-beige px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-near-black"
+                className="lg:hidden flex items-center gap-1.5 sm:gap-2 border border-warm-beige px-3 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-near-black hover:bg-cream transition-colors rounded"
               >
-                <SlidersHorizontal className="w-4 h-4" />
-                Filters
+                <SlidersHorizontal className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <span>Filters</span>
               </button>
-              <p className="text-[11px] font-bold text-gray-a0 uppercase tracking-widest">
-                Showing {filteredProducts.length} Results
+              <p className="text-[10px] sm:text-[11px] font-bold text-gray-a0 uppercase tracking-widest">
+                {filteredProducts.length} Result{filteredProducts.length !== 1 ? 's' : ''}
               </p>
             </div>
 
-            <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-              <span className="text-[11px] font-bold text-gray-a0 uppercase tracking-widest hidden sm:inline">
+            <div className="flex items-center gap-2 sm:gap-3 w-full xs:w-auto justify-end">
+              <span className="text-[10px] sm:text-[11px] font-bold text-gray-a0 uppercase tracking-widest hidden sm:inline">
                 Sort by:
               </span>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="bg-cream border border-warm-beige px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-near-black outline-none focus:border-gold cursor-pointer"
+                className="bg-cream border border-warm-beige px-3 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-near-black outline-none focus:border-gold cursor-pointer rounded"
               >
                 <option value="latest">Latest Arrivals</option>
                 <option value="low-to-high">Price: Low to High</option>
@@ -242,15 +255,9 @@ export default function ShopPage() {
             </div>
           </div>
 
-          {/* Products Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
-            {filteredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-
-          {filteredProducts.length === 0 && (
-            <div className="py-20 border border-dashed border-warm-beige">
+          {/* Products Grid - Responsive */}
+          {filteredProducts.length === 0 ? (
+            <div className="py-12 sm:py-16 md:py-20 border border-dashed border-warm-beige rounded-lg">
               <EmptyState
                 icon={PackageOpen}
                 title="No matches found"
@@ -259,38 +266,64 @@ export default function ShopPage() {
                 onAction={() => {
                   setSelectedCategory("All");
                   setSearchQuery("");
-                  setPriceRange([0, 5000]);
+                  setPriceRange([0, maxPrice]);
                 }}
               />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 md:gap-6 lg:gap-8">
+              {filteredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
             </div>
           )}
         </div>
       </div>
 
-      {/* Mobile Filters Overlay */}
+      {/* Mobile Filters Overlay - Responsive */}
       {showMobileFilters && (
         <div className="fixed inset-0 z-[60] lg:hidden">
           <div
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
             onClick={() => setShowMobileFilters(false)}
           />
-          <div className="absolute inset-y-0 left-0 w-[280px] bg-white shadow-2xl p-6 space-y-8 overflow-y-auto">
-            <div className="flex justify-between items-center border-b border-warm-beige pb-4">
+          <div className="absolute inset-y-0 left-0 w-[85%] max-w-[320px] bg-white shadow-2xl p-5 sm:p-6 space-y-6 sm:space-y-8 overflow-y-auto animate-slide-in">
+            <div className="flex justify-between items-center border-b border-warm-beige pb-3 sm:pb-4">
               <h3 className="text-sm font-bold uppercase tracking-widest">
                 Filter & Sort
               </h3>
-              <button onClick={() => setShowMobileFilters(false)}>
+              <button 
+                onClick={() => setShowMobileFilters(false)}
+                className="p-1 hover:bg-cream rounded-full transition-colors"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="space-y-8">
+            <div className="space-y-6 sm:space-y-8">
+              {/* Search in Mobile */}
+              <div className="space-y-3">
+                <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-walnut">
+                  Search
+                </h4>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-a0" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search products..."
+                    className="w-full bg-cream border border-warm-beige py-2.5 pl-10 pr-4 text-sm outline-none focus:border-gold rounded"
+                  />
+                </div>
+              </div>
+
               {/* Categories */}
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-walnut">
                   Categories
                 </h4>
-                <div className="grid grid-cols-1 gap-2">
+                <div className="grid grid-cols-1 gap-1.5 max-h-[200px] overflow-y-auto">
                   {categoryNames.map((cat) => (
                     <button
                       key={cat}
@@ -298,7 +331,11 @@ export default function ShopPage() {
                         setSelectedCategory(cat);
                         setShowMobileFilters(false);
                       }}
-                      className={`text-left text-[12px] py-2 px-3 border border-warm-beige ${selectedCategory === cat ? "bg-near-black text-white" : "bg-cream text-gray-666"}`}
+                      className={`text-left text-[12px] py-2.5 px-3 border rounded transition-all ${
+                        selectedCategory === cat 
+                          ? "bg-near-black text-white border-near-black" 
+                          : "bg-cream text-gray-666 border-warm-beige hover:border-gold"
+                      }`}
                     >
                       {cat}
                     </button>
@@ -307,35 +344,92 @@ export default function ShopPage() {
               </div>
 
               {/* Price Range */}
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-walnut">
-                  Max Price
+                  Max Price: £{priceRange[1]}
                 </h4>
                 <input
                   type="range"
                   min="0"
-                  max="5000"
+                  max={maxPrice}
                   step="100"
                   value={priceRange[1]}
                   onChange={(e) => setPriceRange([0, parseInt(e.target.value)])}
-                  className="w-full accent-walnut"
+                  className="w-full accent-walnut h-2"
                 />
-                <div className="flex justify-between text-[11px] font-bold text-gray-666">
+                <div className="flex justify-between text-[10px] text-gray-500">
                   <span>£0</span>
-                  <span>£{priceRange[1]}</span>
+                  <span>£{maxPrice}+</span>
+                </div>
+              </div>
+
+              {/* Sort Options */}
+              <div className="space-y-3">
+                <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-walnut">
+                  Sort By
+                </h4>
+                <div className="grid grid-cols-1 gap-1.5">
+                  {[
+                    { value: "latest", label: "Latest Arrivals" },
+                    { value: "low-to-high", label: "Price: Low to High" },
+                    { value: "high-to-low", label: "Price: High to Low" }
+                  ].map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => {
+                        setSortBy(option.value);
+                        setShowMobileFilters(false);
+                      }}
+                      className={`text-left text-[12px] py-2.5 px-3 border rounded transition-all ${
+                        sortBy === option.value 
+                          ? "bg-near-black text-white border-near-black" 
+                          : "bg-cream text-gray-666 border-warm-beige"
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
 
             <button
-              onClick={() => setShowMobileFilters(false)}
-              className="w-full bg-near-black text-white py-4 text-[11px] font-bold uppercase tracking-widest"
+              onClick={() => {
+                setSelectedCategory("All");
+                setSearchQuery("");
+                setPriceRange([0, maxPrice]);
+                setSortBy("latest");
+                setShowMobileFilters(false);
+              }}
+              className="w-full bg-warm-beige text-near-black py-3 text-[11px] font-bold uppercase tracking-widest rounded hover:bg-gold transition-colors mt-4"
             >
-              Show Results
+              Reset All Filters
+            </button>
+
+            <button
+              onClick={() => setShowMobileFilters(false)}
+              className="w-full bg-near-black text-white py-3 text-[11px] font-bold uppercase tracking-widest rounded hover:bg-gold hover:text-near-black transition-colors"
+            >
+              Show {filteredProducts.length} Results
             </button>
           </div>
         </div>
       )}
+
+      {/* Add custom animation style */}
+      <style>{`
+        @keyframes slideIn {
+          from {
+            transform: translateX(-100%);
+          }
+          to {
+            transform: translateX(0);
+          }
+        }
+        .animate-slide-in {
+          animation: slideIn 0.3s ease-out;
+        }
+      `}</style>
     </div>
   );
 }

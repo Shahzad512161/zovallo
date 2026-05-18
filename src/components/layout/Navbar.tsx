@@ -75,7 +75,7 @@ export function Navbar() {
         <div className="flex-shrink-0">
           <Link to="/" className="flex items-center">
             <h1 className="text-xl sm:text-2xl font-bold tracking-tighter text-near-black">
-              LUXWOOD<span className="text-gold">.</span>
+              Zovallo<span className="text-gold">.</span>
             </h1>
           </Link>
         </div>

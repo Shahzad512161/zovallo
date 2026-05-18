@@ -9,7 +9,7 @@ interface SEOProps {
 }
 
 export const SEO = ({ title, description, image, url }: SEOProps) => {
-  const siteTitle = "LUXWOOD | Premium Furniture Boutique";
+  const siteTitle = "Zovallo | Premium Furniture Boutique";
   const fullTitle = `${title} | ${siteTitle}`;
   const siteDescription = "Masterfully crafted premium furniture blending traditional joinery with modern silhouettes. Discover our walnut and olive collection.";
 

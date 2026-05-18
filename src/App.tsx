@@ -155,7 +155,7 @@ export default function App() {
                 element={
                   <>
                     <Navbar />
-                    <main className="flex-grow pt-40">
+                    <main className="flex-grow pt-20 md:pt-38">
                       <Routes>
                         <Route path="/" element={<HomePage />} />
                         <Route path="/shop" element={<ShopPage />} />

@@ -68,7 +68,7 @@ export default function LoginPage() {
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12 bg-cream/20">
       <SEO
         title="Sign In"
-        description="Access your LUXWOOD account to manage your orders and curated furniture collection."
+        description="Access your Zovallo account to manage your orders and curated furniture collection."
       />
       <div className="max-w-md w-full space-y-8 bg-white border border-warm-beige p-6 sm:p-8 md:p-12 shadow-sm rounded-sm">
         <div className="text-center space-y-2">

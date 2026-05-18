@@ -57,13 +57,13 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}
       >
-        <div className="p-8 flex flex-col h-full">
+        <div className="p-3 sm:p-5 flex flex-col h-full">
           <div className="flex items-center justify-between mb-12">
             <Link
               to="/"
               className="text-xl font-display tracking-tighter hover:text-gold transition-colors"
             >
-              ETHEREAL{" "}
+              Zovallo{" "}
               <span className="text-[10px] tracking-widest font-sans font-bold bg-gold px-2 py-0.5 rounded ml-2">
                 ADMIN
               </span>
@@ -163,7 +163,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         </header>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto p-6 sm:p-10">{children}</div>
+        <div className="flex-1 overflow-y-auto p-3 sm:p-6">{children}</div>
       </main>
     </div>
   );

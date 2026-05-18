@@ -92,7 +92,7 @@ export default function RegisterPage() {
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12 bg-cream/20">
       <SEO
         title="Create Account"
-        description="Join the LUXWOOD community to manage your curated furniture orders and preferences."
+        description="Join the Zovallo community to manage your curated furniture orders and preferences."
       />
       <div className="max-w-md w-full space-y-8 bg-white border border-warm-beige p-6 sm:p-8 md:p-12 shadow-sm rounded-sm">
         <div className="text-center space-y-2">
@@ -100,7 +100,7 @@ export default function RegisterPage() {
             <UserPlus className="w-10 h-10 text-walnut" />
           </div>
           <h1 className="text-2xl sm:text-3xl font-display text-near-black">
-            Join LUXWOOD
+            Join Zovallo
           </h1>
           <p className="text-gray-666 font-light text-sm">
             Create an account for a seamless experience
