@@ -81,13 +81,26 @@ export default function ProductPage() {
     return (
       <div className="max-w-7xl mx-auto px-4 py-16 sm:py-24 md:py-32 text-center space-y-4 sm:space-y-6">
         <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-cream rounded-full mb-4">
-          <svg className="w-8 h-8 sm:w-10 sm:h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <svg
+            className="w-8 h-8 sm:w-10 sm:h-10 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
           </svg>
         </div>
-        <h2 className="text-xl sm:text-2xl font-display text-near-black">Product Not Found</h2>
+        <h2 className="text-xl sm:text-2xl font-display text-near-black">
+          Product Not Found
+        </h2>
         <p className="text-gray-500 text-sm sm:text-base max-w-md mx-auto px-4">
-          The product you're looking for doesn't exist or has been removed from our collection.
+          The product you're looking for doesn't exist or has been removed from
+          our collection.
         </p>
         <Link
           to="/shop"
@@ -101,27 +114,37 @@ export default function ProductPage() {
 
   return (
     <>
-      <SEO title={product.title} description={product.description.substring(0, 160)} />
+      <SEO
+        title={product.title}
+        description={product.description.substring(0, 160)}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-12">
-        
         {/* Breadcrumb - Responsive */}
         <div className="mb-6 sm:mb-8 overflow-x-auto">
           <div className="flex items-center gap-1 sm:gap-2 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-gray-400 whitespace-nowrap">
-            <Link to="/" className="hover:text-gold transition-colors">Home</Link>
+            <Link to="/" className="hover:text-gold transition-colors">
+              Home
+            </Link>
             <span>/</span>
-            <Link to="/shop" className="hover:text-gold transition-colors">Shop</Link>
+            <Link to="/shop" className="hover:text-gold transition-colors">
+              Shop
+            </Link>
             <span>/</span>
-            <Link to={`/category/${product.category.toLowerCase().replace(/ /g, "-")}`} className="hover:text-gold transition-colors">
+            <Link
+              to={`/category/${product.category.toLowerCase().replace(/ /g, "-")}`}
+              className="hover:text-gold transition-colors"
+            >
               {product.category}
             </Link>
             <span>/</span>
-            <span className="text-gold truncate max-w-[150px] sm:max-w-none">{product.title}</span>
+            <span className="text-gold truncate max-w-[150px] sm:max-w-none">
+              {product.title}
+            </span>
           </div>
         </div>
 
         {/* Main Content - Responsive Grid */}
         <div className="flex flex-col lg:flex-row gap-6 sm:gap-8 md:gap-12">
-          
           {/* Image Gallery - Responsive */}
           <div className="lg:w-1/2 space-y-3 sm:space-y-4">
             {/* Main Image */}
@@ -146,7 +169,11 @@ export default function ProductPage() {
                         : "border-warm-beige hover:border-gold"
                     }`}
                   >
-                    <img src={img} alt={`${product.title} view ${idx + 1}`} className="w-full h-full object-cover" />
+                    <img
+                      src={img}
+                      alt={`${product.title} view ${idx + 1}`}
+                      className="w-full h-full object-cover"
+                    />
                   </button>
                 ))}
               </div>
@@ -155,7 +182,6 @@ export default function ProductPage() {
 
           {/* Product Info - Responsive */}
           <div className="lg:w-1/2 space-y-5 sm:space-y-6 md:space-y-8">
-            
             {/* Badges */}
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               <span className="text-[8px] sm:text-[10px] font-bold uppercase tracking-widest text-walnut bg-cream px-2 sm:px-3 py-1 rounded">
@@ -186,7 +212,10 @@ export default function ProductPage() {
             <div className="flex flex-wrap items-center gap-2 sm:gap-4">
               <div className="flex items-center gap-1">
                 {[1, 2, 3, 4, 5].map((star) => (
-                  <Star key={star} className="w-3 h-3 sm:w-4 sm:h-4 fill-gold text-gold" />
+                  <Star
+                    key={star}
+                    className="w-3 h-3 sm:w-4 sm:h-4 fill-gold text-gold"
+                  />
                 ))}
               </div>
               <span className="text-[8px] sm:text-[10px] text-gray-400 uppercase tracking-widest">
@@ -205,21 +234,31 @@ export default function ProductPage() {
             </p>
 
             {/* Specifications - Responsive Grid */}
-            {product.specifications && Object.keys(product.specifications).length > 0 && (
-              <div className="space-y-3 sm:space-y-4">
-                <h3 className="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.2em] text-walnut">
-                  Specifications
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
-                  {Object.entries(product.specifications).map(([key, value]) => (
-                    <div key={key} className="flex flex-col sm:flex-row border-b border-warm-beige pb-2">
-                      <span className="font-bold text-near-black sm:w-1/3 mb-1 sm:mb-0">{key}:</span>
-                      <span className="text-gray-666 sm:w-2/3">{value as string}</span>
-                    </div>
-                  ))}
+            {product.specifications &&
+              Object.keys(product.specifications).length > 0 && (
+                <div className="space-y-3 sm:space-y-4">
+                  <h3 className="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.2em] text-walnut">
+                    Specifications
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
+                    {Object.entries(product.specifications).map(
+                      ([key, value]) => (
+                        <div
+                          key={key}
+                          className="flex flex-col sm:flex-row border-b border-warm-beige pb-2"
+                        >
+                          <span className="font-bold text-near-black sm:w-1/3 mb-1 sm:mb-0">
+                            {key}:
+                          </span>
+                          <span className="text-gray-666 sm:w-2/3">
+                            {value as string}
+                          </span>
+                        </div>
+                      ),
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
             {/* Quantity & Add to Cart - Responsive */}
             <div className="space-y-4 sm:space-y-6">
@@ -313,20 +352,27 @@ export default function ProductPage() {
             </h3>
             <div className="space-y-4 sm:space-y-6">
               {product.reviews.map((review) => (
-                <div key={review.id} className="border-b border-warm-beige pb-4 sm:pb-6">
+                <div
+                  key={review.id}
+                  className="border-b border-warm-beige pb-4 sm:pb-6"
+                >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
                     <div>
                       <p className="font-bold text-near-black text-sm sm:text-base">
                         {review.userName}
                       </p>
-                      <p className="text-[8px] sm:text-[10px] text-gray-400">{review.date}</p>
+                      <p className="text-[8px] sm:text-[10px] text-gray-400">
+                        {review.date}
+                      </p>
                     </div>
                     <div className="flex gap-1">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <Star
                           key={star}
                           className={`w-2.5 h-2.5 sm:w-3 sm:h-3 ${
-                            star <= review.rating ? "fill-gold text-gold" : "text-gray-300"
+                            star <= review.rating
+                              ? "fill-gold text-gold"
+                              : "text-gray-300"
                           }`}
                         />
                       ))}

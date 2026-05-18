@@ -70,10 +70,26 @@ export default function AdminOrders() {
   });
 
   const stats = [
-    { label: "Pending", count: orders.filter((o) => o.orderStatus === "pending").length, color: "text-gold" },
-    { label: "Processing", count: orders.filter((o) => o.orderStatus === "processing").length, color: "text-near-black" },
-    { label: "Shipped", count: orders.filter((o) => o.orderStatus === "shipped").length, color: "text-blue-500" },
-    { label: "Delivered", count: orders.filter((o) => o.orderStatus === "delivered").length, color: "text-mint-700" },
+    {
+      label: "Pending",
+      count: orders.filter((o) => o.orderStatus === "pending").length,
+      color: "text-gold",
+    },
+    {
+      label: "Processing",
+      count: orders.filter((o) => o.orderStatus === "processing").length,
+      color: "text-near-black",
+    },
+    {
+      label: "Shipped",
+      count: orders.filter((o) => o.orderStatus === "shipped").length,
+      color: "text-blue-500",
+    },
+    {
+      label: "Delivered",
+      count: orders.filter((o) => o.orderStatus === "delivered").length,
+      color: "text-mint-700",
+    },
   ];
 
   return (
@@ -94,7 +110,9 @@ export default function AdminOrders() {
               <p className="text-[8px] sm:text-[9px] font-bold uppercase tracking-widest text-gray-400 mb-0.5 sm:mb-1">
                 {s.label}
               </p>
-              <p className={`text-base sm:text-lg md:text-xl font-display font-bold ${s.color}`}>
+              <p
+                className={`text-base sm:text-lg md:text-xl font-display font-bold ${s.color}`}
+              >
                 {s.count}
               </p>
             </div>
@@ -103,7 +121,6 @@ export default function AdminOrders() {
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6 sm:gap-8 md:gap-10">
-        
         {/* Orders List */}
         <div className="flex-1 space-y-4 sm:space-y-5 md:space-y-6">
           {/* Search & Filter Bar */}
@@ -158,19 +175,29 @@ export default function AdminOrders() {
                 <tbody className="divide-y divide-warm-beige">
                   {loading ? (
                     <tr>
-                      <td colSpan={5} className="px-3 sm:px-4 md:px-5 lg:px-6 py-12 sm:py-16 md:py-20 lg:py-24">
+                      <td
+                        colSpan={5}
+                        className="px-3 sm:px-4 md:px-5 lg:px-6 py-12 sm:py-16 md:py-20 lg:py-24"
+                      >
                         <div className="flex flex-col items-center justify-center gap-3 sm:gap-4">
                           <LoadingSpinner />
                           <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-gold text-center">
                             Scanning ledger...
                           </p>
                         </div>
-                       </td>
+                      </td>
                     </tr>
                   ) : filteredOrders.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="px-3 sm:px-4 md:px-5 lg:px-6 py-12 sm:py-16 md:py-20">
-                        <EmptyState icon={Package} title="No Orders Found" description="We couldn't find any orders matching your current filters." />
+                      <td
+                        colSpan={5}
+                        className="px-3 sm:px-4 md:px-5 lg:px-6 py-12 sm:py-16 md:py-20"
+                      >
+                        <EmptyState
+                          icon={Package}
+                          title="No Orders Found"
+                          description="We couldn't find any orders matching your current filters."
+                        />
                       </td>
                     </tr>
                   ) : (
@@ -192,7 +219,9 @@ export default function AdminOrders() {
                         </td>
                         <td className="px-3 sm:px-4 md:px-5 lg:px-6 py-3 sm:py-4 md:py-5 lg:py-6">
                           <span className="text-[9px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-tighter">
-                            {order.createdAt?.toDate().toLocaleDateString("en-GB")}
+                            {order.createdAt
+                              ?.toDate()
+                              .toLocaleDateString("en-GB")}
                           </span>
                         </td>
                         <td className="px-3 sm:px-4 md:px-5 lg:px-6 py-3 sm:py-4 md:py-5 lg:py-6">
@@ -201,11 +230,15 @@ export default function AdminOrders() {
                           </span>
                         </td>
                         <td className="px-3 sm:px-4 md:px-5 lg:px-6 py-3 sm:py-4 md:py-5 lg:py-6 text-right">
-                          <span className={`inline-block px-2 sm:px-3 py-0.5 sm:py-1 text-[7px] sm:text-[8px] md:text-[9px] font-bold uppercase tracking-widest rounded-sm ${
-                            order.orderStatus === "delivered" ? "bg-mint-50 text-mint-700" :
-                            order.orderStatus === "pending" ? "bg-gold/10 text-walnut" :
-                            "bg-gray-100 text-gray-400"
-                          }`}>
+                          <span
+                            className={`inline-block px-2 sm:px-3 py-0.5 sm:py-1 text-[7px] sm:text-[8px] md:text-[9px] font-bold uppercase tracking-widest rounded-sm ${
+                              order.orderStatus === "delivered"
+                                ? "bg-mint-50 text-mint-700"
+                                : order.orderStatus === "pending"
+                                  ? "bg-gold/10 text-walnut"
+                                  : "bg-gray-100 text-gray-400"
+                            }`}
+                          >
                             {order.orderStatus}
                           </span>
                         </td>
@@ -232,10 +265,17 @@ export default function AdminOrders() {
                   </h3>
                 </div>
                 <div className="flex gap-1 sm:gap-2">
-                  <Link to={`/admin/orders/${selectedOrder.id}`} className="p-1.5 sm:p-2 hover:bg-cream transition-colors text-gray-400 rounded" title="View Full Intel">
+                  <Link
+                    to={`/admin/orders/${selectedOrder.id}`}
+                    className="p-1.5 sm:p-2 hover:bg-cream transition-colors text-gray-400 rounded"
+                    title="View Full Intel"
+                  >
                     <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />
                   </Link>
-                  <button className="p-1.5 sm:p-2 hover:bg-cream transition-colors text-gray-400 rounded" onClick={() => setSelectedOrder(null)}>
+                  <button
+                    className="p-1.5 sm:p-2 hover:bg-cream transition-colors text-gray-400 rounded"
+                    onClick={() => setSelectedOrder(null)}
+                  >
                     <XCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
                 </div>
@@ -254,7 +294,12 @@ export default function AdminOrders() {
                     <div className="relative">
                       <select
                         value={selectedOrder.orderStatus}
-                        onChange={(e) => updateStatus(selectedOrder.id, e.target.value as Order["orderStatus"])}
+                        onChange={(e) =>
+                          updateStatus(
+                            selectedOrder.id,
+                            e.target.value as Order["orderStatus"],
+                          )
+                        }
                         className="w-full bg-transparent border-none p-0 text-xs sm:text-sm font-bold text-near-black appearance-none focus:ring-0 cursor-pointer"
                       >
                         <option value="pending">Mark as Pending</option>
@@ -276,18 +321,25 @@ export default function AdminOrders() {
                   <div className="grid grid-cols-1 gap-3 sm:gap-4">
                     <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm break-all">
                       <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-walnut flex-shrink-0" />
-                      <span className="font-medium">{selectedOrder.customerInfo.email}</span>
+                      <span className="font-medium">
+                        {selectedOrder.customerInfo.email}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm">
                       <Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-walnut flex-shrink-0" />
-                      <span className="font-medium">{selectedOrder.customerInfo.phone}</span>
+                      <span className="font-medium">
+                        {selectedOrder.customerInfo.phone}
+                      </span>
                     </div>
                     <div className="flex items-start gap-2 sm:gap-3 text-xs sm:text-sm">
                       <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-walnut mt-0.5 flex-shrink-0" />
                       <div className="flex flex-col">
-                        <span className="font-medium break-words">{selectedOrder.customerInfo.address}</span>
+                        <span className="font-medium break-words">
+                          {selectedOrder.customerInfo.address}
+                        </span>
                         <span className="text-[9px] sm:text-[10px] text-gray-400 uppercase tracking-tighter">
-                          {selectedOrder.customerInfo.city}, {selectedOrder.customerInfo.postalCode}
+                          {selectedOrder.customerInfo.city},{" "}
+                          {selectedOrder.customerInfo.postalCode}
                         </span>
                       </div>
                     </div>
@@ -303,7 +355,10 @@ export default function AdminOrders() {
                     {selectedOrder.products.map((p, idx) => (
                       <div key={idx} className="flex gap-2 sm:gap-3 md:gap-4">
                         <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-cream border border-warm-beige flex-shrink-0 rounded overflow-hidden">
-                          <img src={p.image} className="w-full h-full object-cover" />
+                          <img
+                            src={p.image}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-[10px] sm:text-xs font-bold text-near-black leading-tight truncate">
@@ -334,7 +389,8 @@ export default function AdminOrders() {
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5 sm:gap-2 text-[8px] sm:text-[9px] font-bold uppercase tracking-widest text-mint-400">
-                    <CheckCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Paid via Cash on Delivery
+                    <CheckCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Paid
+                    via Cash on Delivery
                   </div>
                 </div>
               </div>
@@ -343,7 +399,8 @@ export default function AdminOrders() {
             <div className="h-[400px] sm:h-[500px] lg:h-[600px] bg-cream/30 border border-dashed border-warm-beige flex flex-col items-center justify-center text-center p-6 sm:p-8 md:p-10 rounded-lg">
               <Package className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 text-gray-300 mb-3 sm:mb-4" />
               <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                Select an order from the ledger to view full intelligence and fulfilment history.
+                Select an order from the ledger to view full intelligence and
+                fulfilment history.
               </p>
             </div>
           )}

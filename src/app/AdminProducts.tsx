@@ -246,7 +246,10 @@ export default function AdminProducts() {
             <tbody className="divide-y divide-warm-beige">
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="px-3 sm:px-4 md:px-5 lg:px-8 py-12 sm:py-16 md:py-20 lg:py-24">
+                  <td
+                    colSpan={5}
+                    className="px-3 sm:px-4 md:px-5 lg:px-8 py-12 sm:py-16 md:py-20 lg:py-24"
+                  >
                     <div className="flex flex-col items-center justify-center gap-3 sm:gap-4">
                       <LoadingSpinner />
                       <p className="text-[8px] sm:text-[9px] md:text-[10px] font-bold uppercase tracking-[0.2em] text-gold">
@@ -257,13 +260,19 @@ export default function AdminProducts() {
                 </tr>
               ) : paginatedProducts.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-3 sm:px-4 md:px-5 lg:px-8 py-10 sm:py-12 md:py-16 text-center text-gray-400 text-xs sm:text-sm">
+                  <td
+                    colSpan={5}
+                    className="px-3 sm:px-4 md:px-5 lg:px-8 py-10 sm:py-12 md:py-16 text-center text-gray-400 text-xs sm:text-sm"
+                  >
                     No products matched your search criteria.
-                   </td>
+                  </td>
                 </tr>
               ) : (
                 paginatedProducts.map((p) => (
-                  <tr key={p.id} className="hover:bg-cream/20 transition-colors">
+                  <tr
+                    key={p.id}
+                    className="hover:bg-cream/20 transition-colors"
+                  >
                     <td className="px-3 sm:px-4 md:px-5 lg:px-8 py-3 sm:py-4 md:py-5 lg:py-6">
                       <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
                         <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 bg-cream border border-warm-beige overflow-hidden rounded">

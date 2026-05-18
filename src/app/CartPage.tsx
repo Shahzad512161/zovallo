@@ -32,7 +32,6 @@ export default function CartPage() {
   return (
     <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8 md:py-10 lg:py-12">
       <div className="flex flex-col lg:flex-row gap-6 md:gap-8 lg:gap-12">
-        
         {/* Cart Items List */}
         <div className="flex-1 space-y-5 sm:space-y-6 md:space-y-8">
           {/* Header */}
@@ -90,7 +89,9 @@ export default function CartPage() {
                     {/* Quantity Controls */}
                     <div className="flex items-center border border-warm-beige h-9 sm:h-10 rounded">
                       <button
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        onClick={() =>
+                          updateQuantity(item.id, item.quantity - 1)
+                        }
                         className="w-8 sm:w-10 h-full flex items-center justify-center hover:bg-cream transition-colors border-r border-warm-beige rounded-l"
                       >
                         <Minus className="w-3 h-3" />
@@ -99,7 +100,9 @@ export default function CartPage() {
                         {item.quantity}
                       </span>
                       <button
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        onClick={() =>
+                          updateQuantity(item.id, item.quantity + 1)
+                        }
                         className="w-8 sm:w-10 h-full flex items-center justify-center hover:bg-cream transition-colors border-l border-warm-beige rounded-r"
                       >
                         <Plus className="w-3 h-3" />
@@ -164,7 +167,7 @@ export default function CartPage() {
               >
                 Proceed to Checkout
               </Link>
-              
+
               {/* Security & Delivery Info */}
               <div className="flex flex-col gap-3 sm:gap-4 py-4 sm:py-5 md:py-6 border-t border-warm-beige mt-4 sm:mt-5 md:mt-6">
                 <div className="flex items-center gap-3">

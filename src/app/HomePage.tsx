@@ -55,14 +55,21 @@ export default function HomePage() {
       return category.image;
     }
     const fallbackImages: Record<string, string> = {
-      "Sofa Sets": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800",
-      "Dining Tables": "https://images.unsplash.com/photo-1577146333359-39f99d73010b?auto=format&fit=crop&q=80&w=800",
+      "Sofa Sets":
+        "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800",
+      "Dining Tables":
+        "https://images.unsplash.com/photo-1577146333359-39f99d73010b?auto=format&fit=crop&q=80&w=800",
       Beds: "https://images.unsplash.com/photo-1505691938895-1758d7eaa511?auto=format&fit=crop&q=80&w=800",
-      Mattresses: "https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&q=80&w=800",
-      "Acoustic Wall Panels": "https://images.unsplash.com/photo-1615876234586-44c13824bba3?auto=format&fit=crop&q=80&w=800",
-      "Coffee Tables": "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&q=80&w=800",
-      "Office Chairs": "https://images.unsplash.com/photo-1505797149-43b00fe1eeac?auto=format&fit=crop&q=80&w=800",
-      Wardrobes: "https://images.unsplash.com/photo-1595428774223-ef52624120ec?auto=format&fit=crop&q=80&w=800",
+      Mattresses:
+        "https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&q=80&w=800",
+      "Acoustic Wall Panels":
+        "https://images.unsplash.com/photo-1615876234586-44c13824bba3?auto=format&fit=crop&q=80&w=800",
+      "Coffee Tables":
+        "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&q=80&w=800",
+      "Office Chairs":
+        "https://images.unsplash.com/photo-1505797149-43b00fe1eeac?auto=format&fit=crop&q=80&w=800",
+      Wardrobes:
+        "https://images.unsplash.com/photo-1595428774223-ef52624120ec?auto=format&fit=crop&q=80&w=800",
     };
     return (
       fallbackImages[category.name] ||
@@ -101,7 +108,7 @@ export default function HomePage() {
         title="Home"
         description="Discover our masterfully crafted autumnal collection, blending traditional joinery with modern silhouettes for the contemporary home."
       />
-      
+
       {/* Hero Section - Responsive */}
       <section className="relative h-[70vh] sm:h-[80vh] lg:h-[85vh] flex items-center justify-start overflow-hidden">
         <img
@@ -289,8 +296,6 @@ export default function HomePage() {
           </Button>
         </div>
       </section>
-
-      
 
       {/* Newsletter Section - Responsive */}
       {/* <section className="bg-near-black text-white py-16 sm:py-20 md:py-24 px-4 sm:px-6 lg:px-8">

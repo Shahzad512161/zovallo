@@ -259,7 +259,6 @@ export default function AdminProductForm() {
 
   return (
     <div className="max-w-5xl mx-auto px-3 sm:px-4 md:px-5 lg:px-0 space-y-5 sm:space-y-6 md:space-y-8 lg:space-y-12">
-      
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-warm-beige pb-4 sm:pb-6 md:pb-8 gap-4 sm:gap-6">
         <div className="flex items-center gap-3 sm:gap-4 md:gap-5 lg:gap-6">
@@ -280,7 +279,8 @@ export default function AdminProductForm() {
         </div>
         <div className="flex items-center gap-1.5 sm:gap-2 text-[8px] sm:text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-gray-400">
           Admin <ChevronRight className="w-2.5 h-2.5 sm:w-3 sm:h-3" /> Inventory{" "}
-          <ChevronRight className="w-2.5 h-2.5 sm:w-3 sm:h-3" /> {isEdit ? "Edit" : "New"}
+          <ChevronRight className="w-2.5 h-2.5 sm:w-3 sm:h-3" />{" "}
+          {isEdit ? "Edit" : "New"}
         </div>
       </div>
 
@@ -291,7 +291,6 @@ export default function AdminProductForm() {
       >
         {/* Left Column - Main Form Fields */}
         <div className="flex-1 space-y-5 sm:space-y-6 md:space-y-8 lg:space-y-10 xl:space-y-12">
-          
           {/* Core Identity */}
           <section className="bg-white border border-warm-beige p-4 sm:p-5 md:p-6 lg:p-8 xl:p-10 space-y-4 sm:space-y-6 md:space-y-8 shadow-sm rounded-lg">
             <div className="flex items-center gap-2 sm:gap-3 border-l-4 border-gold pl-3 sm:pl-4">
@@ -410,7 +409,9 @@ export default function AdminProductForm() {
 
             <div className="space-y-4 sm:space-y-5 md:space-y-6">
               <div className="p-2.5 sm:p-3 bg-mint-50 border border-mint-200 text-[9px] sm:text-[10px] text-mint-700 rounded">
-                <strong>Tip:</strong> Select multiple images at once (Ctrl+Click or Shift+Click). First image will be the main product image. Max 5 images, each under 500KB.
+                <strong>Tip:</strong> Select multiple images at once (Ctrl+Click
+                or Shift+Click). First image will be the main product image. Max
+                5 images, each under 500KB.
               </div>
 
               {imageCount < 5 && (
@@ -432,8 +433,14 @@ export default function AdminProductForm() {
                     className={`w-full border-2 border-dashed border-warm-beige py-6 sm:py-7 md:py-8 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:border-gold hover:text-gold transition-all flex flex-col items-center justify-center gap-2 sm:gap-3 cursor-pointer rounded-lg ${uploadingImages ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
                     <Upload className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8" />
-                    <span>{uploadingImages ? "Uploading Images..." : "Click or Drag & Drop Multiple Images"}</span>
-                    <span className="text-[7px] sm:text-[8px] text-gray-300">(Max 5 images, 500KB each)</span>
+                    <span>
+                      {uploadingImages
+                        ? "Uploading Images..."
+                        : "Click or Drag & Drop Multiple Images"}
+                    </span>
+                    <span className="text-[7px] sm:text-[8px] text-gray-300">
+                      (Max 5 images, 500KB each)
+                    </span>
                   </label>
                 </div>
               )}
@@ -512,7 +519,8 @@ export default function AdminProductForm() {
 
               {imageCount > 1 && (
                 <div className="text-center text-[7px] sm:text-[8px] text-gray-400">
-                  Hover over images to reorder or delete. First image is the main product image.
+                  Hover over images to reorder or delete. First image is the
+                  main product image.
                 </div>
               )}
             </div>

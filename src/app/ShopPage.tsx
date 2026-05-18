@@ -115,7 +115,7 @@ export default function ShopPage() {
   // Reset price range max based on products
   const maxPrice = useMemo(() => {
     if (products.length === 0) return 5000;
-    return Math.max(...products.map(p => p.price), 5000);
+    return Math.max(...products.map((p) => p.price), 5000);
   }, [products]);
 
   if (loading) {
@@ -139,7 +139,7 @@ export default function ShopPage() {
         }
         description={`Explore our curated selection of ${selectedCategory.toLowerCase()} pieces. Premium furniture designed for comfort and crafted to last.`}
       />
-      
+
       {/* Page Header - Responsive */}
       <div className="text-center space-y-2 sm:space-y-3 md:space-y-4 mb-6 sm:mb-8">
         <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-display text-near-black tracking-tight px-2">
@@ -154,7 +154,6 @@ export default function ShopPage() {
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6 md:gap-8">
-        
         {/* Filters Sidebar (Desktop) */}
         <aside className="hidden lg:block w-64 space-y-6 md:space-y-8 flex-shrink-0">
           <div className="space-y-5 md:space-y-6">
@@ -186,8 +185,8 @@ export default function ShopPage() {
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
                     className={`block w-full text-left text-[11px] md:text-[12px] py-1.5 px-2 md:px-3 transition-colors rounded ${
-                      selectedCategory === cat 
-                        ? "bg-near-black text-white" 
+                      selectedCategory === cat
+                        ? "bg-near-black text-white"
                         : "hover:bg-cream text-gray-666"
                     }`}
                   >
@@ -223,7 +222,6 @@ export default function ShopPage() {
 
         {/* Main Content */}
         <div className="flex-1 min-w-0 space-y-6 md:space-y-8">
-          
           {/* Controls Bar - Responsive */}
           <div className="flex flex-col xs:flex-row justify-between items-center bg-white border-y border-warm-beige py-3 sm:py-4 px-3 sm:px-4 gap-3 sm:gap-4">
             <div className="flex items-center gap-3 sm:gap-4 w-full xs:w-auto justify-between xs:justify-start">
@@ -235,7 +233,8 @@ export default function ShopPage() {
                 <span>Filters</span>
               </button>
               <p className="text-[10px] sm:text-[11px] font-bold text-gray-a0 uppercase tracking-widest">
-                {filteredProducts.length} Result{filteredProducts.length !== 1 ? 's' : ''}
+                {filteredProducts.length} Result
+                {filteredProducts.length !== 1 ? "s" : ""}
               </p>
             </div>
 
@@ -292,7 +291,7 @@ export default function ShopPage() {
               <h3 className="text-sm font-bold uppercase tracking-widest">
                 Filter & Sort
               </h3>
-              <button 
+              <button
                 onClick={() => setShowMobileFilters(false)}
                 className="p-1 hover:bg-cream rounded-full transition-colors"
               >
@@ -332,8 +331,8 @@ export default function ShopPage() {
                         setShowMobileFilters(false);
                       }}
                       className={`text-left text-[12px] py-2.5 px-3 border rounded transition-all ${
-                        selectedCategory === cat 
-                          ? "bg-near-black text-white border-near-black" 
+                        selectedCategory === cat
+                          ? "bg-near-black text-white border-near-black"
                           : "bg-cream text-gray-666 border-warm-beige hover:border-gold"
                       }`}
                     >
@@ -372,7 +371,7 @@ export default function ShopPage() {
                   {[
                     { value: "latest", label: "Latest Arrivals" },
                     { value: "low-to-high", label: "Price: Low to High" },
-                    { value: "high-to-low", label: "Price: High to Low" }
+                    { value: "high-to-low", label: "Price: High to Low" },
                   ].map((option) => (
                     <button
                       key={option.value}
@@ -381,8 +380,8 @@ export default function ShopPage() {
                         setShowMobileFilters(false);
                       }}
                       className={`text-left text-[12px] py-2.5 px-3 border rounded transition-all ${
-                        sortBy === option.value 
-                          ? "bg-near-black text-white border-near-black" 
+                        sortBy === option.value
+                          ? "bg-near-black text-white border-near-black"
                           : "bg-cream text-gray-666 border-warm-beige"
                       }`}
                     >

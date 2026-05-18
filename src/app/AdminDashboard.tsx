@@ -103,7 +103,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-5 sm:space-y-6 md:space-y-8 lg:space-y-10 px-3 sm:px-4 md:px-5 lg:px-6">
-      
       {/* Header - Responsive */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 md:gap-6">
         <div>
@@ -114,7 +113,7 @@ export default function AdminDashboard() {
             Real-time overview of your furniture boutique.
           </p>
         </div>
-        
+
         {/* Action Buttons - Responsive */}
         <div className="flex flex-wrap gap-2 sm:gap-3">
           <button
@@ -122,7 +121,9 @@ export default function AdminDashboard() {
             disabled={refreshing}
             className="bg-white border border-warm-beige px-2.5 sm:px-3 md:px-4 py-1.5 sm:py-2 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 sm:gap-2 hover:bg-cream transition-colors disabled:opacity-50 rounded"
           >
-            <RefreshCw className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${refreshing ? "animate-spin" : ""}`} />
+            <RefreshCw
+              className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${refreshing ? "animate-spin" : ""}`}
+            />
             <span className="hidden xs:inline">Refresh</span>
           </button>
           <button className="bg-white border border-warm-beige px-2.5 sm:px-3 md:px-4 py-1.5 sm:py-2 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 sm:gap-2 hover:bg-cream transition-colors rounded">
@@ -147,7 +148,9 @@ export default function AdminDashboard() {
               <div className={`p-1.5 sm:p-2 md:p-3 rounded-lg ${card.color}`}>
                 <card.icon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
               </div>
-              <div className={`flex items-center gap-0.5 sm:gap-1 text-[8px] sm:text-[9px] md:text-[10px] font-bold ${card.isUp ? "text-mint-700" : "text-red-500"}`}>
+              <div
+                className={`flex items-center gap-0.5 sm:gap-1 text-[8px] sm:text-[9px] md:text-[10px] font-bold ${card.isUp ? "text-mint-700" : "text-red-500"}`}
+              >
                 {card.growth}
                 {card.isUp ? (
                   <ArrowUpRight className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
@@ -171,7 +174,6 @@ export default function AdminDashboard() {
 
       {/* Recent Orders Section */}
       <div className="flex flex-col gap-5 sm:gap-6 md:gap-8">
-        
         {/* Recent Orders Table */}
         <div className="bg-white border border-warm-beige overflow-hidden rounded-lg">
           {/* Table Header */}
@@ -212,13 +214,19 @@ export default function AdminDashboard() {
               <tbody className="divide-y divide-warm-beige">
                 {recentOrders.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-3 sm:px-4 md:px-5 lg:px-6 py-8 sm:py-10 md:py-12 text-center text-gray-400 text-xs sm:text-sm">
+                    <td
+                      colSpan={5}
+                      className="px-3 sm:px-4 md:px-5 lg:px-6 py-8 sm:py-10 md:py-12 text-center text-gray-400 text-xs sm:text-sm"
+                    >
                       No orders found
                     </td>
                   </tr>
                 ) : (
                   recentOrders.map((order) => (
-                    <tr key={order.id} className="hover:bg-cream/20 transition-colors">
+                    <tr
+                      key={order.id}
+                      className="hover:bg-cream/20 transition-colors"
+                    >
                       <td className="px-3 sm:px-4 md:px-5 lg:px-6 py-3 sm:py-4">
                         <span className="font-mono text-[10px] sm:text-xs font-bold">
                           #{order.id?.slice(-6).toUpperCase() || "N/A"}
@@ -240,15 +248,17 @@ export default function AdminDashboard() {
                         </span>
                       </td>
                       <td className="px-3 sm:px-4 md:px-5 lg:px-6 py-3 sm:py-4">
-                        <span className={`inline-block px-1.5 sm:px-2 md:px-3 py-0.5 sm:py-1 text-[7px] sm:text-[8px] md:text-[9px] font-bold uppercase tracking-widest rounded-full whitespace-nowrap ${
-                          order.orderStatus === "delivered"
-                            ? "bg-mint-50 text-mint-700"
-                            : order.orderStatus === "pending"
-                              ? "bg-gold/10 text-walnut"
-                              : order.orderStatus === "processing"
-                                ? "bg-blue-50 text-blue-600"
-                                : "bg-gray-100 text-gray-400"
-                        }`}>
+                        <span
+                          className={`inline-block px-1.5 sm:px-2 md:px-3 py-0.5 sm:py-1 text-[7px] sm:text-[8px] md:text-[9px] font-bold uppercase tracking-widest rounded-full whitespace-nowrap ${
+                            order.orderStatus === "delivered"
+                              ? "bg-mint-50 text-mint-700"
+                              : order.orderStatus === "pending"
+                                ? "bg-gold/10 text-walnut"
+                                : order.orderStatus === "processing"
+                                  ? "bg-blue-50 text-blue-600"
+                                  : "bg-gray-100 text-gray-400"
+                          }`}
+                        >
                           {order.orderStatus || "pending"}
                         </span>
                       </td>

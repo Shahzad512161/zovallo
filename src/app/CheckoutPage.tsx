@@ -288,7 +288,6 @@ export default function CheckoutPage() {
       />
 
       <div className="flex flex-col lg:flex-row gap-6 md:gap-8 lg:gap-12 xl:gap-16">
-        
         {/* Checkout Form */}
         <div className="flex-1 space-y-6 sm:space-y-8 md:space-y-10 lg:space-y-12">
           {/* Header */}
@@ -313,10 +312,12 @@ export default function CheckoutPage() {
             </div>
           )}
 
-          <form onSubmit={handleProceedToConfirmation} className="space-y-6 sm:space-y-8 md:space-y-10">
+          <form
+            onSubmit={handleProceedToConfirmation}
+            className="space-y-6 sm:space-y-8 md:space-y-10"
+          >
             {/* Form Fields */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 md:gap-6 lg:gap-8">
-              
               {/* Full Name */}
               <div className="space-y-1.5 sm:space-y-2">
                 <label className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-walnut block">
@@ -366,15 +367,24 @@ export default function CheckoutPage() {
                       value={selectedCountryCode.code}
                       onChange={(e) => {
                         const code = e.target.value;
-                        const countryData = countryCodes.find(c => c.code === code);
+                        const countryData = countryCodes.find(
+                          (c) => c.code === code,
+                        );
                         if (countryData) {
                           setSelectedCountryCode(countryData);
-                          setFormData(prev => ({ ...prev, country: countryData.country }));
+                          setFormData((prev) => ({
+                            ...prev,
+                            country: countryData.country,
+                          }));
                         }
                       }}
                       className="w-full bg-cream border border-warm-beige py-2.5 sm:py-3 pl-9 sm:pl-10 pr-2 text-sm outline-none focus:border-gold transition-colors rounded appearance-none"
                     >
-                      {countryCodes.map(c => <option key={c.code} value={c.code}>{c.code}</option>)}
+                      {countryCodes.map((c) => (
+                        <option key={c.code} value={c.code}>
+                          {c.code}
+                        </option>
+                      ))}
                     </select>
                   </div>
                   <div className="relative flex-1">
@@ -390,7 +400,9 @@ export default function CheckoutPage() {
                     />
                   </div>
                 </div>
-                <p className="text-[7px] sm:text-[8px] text-gray-400">Example: {selectedCountryCode.example}</p>
+                <p className="text-[7px] sm:text-[8px] text-gray-400">
+                  Example: {selectedCountryCode.example}
+                </p>
               </div>
 
               {/* Country */}
@@ -404,7 +416,11 @@ export default function CheckoutPage() {
                   onChange={handleCountryChange}
                   className="w-full bg-cream border border-warm-beige py-2.5 sm:py-3 px-3 sm:px-4 text-sm outline-none focus:border-gold transition-colors appearance-none rounded"
                 >
-                  {countryCodes.map(c => <option key={c.country} value={c.country}>{c.country}</option>)}
+                  {countryCodes.map((c) => (
+                    <option key={c.country} value={c.country}>
+                      {c.country}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -478,15 +494,21 @@ export default function CheckoutPage() {
 
             {/* Payment Method */}
             <div className="space-y-4 sm:space-y-5 md:space-y-6 pt-4 sm:pt-6 md:pt-8 lg:pt-10 border-t border-warm-beige">
-              <h2 className="text-lg sm:text-xl font-display text-near-black">Payment Method</h2>
+              <h2 className="text-lg sm:text-xl font-display text-near-black">
+                Payment Method
+              </h2>
               <div className="bg-mint-50 border border-mint-200 p-4 sm:p-5 md:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 rounded-lg">
                 <div className="flex items-center gap-3 sm:gap-4">
                   <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-full flex items-center justify-center shadow-sm">
                     <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 text-mint-700" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-near-black">Cash On Delivery (COD)</p>
-                    <p className="text-[10px] sm:text-xs text-mint-700">Pay when your furniture arrives at your doorstep</p>
+                    <p className="text-sm font-bold text-near-black">
+                      Cash On Delivery (COD)
+                    </p>
+                    <p className="text-[10px] sm:text-xs text-mint-700">
+                      Pay when your furniture arrives at your doorstep
+                    </p>
                   </div>
                 </div>
                 <div className="w-4 h-4 sm:w-5 sm:h-5 bg-mint-700 rounded-full flex items-center justify-center flex-shrink-0">
@@ -502,7 +524,9 @@ export default function CheckoutPage() {
               className="w-full bg-near-black text-white py-3 sm:py-4 md:py-5 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest hover:bg-gold transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3 disabled:opacity-50 rounded"
             >
               {loading ? "Processing Order..." : "Review Order"}
-              {!loading && <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
+              {!loading && (
+                <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              )}
             </button>
           </form>
         </div>
@@ -519,14 +543,26 @@ export default function CheckoutPage() {
               {cart.map((item) => (
                 <div key={item.id} className="flex gap-3 sm:gap-4">
                   <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-white border border-warm-beige flex-shrink-0 rounded overflow-hidden">
-                    <img src={item.images[0]} alt={item.title} className="w-full h-full object-cover" />
+                    <img
+                      src={item.images[0]}
+                      alt={item.title}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-xs sm:text-sm font-display text-near-black truncate">{item.title}</h4>
-                    <p className="text-[9px] sm:text-[10px] text-gray-666 uppercase tracking-widest mt-0.5">{item.category}</p>
+                    <h4 className="text-xs sm:text-sm font-display text-near-black truncate">
+                      {item.title}
+                    </h4>
+                    <p className="text-[9px] sm:text-[10px] text-gray-666 uppercase tracking-widest mt-0.5">
+                      {item.category}
+                    </p>
                     <div className="flex justify-between items-center mt-1 sm:mt-2">
-                      <p className="text-[10px] sm:text-[11px] font-bold text-gray-a0">QTY: {item.quantity}</p>
-                      <p className="text-xs sm:text-sm font-medium text-near-black">{formatCurrency(item.price * item.quantity)}</p>
+                      <p className="text-[10px] sm:text-[11px] font-bold text-gray-a0">
+                        QTY: {item.quantity}
+                      </p>
+                      <p className="text-xs sm:text-sm font-medium text-near-black">
+                        {formatCurrency(item.price * item.quantity)}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -537,15 +573,23 @@ export default function CheckoutPage() {
             <div className="space-y-2 sm:space-y-3 pt-4 sm:pt-5 md:pt-6 border-t border-warm-beige mt-4 sm:mt-5 md:mt-6">
               <div className="flex justify-between text-xs sm:text-sm">
                 <span className="text-gray-666">Order Subtotal</span>
-                <span className="font-medium text-near-black">{formatCurrency(subtotal)}</span>
+                <span className="font-medium text-near-black">
+                  {formatCurrency(subtotal)}
+                </span>
               </div>
               <div className="flex justify-between text-xs sm:text-sm">
                 <span className="text-gray-666">Standard Delivery</span>
-                <span className="text-mint-700 font-bold uppercase tracking-wider text-[9px] sm:text-[10px]">FREE</span>
+                <span className="text-mint-700 font-bold uppercase tracking-wider text-[9px] sm:text-[10px]">
+                  FREE
+                </span>
               </div>
               <div className="pt-2 sm:pt-3 border-t border-warm-beige flex justify-between items-baseline">
-                <span className="text-base sm:text-lg font-display text-near-black">Order Total</span>
-                <span className="text-lg sm:text-xl md:text-2xl font-light text-walnut">{formatCurrency(subtotal)}</span>
+                <span className="text-base sm:text-lg font-display text-near-black">
+                  Order Total
+                </span>
+                <span className="text-lg sm:text-xl md:text-2xl font-light text-walnut">
+                  {formatCurrency(subtotal)}
+                </span>
               </div>
             </div>
 
@@ -553,11 +597,15 @@ export default function CheckoutPage() {
             <div className="space-y-2 sm:space-y-3 pt-3 sm:pt-4">
               <div className="flex items-center gap-2 sm:gap-3">
                 <Truck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-mint-700" />
-                <p className="text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.1em] text-gray-a0">Dispatched within 24-48 hours</p>
+                <p className="text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.1em] text-gray-a0">
+                  Dispatched within 24-48 hours
+                </p>
               </div>
               <div className="flex items-center gap-2 sm:gap-3">
                 <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-mint-700" />
-                <p className="text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.1em] text-gray-a0">White glove placement included</p>
+                <p className="text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.1em] text-gray-a0">
+                  White glove placement included
+                </p>
               </div>
             </div>
           </div>
@@ -589,30 +637,58 @@ export default function CheckoutPage() {
             <div className="p-4 sm:p-5 md:p-6 space-y-4 sm:space-y-5 max-h-[50vh] sm:max-h-[60vh] overflow-y-auto">
               {/* Delivery Details */}
               <div className="space-y-2 sm:space-y-3">
-                <h4 className="text-[10px] font-bold uppercase tracking-widest text-walnut">Delivery Details</h4>
+                <h4 className="text-[10px] font-bold uppercase tracking-widest text-walnut">
+                  Delivery Details
+                </h4>
                 <div className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm">
-                  <p><span className="font-bold">Name:</span> {formData.fullName}</p>
-                  <p><span className="font-bold">Email:</span> {formData.email}</p>
-                  <p><span className="font-bold">Phone:</span> {selectedCountryCode.code} {formData.phone}</p>
-                  <p><span className="font-bold">Address:</span> {formData.address}, {formData.city}, {formData.postalCode}, {formData.country}</p>
-                  {formData.notes && <p><span className="font-bold">Notes:</span> {formData.notes}</p>}
+                  <p>
+                    <span className="font-bold">Name:</span> {formData.fullName}
+                  </p>
+                  <p>
+                    <span className="font-bold">Email:</span> {formData.email}
+                  </p>
+                  <p>
+                    <span className="font-bold">Phone:</span>{" "}
+                    {selectedCountryCode.code} {formData.phone}
+                  </p>
+                  <p>
+                    <span className="font-bold">Address:</span>{" "}
+                    {formData.address}, {formData.city}, {formData.postalCode},{" "}
+                    {formData.country}
+                  </p>
+                  {formData.notes && (
+                    <p>
+                      <span className="font-bold">Notes:</span> {formData.notes}
+                    </p>
+                  )}
                 </div>
               </div>
 
               {/* Order Summary */}
               <div className="space-y-2 sm:space-y-3">
-                <h4 className="text-[10px] font-bold uppercase tracking-widest text-walnut">Order Summary</h4>
+                <h4 className="text-[10px] font-bold uppercase tracking-widest text-walnut">
+                  Order Summary
+                </h4>
                 <div className="space-y-1.5 sm:space-y-2">
                   {cart.map((item, idx) => (
-                    <div key={idx} className="flex justify-between text-xs sm:text-sm">
-                      <span className="truncate max-w-[150px] sm:max-w-[200px]">{item.title} x{item.quantity}</span>
-                      <span className="font-medium">{formatCurrency(item.price * item.quantity)}</span>
+                    <div
+                      key={idx}
+                      className="flex justify-between text-xs sm:text-sm"
+                    >
+                      <span className="truncate max-w-[150px] sm:max-w-[200px]">
+                        {item.title} x{item.quantity}
+                      </span>
+                      <span className="font-medium">
+                        {formatCurrency(item.price * item.quantity)}
+                      </span>
                     </div>
                   ))}
                   <div className="border-t border-warm-beige pt-2 mt-2">
                     <div className="flex justify-between font-bold text-sm sm:text-base">
                       <span>Total</span>
-                      <span className="text-gold">{formatCurrency(subtotal)}</span>
+                      <span className="text-gold">
+                        {formatCurrency(subtotal)}
+                      </span>
                     </div>
                   </div>
                 </div>

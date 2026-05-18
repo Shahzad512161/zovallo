@@ -52,7 +52,10 @@ export default function AdminCategories() {
     });
   };
 
-  const compressImage = (file: File, maxWidth: number = 800): Promise<string> => {
+  const compressImage = (
+    file: File,
+    maxWidth: number = 800,
+  ): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -143,7 +146,8 @@ export default function AdminCategories() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this category?")) return;
+    if (!window.confirm("Are you sure you want to delete this category?"))
+      return;
     try {
       await categoryApi.delete(id);
       await fetchCategories();
@@ -210,7 +214,10 @@ export default function AdminCategories() {
       {loading ? (
         <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-            <div key={i} className="bg-white border border-warm-beige overflow-hidden rounded-lg">
+            <div
+              key={i}
+              className="bg-white border border-warm-beige overflow-hidden rounded-lg"
+            >
               <Skeleton className="aspect-[4/3] w-full" />
               <div className="p-3 sm:p-4 md:p-5 lg:p-6 space-y-2 sm:space-y-3 md:space-y-4">
                 <Skeleton className="h-5 sm:h-6 w-3/4" />
@@ -226,7 +233,9 @@ export default function AdminCategories() {
       ) : filteredCategories.length === 0 ? (
         <div className="text-center py-10 sm:py-16 md:py-20 border border-dashed border-warm-beige rounded-lg">
           <ImageIcon className="w-10 h-10 sm:w-12 sm:h-12 text-gray-300 mx-auto mb-3 sm:mb-4" />
-          <p className="text-gray-400 text-xs sm:text-sm">No categories found. Create your first category!</p>
+          <p className="text-gray-400 text-xs sm:text-sm">
+            No categories found. Create your first category!
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
@@ -246,7 +255,9 @@ export default function AdminCategories() {
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center text-gray-300">
                     <ImageIcon className="w-6 h-6 sm:w-8 sm:h-10 mb-1 sm:mb-2" />
-                    <span className="text-[7px] sm:text-[8px] md:text-[10px] uppercase font-bold">No Preview</span>
+                    <span className="text-[7px] sm:text-[8px] md:text-[10px] uppercase font-bold">
+                      No Preview
+                    </span>
                   </div>
                 )}
                 <div className="absolute top-1 sm:top-2 md:top-4 right-1 sm:right-2 md:right-4 flex gap-1 sm:gap-2 translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300">
@@ -277,7 +288,8 @@ export default function AdminCategories() {
                   /{category.slug}
                 </p>
                 <p className="text-[9px] sm:text-[10px] md:text-xs text-gray-400 line-clamp-2 leading-relaxed">
-                  {category.description || "No description provided for this collection."}
+                  {category.description ||
+                    "No description provided for this collection."}
                 </p>
               </div>
             </div>
@@ -288,7 +300,10 @@ export default function AdminCategories() {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center px-3 sm:px-4">
-          <div className="absolute inset-0 bg-near-black/80 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
+          <div
+            className="absolute inset-0 bg-near-black/80 backdrop-blur-sm"
+            onClick={() => setIsModalOpen(false)}
+          />
           <div className="bg-white w-full max-w-md sm:max-w-lg relative z-10 shadow-2xl border border-warm-beige p-5 sm:p-6 md:p-8 lg:p-10 max-h-[90vh] overflow-y-auto rounded-xl sm:rounded-lg">
             <button
               className="absolute top-3 right-3 sm:top-4 sm:right-4 md:top-5 md:right-5 text-gray-400 hover:text-near-black transition-colors"
@@ -300,24 +315,38 @@ export default function AdminCategories() {
               <h2 className="text-lg sm:text-xl md:text-2xl font-display text-near-black uppercase tracking-tight">
                 {currentCategory?.id ? "Edit Category" : "New Category"}
               </h2>
-              <p className="text-gray-400 text-xs sm:text-sm mt-1">Define a new curated collection.</p>
+              <p className="text-gray-400 text-xs sm:text-sm mt-1">
+                Define a new curated collection.
+              </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5 md:space-y-6">
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-4 sm:space-y-5 md:space-y-6"
+            >
               <div className="space-y-3 sm:space-y-4">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-walnut block">Category Name</label>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-walnut block">
+                    Category Name
+                  </label>
                   <input
                     required
                     value={currentCategory?.name || ""}
-                    onChange={(e) => setCurrentCategory((prev) => ({ ...prev, name: e.target.value }))}
+                    onChange={(e) =>
+                      setCurrentCategory((prev) => ({
+                        ...prev,
+                        name: e.target.value,
+                      }))
+                    }
                     className="w-full bg-cream border border-warm-beige py-2 sm:py-2.5 md:py-3 px-3 sm:px-4 text-sm focus:border-gold outline-none transition-colors rounded"
                     placeholder="e.g. Sofa Sets"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-walnut block">Slug (URL Path)</label>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-walnut block">
+                    Slug (URL Path)
+                  </label>
                   <input
                     required
                     value={currentCategory?.slug || ""}
@@ -333,10 +362,16 @@ export default function AdminCategories() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-walnut block">Category Image</label>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-walnut block">
+                    Category Image
+                  </label>
                   {imagePreview && (
                     <div className="relative w-full aspect-[16/9] bg-cream border border-warm-beige rounded-lg overflow-hidden">
-                      <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                      />
                       <button
                         type="button"
                         onClick={removeImage}
@@ -367,8 +402,12 @@ export default function AdminCategories() {
                       ) : (
                         <>
                           <Upload className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8" />
-                          <span>{imagePreview ? "Change Image" : "Upload Image"}</span>
-                          <span className="text-[7px] sm:text-[8px] text-gray-300">(Max 500KB, JPG, PNG, GIF)</span>
+                          <span>
+                            {imagePreview ? "Change Image" : "Upload Image"}
+                          </span>
+                          <span className="text-[7px] sm:text-[8px] text-gray-300">
+                            (Max 500KB, JPG, PNG, GIF)
+                          </span>
                         </>
                       )}
                     </label>
@@ -376,10 +415,17 @@ export default function AdminCategories() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-walnut block">Description</label>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-walnut block">
+                    Description
+                  </label>
                   <textarea
                     value={currentCategory?.description || ""}
-                    onChange={(e) => setCurrentCategory((prev) => ({ ...prev, description: e.target.value }))}
+                    onChange={(e) =>
+                      setCurrentCategory((prev) => ({
+                        ...prev,
+                        description: e.target.value,
+                      }))
+                    }
                     rows={3}
                     className="w-full bg-cream border border-warm-beige py-2 sm:py-2.5 md:py-3 px-3 sm:px-4 text-sm focus:border-gold outline-none resize-none transition-colors rounded"
                     placeholder="Brief description of this collection..."
@@ -406,7 +452,9 @@ export default function AdminCategories() {
             </form>
 
             <div className="mt-4 p-2.5 sm:p-3 bg-mint-50 border border-mint-200 rounded text-[8px] sm:text-[9px] text-mint-700">
-              <strong className="flex items-center gap-1">💡 Tip:</strong> Images are stored directly in Firestore. Keep images under 500KB for best performance.
+              <strong className="flex items-center gap-1">💡 Tip:</strong>{" "}
+              Images are stored directly in Firestore. Keep images under 500KB
+              for best performance.
             </div>
           </div>
         </div>
