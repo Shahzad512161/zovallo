@@ -24,6 +24,7 @@ import AdminProductForm from './app/AdminProductForm';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AdminLayout } from './components/admin/AdminLayout';
+import UserProfile from './app/UserProfile';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -66,33 +67,7 @@ export default function App() {
         <Router>
           <div className="flex flex-col min-h-screen">
             <Routes>
-              {/* Customer Routes Area */}
-              <Route path="*" element={
-                <>
-                  <Navbar />
-                  <main className="flex-grow pt-40">
-                    <Routes>
-                      <Route path="/" element={<HomePage />} />
-                      <Route path="/shop" element={<ShopPage />} />
-                      <Route path="/category/:categoryId" element={<ShopPage />} />
-                      <Route path="/product/:productId" element={<ProductPage />} />
-                      <Route path="/cart" element={<CartPage />} />
-                      <Route path="/auth" element={<LoginPage />} />
-                      <Route path="/register" element={<RegisterPage />} />
-                      <Route path="/checkout" element={
-                        <ProtectedRoute>
-                          <CheckoutPage />
-                        </ProtectedRoute>
-                      } />
-                      <Route path="/about" element={<Placeholder title="Our Story" />} />
-                      <Route path="*" element={<Navigate to="/" replace />} />
-                    </Routes>
-                  </main>
-                  <Footer />
-                </>
-              } />
-
-              {/* Admin Routes Area */}
+              {/* Admin Routes Area - MUST COME FIRST before the wildcard route */}
               <Route path="/admin" element={
                 <AdminRoute>
                   <AdminDashboard />
@@ -137,6 +112,37 @@ export default function App() {
                 <AdminRoute>
                   <Placeholder title="Admin Settings" />
                 </AdminRoute>
+              } />
+
+              {/* Customer Routes Area - with wildcard */}
+              <Route path="*" element={
+                <>
+                  <Navbar />
+                  <main className="flex-grow pt-40">
+                    <Routes>
+                      <Route path="/" element={<HomePage />} />
+                      <Route path="/shop" element={<ShopPage />} />
+                      <Route path="/category/:categoryId" element={<ShopPage />} />
+                      <Route path="/product/:productId" element={<ProductPage />} />
+                      <Route path="/cart" element={<CartPage />} />
+                      <Route path="/auth" element={<LoginPage />} />
+                      <Route path="/register" element={<RegisterPage />} />
+                      <Route path="/checkout" element={
+                        <ProtectedRoute>
+                          <CheckoutPage />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/profile" element={
+  <ProtectedRoute>
+    <UserProfile />
+  </ProtectedRoute>
+} />
+                      <Route path="/about" element={<Placeholder title="Our Story" />} />
+                      <Route path="*" element={<Navigate to="/" replace />} />
+                    </Routes>
+                  </main>
+                  <Footer />
+                </>
               } />
             </Routes>
           </div>

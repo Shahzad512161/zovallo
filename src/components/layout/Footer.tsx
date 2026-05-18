@@ -1,7 +1,26 @@
 import { Link } from 'react-router-dom';
-import { CATEGORIES } from '../../data/dummyData';
+import { useState, useEffect } from 'react';
+import { categoryApi } from '../../services/categoryApi';
+import { Category } from '../../types';
 
 export function Footer() {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await categoryApi.getAllCategories();
+        setCategories(data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCategories();
+  }, []);
+
   return (
     <footer className="bg-white border-t border-warm-beige pt-20 pb-8 mt-auto">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -18,16 +37,26 @@ export function Footer() {
             </p>
           </div>
 
-          {/* Quick Links */}
+          {/* Shop Collections - Dynamic Categories */}
           <div className="space-y-6">
             <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-walnut">Shop Collections</h4>
-            <ul className="space-y-3 text-[13px] text-gray-666 font-light">
-              {CATEGORIES.slice(0, 5).map(cat => (
-                <li key={cat}>
-                  <Link to={`/category/${cat.toLowerCase().replace(/ /g, '-')}`} className="hover:text-gold transition-colors">{cat}</Link>
-                </li>
-              ))}
-            </ul>
+            {loading ? (
+              <div className="space-y-2">
+                <div className="h-3 bg-cream animate-pulse rounded w-24"></div>
+                <div className="h-3 bg-cream animate-pulse rounded w-28"></div>
+                <div className="h-3 bg-cream animate-pulse rounded w-20"></div>
+              </div>
+            ) : (
+              <ul className="space-y-3 text-[13px] text-gray-666 font-light">
+                {categories.slice(0, 5).map(cat => (
+                  <li key={cat.id}>
+                    <Link to={`/category/${cat.slug}`} className="hover:text-gold transition-colors">
+                      {cat.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           {/* Company */}

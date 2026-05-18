@@ -19,12 +19,22 @@ export default function RegisterPage() {
   
   const navigate = useNavigate();
 
+  // Check if email is admin
+  const isAdminEmail = (email: string): boolean => {
+    return email === 'admin@zovallo.com' || email.toLowerCase().startsWith('admin');
+  };
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     
     if (password !== confirmPassword) {
       setError('Passwords do not match');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
       return;
     }
 
@@ -37,16 +47,21 @@ export default function RegisterPage() {
       // Update auth profile
       await updateProfile(user, { displayName: name });
 
-      // Create firestore document
+      // Create Firestore document with proper role
       await setDoc(doc(db, 'users', user.uid), {
         uid: user.uid,
         email: user.email,
         displayName: name,
-        role: 'user',
+        role: isAdminEmail(email) ? 'admin' : 'user',
         createdAt: serverTimestamp()
       });
 
-      navigate('/');
+      // Redirect based on role
+      if (isAdminEmail(email)) {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
     } catch (err: any) {
       console.error(err);
       let message = 'Failed to create account. Please try again.';
@@ -66,14 +81,17 @@ export default function RegisterPage() {
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12 bg-cream/20">
       <SEO title="Create Account" description="Join the LUXWOOD community to manage your curated furniture orders and preferences." />
-      <div className="max-w-md w-full space-y-8 bg-white border border-warm-beige p-8 md:p-12 shadow-sm rounded-sm">
+      <div className="max-w-md w-full space-y-8 bg-white border border-warm-beige p-6 sm:p-8 md:p-12 shadow-sm rounded-sm">
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-display text-near-black">Join LUXWOOD</h1>
+          <div className="flex justify-center mb-4">
+            <UserPlus className="w-10 h-10 text-walnut" />
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-display text-near-black">Join LUXWOOD</h1>
           <p className="text-gray-666 font-light text-sm">Create an account for a seamless experience</p>
         </div>
 
         {error && (
-          <div role="alert" className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 flex items-center gap-3 text-sm">
+          <div role="alert" className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 flex items-center gap-3 text-sm rounded">
             <AlertCircle className="w-5 h-5 flex-shrink-0" />
             <p>{error}</p>
           </div>
@@ -93,7 +111,7 @@ export default function RegisterPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="John Doe"
-                  className="w-full bg-cream border border-warm-beige py-3 pl-10 pr-4 text-sm outline-none focus:border-gold transition-colors"
+                  className="w-full bg-cream border border-warm-beige py-3 pl-10 pr-4 text-sm outline-none focus:border-gold transition-colors rounded"
                 />
               </div>
             </div>
@@ -110,7 +128,7 @@ export default function RegisterPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
-                  className="w-full bg-cream border border-warm-beige py-3 pl-10 pr-4 text-sm outline-none focus:border-gold transition-colors"
+                  className="w-full bg-cream border border-warm-beige py-3 pl-10 pr-4 text-sm outline-none focus:border-gold transition-colors rounded"
                 />
               </div>
             </div>
@@ -128,7 +146,7 @@ export default function RegisterPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Min. 6 characters"
                   minLength={6}
-                  className="w-full bg-cream border border-warm-beige py-3 pl-10 pr-4 text-sm outline-none focus:border-gold transition-colors"
+                  className="w-full bg-cream border border-warm-beige py-3 pl-10 pr-4 text-sm outline-none focus:border-gold transition-colors rounded"
                 />
               </div>
             </div>
@@ -145,7 +163,7 @@ export default function RegisterPage() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Repeat your password"
-                  className="w-full bg-cream border border-warm-beige py-3 pl-10 pr-4 text-sm outline-none focus:border-gold transition-colors"
+                  className="w-full bg-cream border border-warm-beige py-3 pl-10 pr-4 text-sm outline-none focus:border-gold transition-colors rounded"
                 />
               </div>
             </div>
@@ -154,7 +172,7 @@ export default function RegisterPage() {
           <button 
             type="submit"
             disabled={loading}
-            className="w-full bg-near-black text-white py-4 text-[11px] font-bold uppercase tracking-widest hover:bg-gold transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm active:scale-[0.98]"
+            className="w-full bg-near-black text-white py-4 text-[11px] font-bold uppercase tracking-widest hover:bg-gold transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm active:scale-[0.98] rounded"
           >
             {loading ? 'Creating Account...' : 'Register'}
             {!loading && <ArrowRight className="w-4 h-4" />}
@@ -166,6 +184,10 @@ export default function RegisterPage() {
             Already have an account?{' '}
             <Link to="/auth" className="text-walnut font-bold hover:underline underline-offset-4">Sign In</Link>
           </p>
+          <Link to="/" className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-a0 hover:text-near-black transition-colors group">
+            <ArrowRight className="w-3 h-3 rotate-180 group-hover:-translate-x-1 transition-transform" />
+            Back to Home
+          </Link>
         </div>
       </div>
     </div>

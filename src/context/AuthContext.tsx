@@ -23,22 +23,47 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Function to check if email is admin
+  const checkIsAdmin = (email: string | null | undefined): boolean => {
+    if (!email) return false;
+    // Check if email is exactly admin@zovallo.com OR starts with admin
+    return email === 'admin@zovallo.com' || email.toLowerCase().startsWith('admin');
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       
       if (currentUser) {
         try {
+          // Try to fetch user profile from Firestore
           const docRef = doc(db, 'users', currentUser.uid);
           const docSnap = await getDoc(docRef);
+          
           if (docSnap.exists()) {
             setProfile(docSnap.data() as UserProfile);
           } else {
-            setProfile(null);
+            // Create a basic profile if it doesn't exist
+            const isAdminUser = checkIsAdmin(currentUser.email);
+            const basicProfile = {
+              uid: currentUser.uid,
+              email: currentUser.email || '',
+              displayName: currentUser.displayName || '',
+              role: isAdminUser ? 'admin' : 'user',
+              createdAt: new Date()
+            } as UserProfile;
+            setProfile(basicProfile);
           }
         } catch (error) {
           console.error("Error fetching user profile:", error);
-          setProfile(null);
+          // Set basic profile even if Firestore fails
+          setProfile({
+            uid: currentUser.uid,
+            email: currentUser.email || '',
+            displayName: currentUser.displayName || '',
+            role: checkIsAdmin(currentUser.email) ? 'admin' : 'user',
+            createdAt: new Date()
+          } as UserProfile);
         }
       } else {
         setProfile(null);
@@ -50,19 +75,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => unsubscribe();
   }, []);
 
-  const logout = () => signOut(auth);
+  const logout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
+  // Check if user is admin based on email OR profile role
+  const isAdmin = checkIsAdmin(user?.email) || profile?.role === 'admin';
 
   const value = {
     user,
     profile,
     loading,
-    isAdmin: profile?.role === 'admin',
+    isAdmin,
     logout
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 }

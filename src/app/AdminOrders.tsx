@@ -14,10 +14,9 @@ import {
   MapPin,
   Clock
 } from 'lucide-react';
-import { collection, getDocs, updateDoc, doc, query, orderBy } from 'firebase/firestore';
-import { db } from '../lib/firebase';
 import { formatCurrency } from '../lib/utils';
 import { Order } from '../types';
+import { orderApi } from '../services/orderApi';
 import { LoadingSpinner } from '../components/ui/Loading';
 import { EmptyState } from '../components/ui/EmptyState';
 
@@ -35,9 +34,8 @@ export default function AdminOrders() {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
-      const snapshot = await getDocs(q);
-      setOrders(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Order)));
+      const data = await orderApi.getAllOrders();
+      setOrders(data);
     } catch (error) {
       console.error("Error fetching orders:", error);
     } finally {
@@ -47,11 +45,8 @@ export default function AdminOrders() {
 
   const updateStatus = async (id: string, newStatus: Order['orderStatus']) => {
     try {
-      const docRef = doc(db, 'orders', id);
-      const { updateDoc } = await import('firebase/firestore');
-      await updateDoc(docRef, { orderStatus: newStatus });
-      
-      setOrders(prev => prev.map(o => o.id === id ? { ...o, orderStatus: newStatus } : o));
+      await orderApi.updateOrderStatus(id, newStatus);
+      await fetchOrders();
       
       if (selectedOrder?.id === id) {
         setSelectedOrder(prev => prev ? { ...prev, orderStatus: newStatus } : null);
@@ -157,37 +152,39 @@ export default function AdminOrders() {
                         />
                       </td>
                     </tr>
-                  ) : filteredOrders.map((order) => (
-                    <tr 
-                      key={order.id} 
-                      onClick={() => setSelectedOrder(order)}
-                      className={`cursor-pointer transition-colors ${selectedOrder?.id === order.id ? 'bg-gold/5' : 'hover:bg-cream/20'}`}
-                    >
-                      <td className="px-6 py-6 ring-inset">
-                        <span className="font-mono text-xs font-bold">#{order.id.slice(-8).toUpperCase()}</span>
-                      </td>
-                      <td className="px-6 py-6">
-                        <span className="text-sm font-bold text-near-black">{order.customerInfo.fullName}</span>
-                      </td>
-                      <td className="px-6 py-6">
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">
-                          {order.createdAt?.toDate().toLocaleDateString('en-GB')}
-                        </span>
-                      </td>
-                      <td className="px-6 py-6">
-                        <span className="text-sm font-medium">{formatCurrency(order.totalPrice)}</span>
-                      </td>
-                      <td className="px-6 py-6 text-right">
-                        <span className={`px-3 py-1 text-[9px] font-bold uppercase tracking-widest rounded-sm ${
-                          order.orderStatus === 'delivered' ? 'bg-mint-50 text-mint-700' :
-                          order.orderStatus === 'pending' ? 'bg-gold/10 text-walnut' :
-                          'bg-gray-100 text-gray-400'
-                        }`}>
-                          {order.orderStatus}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
+                  ) : (
+                    filteredOrders.map((order) => (
+                      <tr 
+                        key={order.id} 
+                        onClick={() => setSelectedOrder(order)}
+                        className={`cursor-pointer transition-colors ${selectedOrder?.id === order.id ? 'bg-gold/5' : 'hover:bg-cream/20'}`}
+                      >
+                        <td className="px-6 py-6">
+                          <span className="font-mono text-xs font-bold">#{order.id.slice(-8).toUpperCase()}</span>
+                        </td>
+                        <td className="px-6 py-6">
+                          <span className="text-sm font-bold text-near-black">{order.customerInfo.fullName}</span>
+                        </td>
+                        <td className="px-6 py-6">
+                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">
+                            {order.createdAt?.toDate().toLocaleDateString('en-GB')}
+                          </span>
+                        </td>
+                        <td className="px-6 py-6">
+                          <span className="text-sm font-medium">{formatCurrency(order.totalPrice)}</span>
+                        </td>
+                        <td className="px-6 py-6 text-right">
+                          <span className={`px-3 py-1 text-[9px] font-bold uppercase tracking-widest rounded-sm ${
+                            order.orderStatus === 'delivered' ? 'bg-mint-50 text-mint-700' :
+                            order.orderStatus === 'pending' ? 'bg-gold/10 text-walnut' :
+                            'bg-gray-100 text-gray-400'
+                          }`}>
+                            {order.orderStatus}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>

@@ -5,7 +5,8 @@ import {
   setPersistence,
   browserLocalPersistence
 } from 'firebase/auth';
-import { auth } from '../lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../lib/firebase';
 import { LogIn, Mail, Lock, AlertCircle, ArrowRight } from 'lucide-react';
 import { SEO } from '../components/SEO';
 
@@ -26,8 +27,19 @@ export default function LoginPage() {
     
     try {
       await setPersistence(auth, browserLocalPersistence);
-      await signInWithEmailAndPassword(auth, email, password);
-      navigate(from, { replace: true });
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      
+      // Check if user is admin by fetching role from Firestore
+      const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
+      const userData = userDoc.data();
+      const isAdmin = userData?.role === 'admin' || email === 'admin@zovallo.com' || email.toLowerCase().startsWith('admin');
+      
+      // Redirect based on role
+      if (isAdmin && from === '/') {
+        navigate('/admin');
+      } else {
+        navigate(from, { replace: true });
+      }
     } catch (err: any) {
       console.error(err);
       let message = 'Failed to sign in. Please check your credentials.';
@@ -45,14 +57,17 @@ export default function LoginPage() {
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12 bg-cream/20">
       <SEO title="Sign In" description="Access your LUXWOOD account to manage your orders and curated furniture collection." />
-      <div className="max-w-md w-full space-y-8 bg-white border border-warm-beige p-8 md:p-12 shadow-sm rounded-sm">
+      <div className="max-w-md w-full space-y-8 bg-white border border-warm-beige p-6 sm:p-8 md:p-12 shadow-sm rounded-sm">
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-display text-near-black">Welcome Back</h1>
+          <div className="flex justify-center mb-4">
+            <LogIn className="w-10 h-10 text-walnut" />
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-display text-near-black">Welcome Back</h1>
           <p className="text-gray-666 font-light text-sm">Access your curated furniture collection</p>
         </div>
 
         {error && (
-          <div role="alert" className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 flex items-center gap-3 text-sm">
+          <div role="alert" className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 flex items-center gap-3 text-sm rounded">
             <AlertCircle className="w-5 h-5 flex-shrink-0" />
             <p>{error}</p>
           </div>
@@ -72,7 +87,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
-                  className="w-full bg-cream border border-warm-beige py-3 pl-10 pr-4 text-sm outline-none focus:border-gold transition-colors"
+                  className="w-full bg-cream border border-warm-beige py-3 pl-10 pr-4 text-sm outline-none focus:border-gold transition-colors rounded"
                 />
               </div>
             </div>
@@ -89,7 +104,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-cream border border-warm-beige py-3 pl-10 pr-4 text-sm outline-none focus:border-gold transition-colors"
+                  className="w-full bg-cream border border-warm-beige py-3 pl-10 pr-4 text-sm outline-none focus:border-gold transition-colors rounded"
                 />
               </div>
             </div>
@@ -98,7 +113,7 @@ export default function LoginPage() {
           <button 
             type="submit"
             disabled={loading}
-            className="w-full bg-near-black text-white py-4 text-[11px] font-bold uppercase tracking-widest hover:bg-gold transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm active:scale-[0.98]"
+            className="w-full bg-near-black text-white py-4 text-[11px] font-bold uppercase tracking-widest hover:bg-gold transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm active:scale-[0.98] rounded"
           >
             {loading ? 'Signing in...' : 'Sign In'}
             {!loading && <ArrowRight className="w-4 h-4" />}

@@ -1,19 +1,46 @@
-import { PRODUCTS, CATEGORIES } from '../data/dummyData';
 import { ProductCard } from '../components/ui/ProductCard';
 import { useState, useMemo, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { Search, SlidersHorizontal, X, PackageOpen } from 'lucide-react';
 import { EmptyState } from '../components/ui/EmptyState';
 import { SEO } from '../components/SEO';
+import { productApi } from '../services/productApi';
+import { categoryApi } from '../services/categoryApi';
+import { Product, Category } from '../types';
+import { LoadingSpinner } from '../components/ui/Loading';
 
 export default function ShopPage() {
   const { categoryId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000]);
   const [sortBy, setSortBy] = useState('latest');
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+
+  // Fetch real data
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [productsData, categoriesData] = await Promise.all([
+        productApi.getAll(),
+        categoryApi.getAllCategories()
+      ]);
+      setProducts(productsData);
+      setCategories(categoriesData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Sync search from URL
   useEffect(() => {
@@ -25,16 +52,21 @@ export default function ShopPage() {
 
   // Sync category from URL
   useEffect(() => {
-    if (categoryId) {
-      const formattedCategory = categoryId.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-      setSelectedCategory(formattedCategory);
+    if (categoryId && categories.length > 0) {
+      const matchedCategory = categories.find(c => c.slug === categoryId);
+      if (matchedCategory) {
+        setSelectedCategory(matchedCategory.name);
+      } else {
+        const formattedCategory = categoryId.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        setSelectedCategory(formattedCategory);
+      }
     } else {
       setSelectedCategory('All');
     }
-  }, [categoryId]);
+  }, [categoryId, categories]);
 
   const filteredProducts = useMemo(() => {
-    let result = [...PRODUCTS];
+    let result = [...products];
 
     // Category Filter
     if (selectedCategory !== 'All') {
@@ -61,13 +93,27 @@ export default function ShopPage() {
         result.sort((a, b) => b.price - a.price);
         break;
       case 'latest':
-        // In real app, would use createdAt. For dummy, we'll just keep original order or reverse
-        result.reverse();
+        result.sort((a, b) => {
+          const dateA = a.createdAt?.toDate?.() || new Date(0);
+          const dateB = b.createdAt?.toDate?.() || new Date(0);
+          return dateB.getTime() - dateA.getTime();
+        });
         break;
     }
 
     return result;
-  }, [selectedCategory, searchQuery, priceRange, sortBy]);
+  }, [products, selectedCategory, searchQuery, priceRange, sortBy]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[600px]">
+        <LoadingSpinner />
+        <span className="ml-3 text-[10px] font-bold uppercase tracking-widest text-gold">Loading Collection...</span>
+      </div>
+    );
+  }
+
+  const categoryNames = ['All', ...categories.map(c => c.name)];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
@@ -108,7 +154,7 @@ export default function ShopPage() {
             <div className="space-y-3">
               <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-walnut">Categories</h4>
               <div className="space-y-1">
-                {['All', ...CATEGORIES].map(cat => (
+                {categoryNames.map(cat => (
                   <button 
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
@@ -218,7 +264,7 @@ export default function ShopPage() {
               <div className="space-y-4">
                 <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-walnut">Categories</h4>
                 <div className="grid grid-cols-1 gap-2">
-                  {['All', ...CATEGORIES].map(cat => (
+                  {categoryNames.map(cat => (
                     <button 
                       key={cat}
                       onClick={() => {

@@ -15,10 +15,9 @@ import {
   Clock,
   AlertCircle
 } from 'lucide-react';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { db } from '../lib/firebase';
 import { formatCurrency } from '../lib/utils';
 import { Order } from '../types';
+import { orderApi } from '../services/orderApi';
 
 export default function AdminOrderDetail() {
   const { orderId } = useParams<{ orderId: string }>();
@@ -36,11 +35,8 @@ export default function AdminOrderDetail() {
   const fetchOrder = async () => {
     setLoading(true);
     try {
-      const docRef = doc(db, 'orders', orderId!);
-      const snapshot = await getDoc(docRef);
-      if (snapshot.exists()) {
-        setOrder({ id: snapshot.id, ...snapshot.data() } as Order);
-      }
+      const data = await orderApi.getById(orderId!);
+      setOrder(data);
     } catch (error) {
       console.error("Error fetching order:", error);
     } finally {
@@ -52,8 +48,7 @@ export default function AdminOrderDetail() {
     if (!order) return;
     setUpdating(true);
     try {
-      const docRef = doc(db, 'orders', order.id);
-      await updateDoc(docRef, { orderStatus: newStatus });
+      await orderApi.updateOrderStatus(order.id, newStatus);
       setOrder(prev => prev ? { ...prev, orderStatus: newStatus } : null);
     } catch (error) {
       console.error("Error updating status:", error);
@@ -62,6 +57,237 @@ export default function AdminOrderDetail() {
       setUpdating(false);
     }
   };
+
+  const printInvoice = () => {
+  if (!order) return;
+
+  const printWindow = window.open('', '_blank');
+  if (!printWindow) {
+    alert('Please allow pop-ups to print the invoice');
+    return;
+  }
+
+  const printContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Invoice #${order.id.slice(-8).toUpperCase()}</title>
+      <style>
+        @media print {
+          body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Arial', sans-serif;
+          }
+          .no-print {
+            display: none;
+          }
+        }
+        body {
+          font-family: 'Arial', sans-serif;
+          line-height: 1.6;
+          color: #333;
+        }
+        .invoice-container {
+          max-width: 800px;
+          margin: 0 auto;
+          background: white;
+        }
+        .invoice-header {
+          text-align: center;
+          margin-bottom: 30px;
+          padding-bottom: 20px;
+          border-bottom: 2px solid #c1a57b;
+        }
+        .logo {
+          font-size: 28px;
+          font-weight: bold;
+          color: #1a1a1a;
+          margin-bottom: 10px;
+        }
+        .logo span {
+          color: #c1a57b;
+        }
+        .invoice-title {
+          font-size: 24px;
+          font-weight: bold;
+          color: #1a1a1a;
+          margin: 20px 0 10px;
+        }
+        .order-info {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 30px;
+          padding: 15px;
+          background: #f5f5f2;
+        }
+        .info-box {
+          flex: 1;
+        }
+        .info-box h3 {
+          font-size: 12px;
+          margin-bottom: 10px;
+          color: #8b6b3d;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+        .info-box p {
+          margin: 5px 0;
+          font-size: 12px;
+        }
+        .products-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 20px 0;
+        }
+        .products-table th {
+          background: #f5f5f2;
+          padding: 12px;
+          text-align: left;
+          font-size: 11px;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          border-bottom: 1px solid #e0d6c8;
+        }
+        .products-table td {
+          padding: 12px;
+          font-size: 12px;
+          border-bottom: 1px solid #e0d6c8;
+          vertical-align: top;
+        }
+        .product-image {
+          width: 60px;
+          height: 60px;
+          object-fit: cover;
+          border: 1px solid #e0d6c8;
+        }
+        .totals {
+          text-align: right;
+          margin-top: 20px;
+          padding-top: 20px;
+          border-top: 2px solid #c1a57b;
+        }
+        .totals-row {
+          display: flex;
+          justify-content: flex-end;
+          margin: 8px 0;
+        }
+        .totals-label {
+          font-weight: bold;
+          width: 150px;
+          text-align: right;
+          margin-right: 20px;
+        }
+        .totals-value {
+          width: 120px;
+          text-align: right;
+        }
+        .grand-total {
+          font-size: 18px;
+          font-weight: bold;
+          color: #c1a57b;
+          margin-top: 10px;
+          padding-top: 10px;
+          border-top: 1px solid #e0d6c8;
+        }
+        .footer {
+          margin-top: 40px;
+          padding-top: 20px;
+          text-align: center;
+          font-size: 10px;
+          border-top: 1px solid #e0d6c8;
+          color: #999;
+        }
+        @page {
+          size: A4;
+          margin: 2cm;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="invoice-container">
+        <div class="invoice-header">
+          <div class="logo">LUXWOOD<span>.</span></div>
+          <div class="invoice-title">TAX INVOICE</div>
+          <p>Premium Furniture Collection</p>
+        </div>
+
+        <div class="order-info">
+          <div class="info-box">
+            <h3>Order Details</h3>
+            <p><strong>Order #:</strong> ${order.id.slice(-8).toUpperCase()}</p>
+            <p><strong>Date:</strong> ${order.createdAt?.toDate().toLocaleDateString('en-GB')}</p>
+            <p><strong>Status:</strong> ${order.orderStatus.toUpperCase()}</p>
+          </div>
+          <div class="info-box">
+            <h3>Customer Information</h3>
+            <p><strong>${order.customerInfo.fullName}</strong></p>
+            <p>${order.customerInfo.email}</p>
+            <p>${order.customerInfo.phone}</p>
+          </div>
+          <div class="info-box">
+            <h3>Shipping Address</h3>
+            <p>${order.customerInfo.address}</p>
+            <p>${order.customerInfo.city}, ${order.customerInfo.postalCode}</p>
+            <p>${order.customerInfo.country}</p>
+          </div>
+        </div>
+
+        <table class="products-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Title</th>
+              <th>Qty</th>
+              <th>Price</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${order.products.map(p => `
+              <tr>
+                <td><img src="${p.image}" alt="${p.title}" class="product-image" onerror="this.style.display='none'" /></td>
+                <td><strong>${p.title}</strong><br/><small>ID: ${p.productId.slice(-8).toUpperCase()}</small></td>
+                <td>${p.quantity}</td>
+                <td>${formatCurrency(p.price)}</td>
+                <td>${formatCurrency(p.price * p.quantity)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+
+        <div class="totals">
+          <div class="totals-row">
+            <span class="totals-label">Subtotal:</span>
+            <span class="totals-value">${formatCurrency(order.totalPrice)}</span>
+          </div>
+          <div class="totals-row">
+            <span class="totals-label">Delivery:</span>
+            <span class="totals-value">FREE</span>
+          </div>
+          <div class="totals-row grand-total">
+            <span class="totals-label">GRAND TOTAL:</span>
+            <span class="totals-value">${formatCurrency(order.totalPrice)}</span>
+          </div>
+        </div>
+
+        <div class="footer">
+          <p>Payment Method: Cash on Delivery (COD)</p>
+          <p>Thank you for shopping with LUXWOOD!</p>
+          <p>For any queries, contact us at support@luxwood.com | +44 20 1234 5678</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  printWindow.document.write(printContent);
+  printWindow.document.close();
+  printWindow.print();
+  printWindow.onafterprint = () => {
+    printWindow.close();
+  };
+};
 
   if (loading) {
     return (
@@ -114,11 +340,11 @@ export default function AdminOrderDetail() {
         </div>
         <div className="flex gap-4">
           <button 
-            onClick={() => window.print()}
-            className="flex items-center gap-2 px-6 py-3 bg-white border border-warm-beige text-[10px] font-bold uppercase tracking-widest text-near-black hover:bg-cream transition-colors"
-          >
-            <Printer className="w-4 h-4" /> Print Invoice
-          </button>
+  onClick={printInvoice}  // Change this line
+  className="flex items-center gap-2 px-6 py-3 bg-white border border-warm-beige text-[10px] font-bold uppercase tracking-widest text-near-black hover:bg-cream transition-colors"
+>
+  <Printer className="w-4 h-4" /> Print Invoice
+</button>
           <div className="relative group">
             <button className="flex items-center gap-2 px-6 py-3 bg-near-black text-white text-[10px] font-bold uppercase tracking-widest hover:bg-gold transition-colors disabled:opacity-50" disabled={updating}>
               Update Status {updating && '...'}

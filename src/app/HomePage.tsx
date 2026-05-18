@@ -1,12 +1,89 @@
-import { PRODUCTS } from '../data/dummyData';
+import { useEffect, useState } from 'react';
 import { ProductCard } from '../components/ui/ProductCard';
 import { Button } from '../components/ui/Button';
 import { Link } from 'react-router-dom';
 import { Truck, ShieldCheck, CreditCard, Award, Star, Quote } from 'lucide-react';
 import { SEO } from '../components/SEO';
+import { productApi } from '../services/productApi';
+import { categoryApi } from '../services/categoryApi';
+import { Product, Category } from '../types';
+import { LoadingSpinner } from '../components/ui/Loading';
 
 export default function HomePage() {
-  const featuredProducts = PRODUCTS.filter(p => p.featured);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      // Fetch all products for best sellers (not just featured)
+      const [productsData, categoriesData] = await Promise.all([
+        productApi.getAll(),
+        categoryApi.getAllCategories()
+      ]);
+      
+      setAllProducts(productsData);
+      // Get featured products (if any, otherwise show first 4 products)
+      const featured = productsData.filter(p => p.featured === true);
+      setFeaturedProducts(featured.length > 0 ? featured : productsData.slice(0, 4));
+      setCategories(categoriesData);
+    } catch (error) {
+      console.error("Error fetching home data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Get the actual category image from Firestore, or use a fallback
+  const getCategoryImage = (category: Category): string => {
+    if (category.image && category.image.startsWith('data:image')) {
+      return category.image; // Base64 image from Firestore
+    }
+    if (category.image && category.image.startsWith('http')) {
+      return category.image; // URL image
+    }
+    // Fallback images based on category name
+    const fallbackImages: Record<string, string> = {
+      'Sofa Sets': 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800',
+      'Dining Tables': 'https://images.unsplash.com/photo-1577146333359-39f99d73010b?auto=format&fit=crop&q=80&w=800',
+      'Beds': 'https://images.unsplash.com/photo-1505691938895-1758d7eaa511?auto=format&fit=crop&q=80&w=800',
+      'Mattresses': 'https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&q=80&w=800',
+      'Acoustic Wall Panels': 'https://images.unsplash.com/photo-1615876234586-44c13824bba3?auto=format&fit=crop&q=80&w=800',
+      'Coffee Tables': 'https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&q=80&w=800',
+      'Office Chairs': 'https://images.unsplash.com/photo-1505797149-43b00fe1eeac?auto=format&fit=crop&q=80&w=800',
+      'Wardrobes': 'https://images.unsplash.com/photo-1595428774223-ef52624120ec?auto=format&fit=crop&q=80&w=800'
+    };
+    return fallbackImages[category.name] || 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&q=80&w=800';
+  };
+
+  const getCategorySubtitle = (categoryName: string): string => {
+    const subtitles: Record<string, string> = {
+      'Sofa Sets': 'Living Area',
+      'Dining Tables': 'The Feast',
+      'Beds': 'Nightly Rest',
+      'Mattresses': 'Sleep',
+      'Acoustic Wall Panels': 'Acoustics',
+      'Coffee Tables': 'Centerpiece',
+      'Office Chairs': 'Workspace',
+      'Wardrobes': 'Storage'
+    };
+    return subtitles[categoryName] || 'Collection';
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[600px]">
+        <LoadingSpinner />
+        <span className="ml-3 text-[10px] font-bold uppercase tracking-widest text-gold">Loading Experience...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-24 pb-24">
@@ -49,7 +126,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Featured Products (Best Sellers) */}
+      {/* Featured Products / Best Sellers */}
       <section className="max-w-7xl mx-auto px-6 lg:px-8 space-y-16">
         <div className="flex flex-col md:flex-row justify-between items-end gap-6 text-center md:text-left">
           <div className="space-y-3">
@@ -62,14 +139,20 @@ export default function HomePage() {
           </Link>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {featuredProducts.map((product) => (
-            <ProductCard 
-              key={product.id} 
-              product={product} 
-            />
-          ))}
-        </div>
+        {featuredProducts.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-400">No products found. Add some products in the admin panel.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {featuredProducts.slice(0, 4).map((product) => (
+              <ProductCard 
+                key={product.id} 
+                product={product} 
+              />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Why Choose Us */}
@@ -106,7 +189,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Categories Grid (Expanded) */}
+      {/* Categories Grid - Using Actual Category Images from Firestore */}
       <section className="bg-warm-beige/30 py-24 px-6 lg:px-8 border-y border-warm-beige">
         <div className="max-w-7xl mx-auto space-y-16">
           <div className="text-center space-y-3">
@@ -114,38 +197,23 @@ export default function HomePage() {
             <p className="text-gray-666 font-light">Explore a world of textures, finishes, and timeless designs.</p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-            <CategoryCard 
-              title="Sofas" 
-              image="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800" 
-              link="/category/sofa-sets"
-              subtitle="Living Area"
-            />
-            <CategoryCard 
-              title="Dining" 
-              image="https://images.unsplash.com/photo-1577146333359-39f99d73010b?auto=format&fit=crop&q=80&w=800" 
-              link="/category/dining-tables"
-              subtitle="The Feast"
-            />
-            <CategoryCard 
-              title="Beds" 
-              image="https://images.unsplash.com/photo-1505691938895-1758d7eaa511?auto=format&fit=crop&q=80&w=800" 
-              link="/category/beds"
-              subtitle="Nightly Rest"
-            />
-            <CategoryCard 
-              title="Sleep" 
-              image="https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&q=80&w=800" 
-              link="/category/mattresses"
-              subtitle="Mattresses"
-            />
-            <CategoryCard 
-              title="Panels" 
-              image="https://images.unsplash.com/photo-1615876234586-44c13824bba3?auto=format&fit=crop&q=80&w=800" 
-              link="/category/acoustic-wall-panels"
-              subtitle="Acoustics"
-            />
-          </div>
+          {categories.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-400">No categories found. Add some categories in the admin panel.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+              {categories.slice(0, 5).map((category) => (
+                <CategoryCard 
+                  key={category.id}
+                  title={category.name}
+                  image={getCategoryImage(category)}
+                  link={`/category/${category.slug}`}
+                  subtitle={getCategorySubtitle(category.name)}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -216,13 +284,18 @@ export default function HomePage() {
 
 function CategoryCard({ title, image, link, subtitle }: { title: string; image: string; link: string; subtitle: string }) {
   return (
-    <Link to={link} className="relative aspect-[3/4] group overflow-hidden bg-walnut block">
-      <img src={image} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-all duration-1000 opacity-80 group-hover:opacity-100" />
+    <Link to={link} className="relative aspect-[3/4] group overflow-hidden bg-walnut block rounded-lg">
+      <img 
+        src={image} 
+        alt={title} 
+        className="w-full h-full object-cover group-hover:scale-105 transition-all duration-1000 opacity-80 group-hover:opacity-100"
+        loading="lazy"
+      />
       <div className="absolute inset-0 flex flex-col items-center justify-center text-white space-y-1 p-4 bg-black/10 group-hover:bg-black/40 transition-colors">
         <span className="text-[9px] font-bold uppercase tracking-[0.3em] transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
           {subtitle}
         </span>
-        <h3 className="text-3xl font-display font-medium tracking-tight">
+        <h3 className="text-2xl sm:text-3xl text-white font-display font-medium tracking-tight text-center px-2">
           {title}
         </h3>
         <span className="w-0 group-hover:w-8 h-px bg-white transition-all duration-500 ease-out" />

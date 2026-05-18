@@ -11,11 +11,10 @@ import {
   ExternalLink,
   Tag
 } from 'lucide-react';
-import { collection, getDocs, deleteDoc, doc, query, orderBy, limit, startAfter } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { Link } from 'react-router-dom';
 import { formatCurrency } from '../lib/utils';
 import { Product } from '../types';
-import { Link } from 'react-router-dom';
+import { productApi } from '../services/productApi';
 import { LoadingSpinner } from '../components/ui/Loading';
 
 export default function AdminProducts() {
@@ -34,9 +33,8 @@ export default function AdminProducts() {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const q = query(collection(db, 'products'), orderBy('createdAt', 'desc'));
-      const snapshot = await getDocs(q);
-      setProducts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Product)));
+      const data = await productApi.getAll();
+      setProducts(data);
     } catch (error) {
       console.error("Error fetching products:", error);
     } finally {
@@ -44,11 +42,93 @@ export default function AdminProducts() {
     }
   };
 
+  const exportDetailedToCSV = () => {
+  const productsToExport = products.filter(p => {
+    const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                         p.category.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === 'All' || p.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  if (productsToExport.length === 0) {
+    alert('No products to export');
+    return;
+  }
+
+  // Extended headers with more details
+  const headers = [
+    'Product ID',
+    'SKU',
+    'Title',
+    'Slug',
+    'Description',
+    'Price (£)',
+    'Category',
+    'Stock Quantity',
+    'Featured',
+    'Main Image URL',
+    'All Image URLs',
+    'Material',
+    'Dimensions',
+    'Assembly',
+    'Weight',
+    'Color',
+    'Warranty',
+    'Created Date',
+    'Last Updated'
+  ];
+
+  const rows = productsToExport.map(product => {
+    // Extract specifications safely
+    const specs = product.specifications || {};
+    
+    return [
+      product.id,
+      product.id.slice(0, 8).toUpperCase(),
+      `"${product.title.replace(/"/g, '""')}"`,
+      product.slug,
+      `"${product.description.replace(/"/g, '""').replace(/\n/g, ' ')}"`,
+      product.price,
+      product.category,
+      product.stock,
+      product.featured ? 'Yes' : 'No',
+      product.images[0] || '',
+      `"${product.images.join('; ')}"`,
+      `"${(specs.Material || specs.material || '').replace(/"/g, '""')}"`,
+      `"${(specs.Dimensions || specs.dimensions || '').replace(/"/g, '""')}"`,
+      `"${(specs.Assembly || specs.assembly || '').replace(/"/g, '""')}"`,
+      `"${(specs.Weight || specs.weight || '').replace(/"/g, '""')}"`,
+      `"${(specs.Color || specs.color || '').replace(/"/g, '""')}"`,
+      `"${(specs.Warranty || specs.warranty || '').replace(/"/g, '""')}"`,
+      product.createdAt?.toDate?.().toLocaleDateString('en-GB') || 'N/A',
+      product.updatedAt?.toDate?.().toLocaleDateString('en-GB') || 'N/A'
+    ];
+  });
+
+  const csvContent = [
+    headers.join(','),
+    ...rows.map(row => row.join(','))
+  ].join('\n');
+
+  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  const fileName = `luxwood_products_${new Date().toISOString().split('T')[0]}.csv`;
+  
+  link.setAttribute('href', url);
+  link.setAttribute('download', fileName);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};
+
+
   const handleDelete = async (id: string) => {
     if (!window.confirm('Are you sure you want to delete this product? This action cannot be undone.')) return;
     try {
-      await deleteDoc(doc(db, 'products', id));
-      fetchProducts();
+      await productApi.delete(id);
+      await fetchProducts();
     } catch (error) {
       console.error("Error deleting product:", error);
       alert("Failed to delete product");
@@ -73,6 +153,9 @@ export default function AdminProducts() {
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, selectedCategory]);
+
+
+  
 
   return (
     <div className="space-y-10">
@@ -112,9 +195,12 @@ export default function AdminProducts() {
               {categories.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
-          <button className="bg-white border border-warm-beige px-6 py-3 text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-cream">
-            <Layers className="w-4 h-4" /> Export CSV
-          </button>
+         <button 
+  onClick={exportDetailedToCSV}  // Change this to the correct function name
+  className="bg-white border border-warm-beige px-6 py-3 text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-cream"
+>
+  <Layers className="w-4 h-4" /> Export CSV
+</button>
         </div>
       </div>
 

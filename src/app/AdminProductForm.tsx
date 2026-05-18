@@ -9,12 +9,15 @@ import {
   Tag,
   Info,
   Layers,
-  ChevronRight
+  ChevronRight,
+  Upload,
+  Trash2,
+  AlertCircle,
+  Move
 } from 'lucide-react';
-import { doc, getDoc, setDoc, addDoc, collection, serverTimestamp, getDocs, orderBy, query } from 'firebase/firestore';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '../lib/firebase';
 import { Product, Category } from '../types';
+import { productApi } from '../services/productApi';
+import { categoryApi } from '../services/categoryApi';
 import { LoadingSpinner } from '../components/ui/Loading';
 
 export default function AdminProductForm() {
@@ -24,9 +27,9 @@ export default function AdminProductForm() {
 
   const [loading, setLoading] = useState(isEdit);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState<{ [key: number]: number }>({});
+  const [uploadingImages, setUploadingImages] = useState<boolean>(false);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<Partial<Product>>({
     title: '',
@@ -34,7 +37,7 @@ export default function AdminProductForm() {
     description: '',
     price: 0,
     category: '',
-    images: [''],
+    images: [],
     stock: 0,
     specifications: {
       'Material': '',
@@ -46,15 +49,13 @@ export default function AdminProductForm() {
 
   useEffect(() => {
     async function fetchData() {
-      // Fetch categories
-      const catsSnap = await getDocs(query(collection(db, 'categories'), orderBy('name', 'asc')));
-      setCategories(catsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Category)));
+      const catsData = await categoryApi.getAllCategories();
+      setCategories(catsData);
 
-      if (isEdit) {
-        const docRef = doc(db, 'products', productId);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setFormData(docSnap.data() as Product);
+      if (isEdit && productId) {
+        const product = await productApi.getById(productId);
+        if (product) {
+          setFormData(product);
         } else {
           alert('Product not found');
           navigate('/admin/products');
@@ -63,7 +64,7 @@ export default function AdminProductForm() {
       }
     }
     fetchData();
-  }, [productId]);
+  }, [productId, isEdit, navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -83,68 +84,156 @@ export default function AdminProductForm() {
     }));
   };
 
-  const handleImageChange = (index: number, value: string) => {
-    const newImages = [...(formData.images || [])];
-    newImages[index] = value;
+  // Convert file to Base64
+  const convertToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  // Compress image before converting to Base64
+  const compressImage = (file: File, maxWidth: number = 800): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (e) => {
+        const img = new Image();
+        img.src = e.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          canvas.toBlob((blob) => {
+            if (blob) {
+              const compressedFile = new File([blob], file.name, { type: file.type });
+              resolve(compressedFile);
+            } else {
+              reject(new Error('Failed to compress image'));
+            }
+          }, file.type, 0.7);
+        };
+        img.onerror = reject;
+      };
+      reader.onerror = reject;
+    });
+  };
+
+  // Handle multiple file selection
+  const handleMultipleFilesUpload = async (files: FileList) => {
+    const filesArray = Array.from(files);
+    const currentImages = formData.images || [];
+    const remainingSlots = 5 - currentImages.length;
+    
+    if (filesArray.length > remainingSlots) {
+      alert(`You can only add ${remainingSlots} more image(s). Maximum 5 images allowed.`);
+      return;
+    }
+
+    setUploadingImages(true);
+    setUploadProgress(0);
+    
+    const newImages: string[] = [];
+    let processed = 0;
+
+    for (const file of filesArray) {
+      try {
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+          alert(`${file.name} is not an image file. Skipping.`);
+          continue;
+        }
+
+        // Validate file size (max 500KB)
+        if (file.size > 500 * 1024) {
+          alert(`${file.name} is larger than 500KB. Please compress it first.`);
+          continue;
+        }
+
+        // Compress and convert
+        const compressedFile = await compressImage(file, 600);
+        const base64String = await convertToBase64(compressedFile);
+        newImages.push(base64String);
+        
+        processed++;
+        setUploadProgress((processed / filesArray.length) * 100);
+      } catch (error) {
+        console.error(`Error processing ${file.name}:`, error);
+        alert(`Failed to process ${file.name}`);
+      }
+    }
+
+    // Update form data with all new images
+    if (newImages.length > 0) {
+      setFormData(prev => ({
+        ...prev,
+        images: [...(prev.images || []), ...newImages]
+      }));
+    }
+
+    setUploadingImages(false);
+    setUploadProgress(0);
+  };
+
+  // Handle single file upload (keeping for backward compatibility)
+  const handleFileUpload = async (files: FileList) => {
+    await handleMultipleFilesUpload(files);
+  };
+
+  const removeImage = (index: number) => {
+    const newImages = (formData.images || []).filter((_, i) => i !== index);
     setFormData(prev => ({ ...prev, images: newImages }));
   };
 
-  const handleFileUpload = async (index: number, file: File) => {
-    if (!file) return;
-
-    const storageRef = ref(storage, `products/${Date.now()}-${file.name}`);
-    const uploadTask = uploadBytesResumable(storageRef, file);
-
-    uploadTask.on('state_changed', 
-      (snapshot) => {
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        setUploadProgress(prev => ({ ...prev, [index]: progress }));
-      }, 
-      (error) => {
-        console.error("Upload error:", error);
-        alert("Failed to upload image");
-      }, 
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          handleImageChange(index, downloadURL);
-          setUploadProgress(prev => {
-            const newState = { ...prev };
-            delete newState[index];
-            return newState;
-          });
-        });
-      }
-    );
-  };
-
-  const addImageField = () => {
-    setFormData(prev => ({ ...prev, images: [...(prev.images || []), ''] }));
-  };
-
-  const removeImageField = (index: number) => {
-    const newImages = (formData.images || []).filter((_, i) => i !== index);
+  const reorderImages = (fromIndex: number, toIndex: number) => {
+    const newImages = [...(formData.images || [])];
+    const [movedImage] = newImages.splice(fromIndex, 1);
+    newImages.splice(toIndex, 0, movedImage);
     setFormData(prev => ({ ...prev, images: newImages }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const validImages = (formData.images || []).filter(img => img && img.trim() !== '');
+    if (validImages.length === 0) {
+      alert('Please add at least one product image');
+      return;
+    }
+
+    // Check total size
+    const totalSize = validImages.reduce((sum, img) => sum + (img.length || 0), 0);
+    if (totalSize > 900 * 1024) {
+      alert('Total image size is too large. Please use smaller images or reduce number of images.');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
       const productData = {
         ...formData,
-        updatedAt: serverTimestamp(),
+        images: validImages,
       };
 
-      if (isEdit) {
-        await setDoc(doc(db, 'products', productId), productData, { merge: true });
+      if (isEdit && productId) {
+        await productApi.update(productId, productData);
       } else {
-        await addDoc(collection(db, 'products'), {
-          ...productData,
-          createdAt: serverTimestamp()
-        });
+        await productApi.create(productData as Omit<Product, 'id'>);
       }
-
       navigate('/admin/products');
     } catch (error) {
       console.error("Error saving product:", error);
@@ -162,6 +251,8 @@ export default function AdminProductForm() {
       </div>
     );
   }
+
+  const imageCount = (formData.images || []).filter(img => img && img.trim() !== '').length;
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 sm:space-y-12">
@@ -255,94 +346,136 @@ export default function AdminProductForm() {
             </div>
           </section>
 
-          {/* Visual Assets */}
+          {/* Visual Assets - Multiple Image Upload */}
           <section className="bg-white border border-warm-beige p-6 sm:p-10 space-y-8 shadow-sm">
-            <div className="flex items-center gap-3 border-l-4 border-gold pl-4">
-              <ImageIcon className="w-5 h-5 text-gold" />
-              <h2 className="text-base sm:text-lg font-display text-near-black uppercase">Visual Assets</h2>
+            <div className="flex items-center justify-between border-l-4 border-gold pl-4">
+              <div className="flex items-center gap-3">
+                <ImageIcon className="w-5 h-5 text-gold" />
+                <h2 className="text-base sm:text-lg font-display text-near-black uppercase">Visual Assets</h2>
+              </div>
+              <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                {imageCount} / 5 Images
+              </div>
             </div>
             
             <div className="space-y-6">
-              {formData.images?.map((img, idx) => (
-                <div key={idx} className="p-4 sm:p-6 bg-cream/50 border border-warm-beige space-y-4">
-                  <div className="flex justify-between items-center">
-                    <label className="text-[9px] font-bold uppercase tracking-widest text-walnut">Perspective {idx + 1}</label>
-                    {formData.images!.length > 1 && (
-                      <button 
-                        type="button" 
-                        onClick={() => removeImageField(idx)}
-                        className="p-1 text-gray-400 hover:text-red-500 transition-colors"
-                        aria-label="Remove image"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    )}
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <span className="text-[8px] font-bold uppercase text-gray-400 block">Direct URL</span>
-                      <input 
-                        value={img}
-                        onChange={(e) => handleImageChange(idx, e.target.value)}
-                        className="w-full bg-white border border-warm-beige py-2 px-4 text-xs focus:border-gold outline-none transition-colors"
-                        placeholder="https://images.unsplash.com/..."
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <span className="text-[8px] font-bold uppercase text-gray-400 block">Upload Image</span>
-                      <div className="relative">
-                        <input 
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => e.target.files?.[0] && handleFileUpload(idx, e.target.files[0])}
-                          className="hidden"
-                          id={`file-upload-${idx}`}
-                        />
-                        <label 
-                          htmlFor={`file-upload-${idx}`}
-                          className="w-full bg-white border border-warm-beige py-2 px-4 text-[10px] font-bold uppercase tracking-widest text-near-black hover:bg-gold hover:text-white transition-all transition-colors cursor-pointer flex items-center justify-center gap-2 h-[34px]"
-                        >
-                          <Plus className="w-3 h-3" /> Choose File
-                        </label>
-                      </div>
-                    </div>
-                  </div>
+              <div className="p-3 bg-mint-50 border border-mint-200 text-[10px] text-mint-700">
+                <strong>Tip:</strong> Select multiple images at once (Ctrl+Click or Shift+Click). First image will be the main product image. Max 5 images, each under 500KB.
+              </div>
 
-                  {uploadProgress[idx] !== undefined && (
-                    <div className="w-full h-1 bg-warm-beige rounded-full overflow-hidden mt-2">
-                      <div 
-                        className="h-full bg-gold transition-all duration-300"
-                        style={{ width: `${uploadProgress[idx]}%` }}
-                      />
-                    </div>
-                  )}
-
-                  {img && (
-                    <div className="w-24 h-24 sm:w-32 sm:h-32 border border-warm-beige relative group overflow-hidden">
-                      <img src={img} alt={`Preview ${idx + 1}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                      <div className="absolute inset-0 bg-near-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <ImageIcon className="w-6 h-6 text-white" />
-                      </div>
-                    </div>
-                  )}
+              {/* Upload Area */}
+              {imageCount < 5 && (
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => e.target.files && handleMultipleFilesUpload(e.target.files)}
+                    className="hidden"
+                    id="multi-file-upload"
+                    disabled={uploadingImages}
+                  />
+                  <label
+                    htmlFor="multi-file-upload"
+                    className={`w-full border-2 border-dashed border-warm-beige py-8 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:border-gold hover:text-gold transition-all flex flex-col items-center justify-center gap-3 cursor-pointer ${uploadingImages ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    <Upload className="w-8 h-8" />
+                    <span>{uploadingImages ? 'Uploading Images...' : 'Click or Drag & Drop Multiple Images'}</span>
+                    <span className="text-[8px] text-gray-300">(Max 5 images, 500KB each)</span>
+                  </label>
                 </div>
-              ))}
-              <button 
-                type="button" 
-                onClick={addImageField}
-                className="w-full border-2 border-dashed border-warm-beige py-6 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:border-gold hover:text-gold transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
-              >
-                <Plus className="w-4 h-4" /> Add Perspective Angle
-              </button>
+              )}
+
+              {/* Upload Progress */}
+              {uploadingImages && uploadProgress > 0 && (
+                <div className="space-y-2">
+                  <div className="w-full h-1 bg-warm-beige rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-gold transition-all duration-300"
+                      style={{ width: `${uploadProgress}%` }}
+                    />
+                  </div>
+                  <p className="text-[8px] text-gray-400 text-center">Processing images... {Math.round(uploadProgress)}%</p>
+                </div>
+              )}
+
+              {/* Image Gallery */}
+              {(formData.images || []).length > 0 && (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                  {(formData.images || []).map((img, idx) => (
+                    img && img.trim() !== '' && (
+                      <div key={idx} className="relative group">
+                        <div className="aspect-square bg-cream border border-warm-beige overflow-hidden">
+                          <img 
+                            src={img} 
+                            alt={`Preview ${idx + 1}`} 
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                          />
+                        </div>
+                        
+                        {/* Image number indicator */}
+                        <div className="absolute top-2 left-2 bg-near-black/70 text-white text-[8px] font-bold px-2 py-1 rounded">
+                          #{idx + 1}
+                        </div>
+                        
+                        {/* Overlay buttons */}
+                        <div className="absolute inset-0 bg-near-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                          {idx > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => reorderImages(idx, idx - 1)}
+                              className="p-2 bg-white text-near-black hover:bg-gold transition-colors rounded-full"
+                              title="Move Left"
+                            >
+                              ←
+                            </button>
+                          )}
+                          {idx < imageCount - 1 && (
+                            <button
+                              type="button"
+                              onClick={() => reorderImages(idx, idx + 1)}
+                              className="p-2 bg-white text-near-black hover:bg-gold transition-colors rounded-full"
+                              title="Move Right"
+                            >
+                              →
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => removeImage(idx)}
+                            className="p-2 bg-red-500 text-white hover:bg-red-600 transition-colors rounded-full"
+                            title="Remove Image"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                        
+                        {/* Main image badge */}
+                        {idx === 0 && (
+                          <div className="absolute bottom-2 right-2 bg-gold text-near-black text-[8px] font-bold px-2 py-1 rounded">
+                            Main
+                          </div>
+                        )}
+                      </div>
+                    )
+                  ))}
+                </div>
+              )}
+
+              {/* Helper text for reordering */}
+              {imageCount > 1 && (
+                <div className="text-center text-[8px] text-gray-400">
+                  Hover over images to reorder or delete. First image is the main product image.
+                </div>
+              )}
             </div>
           </section>
 
           {/* Precise Specifications */}
-          <section className="bg-white border border-warm-beige p-10 space-y-8">
+          <section className="bg-white border border-warm-beige p-6 sm:p-10 space-y-8 shadow-sm">
             <div className="flex items-center gap-3 border-l-4 border-gold pl-4">
               <Layers className="w-5 h-5 text-gold" />
-              <h2 className="text-lg font-display text-near-black uppercase">Precise Specifications</h2>
+              <h2 className="text-base sm:text-lg font-display text-near-black uppercase">Precise Specifications</h2>
             </div>
             
             <div className="space-y-6">
@@ -383,9 +516,11 @@ export default function AdminProductForm() {
                   type="button"
                   onClick={() => {
                     const input = document.getElementById('new-spec-key') as HTMLInputElement;
-                    if (input.value) {
+                    if (input.value && !formData.specifications?.[input.value]) {
                       handleSpecChange(input.value, '');
                       input.value = '';
+                    } else if (input.value && formData.specifications?.[input.value]) {
+                      alert('Specification already exists');
                     }
                   }}
                   className="bg-near-black text-white px-6 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-gold transition-colors"
@@ -399,10 +534,10 @@ export default function AdminProductForm() {
 
         {/* Commercial Intel */}
         <aside className="space-y-8">
-          <div className="bg-near-black text-white p-10 space-y-8 sticky top-44">
+          <div className="bg-near-black text-white p-6 sm:p-10 space-y-8 sticky top-44">
             <div className="flex items-center gap-3 border-l-4 border-gold pl-4">
               <Tag className="w-5 h-5 text-gold" />
-              <h2 className="text-lg font-display uppercase">Commercial Intel</h2>
+              <h2 className="text-base sm:text-lg font-display uppercase">Commercial Intel</h2>
             </div>
 
             <div className="space-y-6">
@@ -417,6 +552,8 @@ export default function AdminProductForm() {
                     value={formData.price}
                     onChange={handleChange}
                     className="w-full bg-white/10 border border-white/20 py-4 pl-10 pr-6 text-xl font-display outline-none focus:border-gold"
+                    step="0.01"
+                    min="0"
                   />
                 </div>
               </div>
@@ -430,6 +567,7 @@ export default function AdminProductForm() {
                   value={formData.stock}
                   onChange={handleChange}
                   className="w-full bg-white/10 border border-white/20 py-4 px-6 text-xl font-display outline-none focus:border-gold"
+                  min="0"
                 />
               </div>
 
