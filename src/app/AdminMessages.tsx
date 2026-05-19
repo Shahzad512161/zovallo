@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Mail, 
-  Search, 
-  Inbox, 
-  CheckCircle, 
-  Reply, 
+import React, { useState, useEffect } from "react";
+import {
+  Mail,
+  Search,
+  Inbox,
+  CheckCircle,
+  Reply,
   Trash2,
   Eye,
   X,
@@ -15,22 +15,24 @@ import {
   Filter,
   MessageSquare,
   User,
-  Calendar
-} from 'lucide-react';
-import { messageApi } from '../services/messageApi';
-import { ContactMessage } from '../types';
-import { formatCurrency } from '../lib/utils';
-import { LoadingSpinner } from '../components/ui/Loading';
-import { EmptyState } from '../components/ui/EmptyState';
+  Calendar,
+} from "lucide-react";
+import { messageApi } from "../services/messageApi";
+import { ContactMessage } from "../types";
+import { formatCurrency } from "../lib/utils";
+import { LoadingSpinner } from "../components/ui/Loading";
+import { EmptyState } from "../components/ui/EmptyState";
 
 export default function AdminMessages() {
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(
+    null,
+  );
   const [showReplyModal, setShowReplyModal] = useState(false);
-  const [replyText, setReplyText] = useState('');
+  const [replyText, setReplyText] = useState("");
   const [sendingReply, setSendingReply] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -71,7 +73,8 @@ export default function AdminMessages() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this message?')) return;
+    if (!window.confirm("Are you sure you want to delete this message?"))
+      return;
     try {
       await messageApi.deleteMessage(id);
       if (selectedMessage?.id === id) setSelectedMessage(null);
@@ -85,12 +88,12 @@ export default function AdminMessages() {
 
   const handleReply = async () => {
     if (!selectedMessage || !replyText.trim()) return;
-    
+
     setSendingReply(true);
     try {
       await messageApi.markAsReplied(selectedMessage.id, replyText);
       setShowReplyModal(false);
-      setReplyText('');
+      setReplyText("");
       await fetchMessages();
       await fetchUnreadCount();
       alert(`Reply sent to ${selectedMessage.email}`);
@@ -104,32 +107,59 @@ export default function AdminMessages() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'unread':
-        return <span className="px-2 py-1 text-[9px] font-bold uppercase tracking-widest rounded-full bg-red-100 text-red-600 border border-red-200">Unread</span>;
-      case 'read':
-        return <span className="px-2 py-1 text-[9px] font-bold uppercase tracking-widest rounded-full bg-blue-100 text-blue-600 border border-blue-200">Read</span>;
-      case 'replied':
-        return <span className="px-2 py-1 text-[9px] font-bold uppercase tracking-widest rounded-full bg-mint-100 text-mint-700 border border-mint-200">Replied</span>;
+      case "unread":
+        return (
+          <span className="px-2 py-1 text-[9px] font-bold uppercase tracking-widest rounded-full bg-red-100 text-red-600 border border-red-200">
+            Unread
+          </span>
+        );
+      case "read":
+        return (
+          <span className="px-2 py-1 text-[9px] font-bold uppercase tracking-widest rounded-full bg-blue-100 text-blue-600 border border-blue-200">
+            Read
+          </span>
+        );
+      case "replied":
+        return (
+          <span className="px-2 py-1 text-[9px] font-bold uppercase tracking-widest rounded-full bg-mint-100 text-mint-700 border border-mint-200">
+            Replied
+          </span>
+        );
       default:
         return null;
     }
   };
 
-  const filteredMessages = messages.filter(msg => {
-    const matchesSearch = 
+  const filteredMessages = messages.filter((msg) => {
+    const matchesSearch =
       msg.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       msg.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       msg.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
       msg.message.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || msg.status === statusFilter;
+    const matchesStatus = statusFilter === "all" || msg.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
   const stats = [
-    { label: 'Total', count: messages.length, icon: MessageSquare, color: 'text-gold' },
-    { label: 'Unread', count: unreadCount, icon: Mail, color: 'text-red-500' },
-    { label: 'Read', count: messages.filter(m => m.status === 'read').length, icon: Eye, color: 'text-blue-500' },
-    { label: 'Replied', count: messages.filter(m => m.status === 'replied').length, icon: Reply, color: 'text-mint-700' },
+    {
+      label: "Total",
+      count: messages.length,
+      icon: MessageSquare,
+      color: "text-gold",
+    },
+    { label: "Unread", count: unreadCount, icon: Mail, color: "text-red-500" },
+    {
+      label: "Read",
+      count: messages.filter((m) => m.status === "read").length,
+      icon: Eye,
+      color: "text-blue-500",
+    },
+    {
+      label: "Replied",
+      count: messages.filter((m) => m.status === "replied").length,
+      icon: Reply,
+      color: "text-mint-700",
+    },
   ];
 
   return (
@@ -145,8 +175,11 @@ export default function AdminMessages() {
           </p>
         </div>
         <div className="flex gap-3">
-          <button 
-            onClick={() => { fetchMessages(); fetchUnreadCount(); }}
+          <button
+            onClick={() => {
+              fetchMessages();
+              fetchUnreadCount();
+            }}
             className="flex items-center gap-2 px-4 py-2 bg-white border border-warm-beige text-[10px] font-bold uppercase tracking-widest hover:bg-cream transition-colors rounded"
           >
             <RefreshCw className="w-3.5 h-3.5" /> Refresh
@@ -157,12 +190,19 @@ export default function AdminMessages() {
       {/* Stats Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
         {stats.map((stat, idx) => (
-          <div key={idx} className="bg-white border border-warm-beige p-4 rounded-lg">
+          <div
+            key={idx}
+            className="bg-white border border-warm-beige p-4 rounded-lg"
+          >
             <div className="flex items-center justify-between">
               <stat.icon className={`w-5 h-5 ${stat.color}`} />
-              <span className="text-2xl font-bold text-near-black">{stat.count}</span>
+              <span className="text-2xl font-bold text-near-black">
+                {stat.count}
+              </span>
             </div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mt-2">{stat.label}</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mt-2">
+              {stat.label}
+            </p>
           </div>
         ))}
       </div>
@@ -204,7 +244,9 @@ export default function AdminMessages() {
             {loading ? (
               <div className="p-12 text-center">
                 <LoadingSpinner />
-                <p className="text-[10px] text-gold mt-2">Loading messages...</p>
+                <p className="text-[10px] text-gold mt-2">
+                  Loading messages...
+                </p>
               </div>
             ) : filteredMessages.length === 0 ? (
               <div className="p-12 text-center">
@@ -213,34 +255,46 @@ export default function AdminMessages() {
               </div>
             ) : (
               filteredMessages.map((message) => (
-                <div 
+                <div
                   key={message.id}
                   onClick={() => {
                     setSelectedMessage(message);
-                    if (message.status === 'unread') handleMarkAsRead(message.id);
+                    if (message.status === "unread")
+                      handleMarkAsRead(message.id);
                   }}
-                  className={`p-4 cursor-pointer transition-all hover:bg-cream/20 ${selectedMessage?.id === message.id ? 'bg-gold/5 border-l-4 border-gold' : ''}`}
+                  className={`p-4 cursor-pointer transition-all hover:bg-cream/20 ${selectedMessage?.id === message.id ? "bg-gold/5 border-l-4 border-gold" : ""}`}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-bold text-near-black text-sm truncate">{message.name}</span>
+                        <span className="font-bold text-near-black text-sm truncate">
+                          {message.name}
+                        </span>
                         {getStatusBadge(message.status)}
                       </div>
-                      <p className="text-xs text-gray-500 mb-1">{message.subject}</p>
-                      <p className="text-xs text-gray-400 line-clamp-2">{message.message}</p>
+                      <p className="text-xs text-gray-500 mb-1">
+                        {message.subject}
+                      </p>
+                      <p className="text-xs text-gray-400 line-clamp-2">
+                        {message.message}
+                      </p>
                       <div className="flex items-center gap-3 mt-2 text-[10px] text-gray-400">
                         <span className="flex items-center gap-1">
                           <Mail className="w-3 h-3" /> {message.email}
                         </span>
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
-                          {message.createdAt?.toDate().toLocaleDateString('en-GB')}
+                          {message.createdAt
+                            ?.toDate()
+                            .toLocaleDateString("en-GB")}
                         </span>
                       </div>
                     </div>
-                    <button 
-                      onClick={(e) => { e.stopPropagation(); handleDelete(message.id); }}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(message.id);
+                      }}
                       className="p-1.5 text-gray-400 hover:text-red-500 transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -259,20 +313,25 @@ export default function AdminMessages() {
               <div className="p-5 border-b border-warm-beige bg-cream/30">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="text-lg font-display text-near-black">Message Details</h3>
+                    <h3 className="text-lg font-display text-near-black">
+                      Message Details
+                    </h3>
                     <p className="text-[10px] text-gray-400 mt-1">
-                      Received {selectedMessage.createdAt?.toDate().toLocaleString('en-GB')}
+                      Received{" "}
+                      {selectedMessage.createdAt
+                        ?.toDate()
+                        .toLocaleString("en-GB")}
                     </p>
                   </div>
                   <div className="flex gap-2">
-                    <button 
+                    <button
                       onClick={() => setShowReplyModal(true)}
                       className="p-2 text-gold hover:bg-gold/10 rounded-full transition-colors"
                       title="Reply"
                     >
                       <Reply className="w-4 h-4" />
                     </button>
-                    <button 
+                    <button
                       onClick={() => handleDelete(selectedMessage.id)}
                       className="p-2 text-gray-400 hover:text-red-500 rounded-full transition-colors"
                       title="Delete"
@@ -282,18 +341,25 @@ export default function AdminMessages() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="p-5 space-y-5">
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-walnut mb-2">Customer Information</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-walnut mb-2">
+                    Customer Information
+                  </p>
                   <div className="space-y-2">
                     <div className="flex items-center gap-3 text-sm">
                       <User className="w-4 h-4 text-gray-400" />
-                      <span className="font-medium">{selectedMessage.name}</span>
+                      <span className="font-medium">
+                        {selectedMessage.name}
+                      </span>
                     </div>
                     <div className="flex items-center gap-3 text-sm">
                       <Mail className="w-4 h-4 text-gray-400" />
-                      <a href={`mailto:${selectedMessage.email}`} className="text-gold hover:underline">
+                      <a
+                        href={`mailto:${selectedMessage.email}`}
+                        className="text-gold hover:underline"
+                      >
                         {selectedMessage.email}
                       </a>
                     </div>
@@ -301,12 +367,18 @@ export default function AdminMessages() {
                 </div>
 
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-walnut mb-2">Subject</p>
-                  <p className="text-sm font-medium text-near-black">{selectedMessage.subject}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-walnut mb-2">
+                    Subject
+                  </p>
+                  <p className="text-sm font-medium text-near-black">
+                    {selectedMessage.subject}
+                  </p>
                 </div>
 
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-walnut mb-2">Message</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-walnut mb-2">
+                    Message
+                  </p>
                   <div className="bg-cream/30 p-4 rounded-lg">
                     <p className="text-sm text-gray-666 leading-relaxed whitespace-pre-wrap">
                       {selectedMessage.message}
@@ -319,9 +391,14 @@ export default function AdminMessages() {
                     <p className="text-[10px] font-bold uppercase tracking-widest text-mint-700 mb-2 flex items-center gap-2">
                       <Reply className="w-3 h-3" /> Your Reply
                     </p>
-                    <p className="text-sm text-gray-666 leading-relaxed">{selectedMessage.replyMessage}</p>
+                    <p className="text-sm text-gray-666 leading-relaxed">
+                      {selectedMessage.replyMessage}
+                    </p>
                     <p className="text-[10px] text-gray-400 mt-2">
-                      Replied on {selectedMessage.repliedAt?.toDate().toLocaleString('en-GB')}
+                      Replied on{" "}
+                      {selectedMessage.repliedAt
+                        ?.toDate()
+                        .toLocaleString("en-GB")}
                     </p>
                   </div>
                 )}
@@ -341,11 +418,19 @@ export default function AdminMessages() {
       {/* Reply Modal */}
       {showReplyModal && selectedMessage && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
-          <div className="absolute inset-0 bg-near-black/80 backdrop-blur-sm" onClick={() => setShowReplyModal(false)} />
+          <div
+            className="absolute inset-0 bg-near-black/80 backdrop-blur-sm"
+            onClick={() => setShowReplyModal(false)}
+          />
           <div className="bg-white max-w-lg w-full relative z-10 shadow-2xl border border-warm-beige rounded-lg">
             <div className="p-5 border-b border-warm-beige flex justify-between items-center">
-              <h3 className="text-xl font-display text-near-black">Reply to {selectedMessage.name}</h3>
-              <button onClick={() => setShowReplyModal(false)} className="text-gray-400 hover:text-near-black">
+              <h3 className="text-xl font-display text-near-black">
+                Reply to {selectedMessage.name}
+              </h3>
+              <button
+                onClick={() => setShowReplyModal(false)}
+                className="text-gray-400 hover:text-near-black"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -363,7 +448,8 @@ export default function AdminMessages() {
                 />
               </div>
               <div className="bg-mint-50 p-3 rounded text-xs text-mint-700">
-                <strong>Note:</strong> The customer will receive this reply via email.
+                <strong>Note:</strong> The customer will receive this reply via
+                email.
               </div>
             </div>
             <div className="p-5 border-t border-warm-beige bg-cream/30 flex gap-3">
@@ -378,7 +464,7 @@ export default function AdminMessages() {
                 disabled={sendingReply || !replyText.trim()}
                 className="flex-1 bg-near-black text-white py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-gold hover:text-near-black transition-colors disabled:opacity-50 flex items-center justify-center gap-2 rounded"
               >
-                {sendingReply ? 'Sending...' : 'Send Reply'}
+                {sendingReply ? "Sending..." : "Send Reply"}
                 <Send className="w-3 h-3" />
               </button>
             </div>

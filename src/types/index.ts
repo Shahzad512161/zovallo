@@ -9,7 +9,7 @@ export interface User {
   postalCode?: string;
   country?: string;
   avatar?: string;
-  role?: 'admin' | 'user';
+  role?: "admin" | "user";
   createdAt?: Date | any;
 }
 
@@ -19,14 +19,13 @@ export interface Product {
   slug: string;
   description: string;
   price: number;
-  compareAtPrice?: number;   
+  compareAtPrice?: number;
   category: string;
   images: string[];
   stock: number;
-  
-  
-  seaterCount?: string[];   
-  colors?: string[];       
+
+  seaterCount?: string[];
+  colors?: string[];
   material?: string;
   dimensions?: string;
   weight?: number;
@@ -34,8 +33,8 @@ export interface Product {
   warrantyYears?: number;
   deliveryCountries?: string[];
   estimatedDelivery?: string;
-  tags?: string[]; 
-  
+  tags?: string[];
+
   specifications?: Record<string, string>;
   featured: boolean;
   createdAt?: any;
@@ -91,11 +90,10 @@ export interface Order {
     weight?: number;
   }>;
   totalPrice: number;
-  orderStatus: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  orderStatus: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
   paymentMethod: string;
   createdAt?: any;
 }
-
 
 export interface ContactMessage {
   id: string;
@@ -103,7 +101,7 @@ export interface ContactMessage {
   email: string;
   subject: string;
   message: string;
-  status: 'unread' | 'read' | 'replied';
+  status: "unread" | "read" | "replied";
   createdAt: any;
   repliedAt?: any;
   replyMessage?: string;

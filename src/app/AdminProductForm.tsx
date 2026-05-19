@@ -98,7 +98,7 @@ export default function AdminProductForm() {
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     const { name, value, type } = e.target;
     setFormData((prev) => ({
@@ -173,10 +173,16 @@ export default function AdminProductForm() {
 
   // Dynamic add for Delivery Countries
   const handleAddCountry = () => {
-    if (newCountry.trim() && !formData.deliveryCountries?.includes(newCountry.trim())) {
+    if (
+      newCountry.trim() &&
+      !formData.deliveryCountries?.includes(newCountry.trim())
+    ) {
       setFormData((prev) => ({
         ...prev,
-        deliveryCountries: [...(prev.deliveryCountries || []), newCountry.trim()],
+        deliveryCountries: [
+          ...(prev.deliveryCountries || []),
+          newCountry.trim(),
+        ],
       }));
       setNewCountry("");
     }
@@ -185,7 +191,9 @@ export default function AdminProductForm() {
   const handleRemoveCountry = (country: string) => {
     setFormData((prev) => ({
       ...prev,
-      deliveryCountries: (prev.deliveryCountries || []).filter((c) => c !== country),
+      deliveryCountries: (prev.deliveryCountries || []).filter(
+        (c) => c !== country,
+      ),
     }));
   };
 
@@ -229,7 +237,7 @@ export default function AdminProductForm() {
               }
             },
             file.type,
-            0.7
+            0.7,
           );
         };
         img.onerror = reject;
@@ -245,7 +253,7 @@ export default function AdminProductForm() {
 
     if (filesArray.length > remainingSlots) {
       alert(
-        `You can only add ${remainingSlots} more image(s). Maximum 5 images allowed.`
+        `You can only add ${remainingSlots} more image(s). Maximum 5 images allowed.`,
       );
       return;
     }
@@ -304,7 +312,7 @@ export default function AdminProductForm() {
     e.preventDefault();
 
     const validImages = (formData.images || []).filter(
-      (img) => img && img.trim() !== ""
+      (img) => img && img.trim() !== "",
     );
     if (validImages.length === 0) {
       alert("Please add at least one product image");
@@ -313,11 +321,11 @@ export default function AdminProductForm() {
 
     const totalSize = validImages.reduce(
       (sum, img) => sum + (img.length || 0),
-      0
+      0,
     );
     if (totalSize > 900 * 1024) {
       alert(
-        "Total image size is too large. Please use smaller images or reduce number of images."
+        "Total image size is too large. Please use smaller images or reduce number of images.",
       );
       return;
     }
@@ -355,12 +363,19 @@ export default function AdminProductForm() {
   }
 
   const imageCount = (formData.images || []).filter(
-    (img) => img && img.trim() !== ""
+    (img) => img && img.trim() !== "",
   ).length;
 
-  const discountPercent = formData.compareAtPrice && formData.price && formData.compareAtPrice > formData.price
-    ? Math.round(((formData.compareAtPrice - formData.price) / formData.compareAtPrice) * 100)
-    : 0;
+  const discountPercent =
+    formData.compareAtPrice &&
+    formData.price &&
+    formData.compareAtPrice > formData.price
+      ? Math.round(
+          ((formData.compareAtPrice - formData.price) /
+            formData.compareAtPrice) *
+            100,
+        )
+      : 0;
 
   return (
     <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-5 lg:px-0 space-y-5 sm:space-y-6 md:space-y-8 lg:space-y-12">
@@ -513,7 +528,9 @@ export default function AdminProductForm() {
                   Sale Price (GBP) *
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gold font-bold">£</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gold font-bold">
+                    £
+                  </span>
                   <input
                     required
                     type="number"
@@ -532,7 +549,9 @@ export default function AdminProductForm() {
                   Compare at Price (Original Price)
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold">£</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold">
+                    £
+                  </span>
                   <input
                     type="number"
                     name="compareAtPrice"
@@ -544,7 +563,9 @@ export default function AdminProductForm() {
                   />
                 </div>
                 {discountPercent > 0 && (
-                  <p className="text-[10px] text-mint-700 mt-1">Save {discountPercent}%</p>
+                  <p className="text-[10px] text-mint-700 mt-1">
+                    Save {discountPercent}%
+                  </p>
                 )}
               </div>
             </div>
@@ -560,7 +581,6 @@ export default function AdminProductForm() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
-              
               {/* Seater Count - Dynamic */}
               <div className="space-y-2">
                 <label className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-walnut block flex items-center gap-2">
@@ -568,26 +588,35 @@ export default function AdminProductForm() {
                 </label>
                 <div className="flex gap-2">
                   <input
-  type="text"
-  value={newSeater}
-  onChange={(e) => {
-    setNewSeater(e.target.value);
-    if (e.target.value.includes(',')) {
-      const seaters = e.target.value.split(',').map(s => s.trim()).filter(s => s);
-      seaters.forEach(seater => {
-        if (seater && !formData.seaterCount?.includes(seater)) {
-          setFormData(prev => ({
-            ...prev,
-            seaterCount: [...(prev.seaterCount || []), seater]
-          }));
-        }
-      });
-      setNewSeater('');
-    }
-  }}
-  placeholder="e.g., 2 Seater, L-Shape, Recliner (separate with commas)"
-  className="flex-1 bg-cream border border-warm-beige py-2 px-3 text-sm focus:border-gold outline-none rounded"
-/>
+                    type="text"
+                    value={newSeater}
+                    onChange={(e) => {
+                      setNewSeater(e.target.value);
+                      if (e.target.value.includes(",")) {
+                        const seaters = e.target.value
+                          .split(",")
+                          .map((s) => s.trim())
+                          .filter((s) => s);
+                        seaters.forEach((seater) => {
+                          if (
+                            seater &&
+                            !formData.seaterCount?.includes(seater)
+                          ) {
+                            setFormData((prev) => ({
+                              ...prev,
+                              seaterCount: [
+                                ...(prev.seaterCount || []),
+                                seater,
+                              ],
+                            }));
+                          }
+                        });
+                        setNewSeater("");
+                      }
+                    }}
+                    placeholder="e.g., 2 Seater, L-Shape, Recliner (separate with commas)"
+                    className="flex-1 bg-cream border border-warm-beige py-2 px-3 text-sm focus:border-gold outline-none rounded"
+                  />
                 </div>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {(formData.seaterCount || []).map((seater) => (
@@ -607,7 +636,9 @@ export default function AdminProductForm() {
                   ))}
                 </div>
                 {(formData.seaterCount || []).length === 0 && (
-                  <p className="text-[10px] text-gray-400">No seater options added. Add above.</p>
+                  <p className="text-[10px] text-gray-400">
+                    No seater options added. Add above.
+                  </p>
                 )}
               </div>
 
@@ -618,35 +649,38 @@ export default function AdminProductForm() {
                 </label>
                 <div className="flex gap-2">
                   <input
-  type="text"
-  value={newColor}
-  onChange={(e) => {
-    setNewColor(e.target.value);
-    if (e.target.value.includes(',')) {
-      const colors = e.target.value.split(',').map(c => c.trim()).filter(c => c);
-      colors.forEach(color => {
-        if (color && !formData.colors?.includes(color)) {
-          setFormData(prev => ({
-            ...prev,
-            colors: [...(prev.colors || []), color]
-          }));
-        }
-      });
-      setNewColor('');
-    }
-  }}
-  placeholder="e.g., Black, Walnut, Navy Blue (separate with commas)"
-  className="flex-1 bg-cream border border-warm-beige py-2 px-3 text-sm focus:border-gold outline-none rounded"
-/>
+                    type="text"
+                    value={newColor}
+                    onChange={(e) => {
+                      setNewColor(e.target.value);
+                      if (e.target.value.includes(",")) {
+                        const colors = e.target.value
+                          .split(",")
+                          .map((c) => c.trim())
+                          .filter((c) => c);
+                        colors.forEach((color) => {
+                          if (color && !formData.colors?.includes(color)) {
+                            setFormData((prev) => ({
+                              ...prev,
+                              colors: [...(prev.colors || []), color],
+                            }));
+                          }
+                        });
+                        setNewColor("");
+                      }
+                    }}
+                    placeholder="e.g., Black, Walnut, Navy Blue (separate with commas)"
+                    className="flex-1 bg-cream border border-warm-beige py-2 px-3 text-sm focus:border-gold outline-none rounded"
+                  />
                 </div>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {(formData.colors || []).map((color) => (
                     <span
                       key={color}
                       className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs"
-                      style={{ backgroundColor: '#f5f5f2', color: '#1a1a1a' }}
+                      style={{ backgroundColor: "#f5f5f2", color: "#1a1a1a" }}
                     >
-                      <div 
+                      <div
                         className="w-3 h-3 rounded-full border border-gray-300"
                         style={{ backgroundColor: color.toLowerCase() }}
                       />
@@ -662,7 +696,9 @@ export default function AdminProductForm() {
                   ))}
                 </div>
                 {(formData.colors || []).length === 0 && (
-                  <p className="text-[10px] text-gray-400">No colors added. Add above.</p>
+                  <p className="text-[10px] text-gray-400">
+                    No colors added. Add above.
+                  </p>
                 )}
               </div>
 
@@ -673,26 +709,29 @@ export default function AdminProductForm() {
                 </label>
                 <div className="flex gap-2">
                   <input
-  type="text"
-  value={newTag}
-  onChange={(e) => {
-    setNewTag(e.target.value);
-    if (e.target.value.includes(',')) {
-      const tags = e.target.value.split(',').map(t => t.trim()).filter(t => t);
-      tags.forEach(tag => {
-        if (tag && !formData.tags?.includes(tag)) {
-          setFormData(prev => ({
-            ...prev,
-            tags: [...(prev.tags || []), tag]
-          }));
-        }
-      });
-      setNewTag('');
-    }
-  }}
-  placeholder="e.g., New, Best Seller, Limited Edition (separate with commas)"
-  className="flex-1 bg-cream border border-warm-beige py-2 px-3 text-sm focus:border-gold outline-none rounded"
-/>
+                    type="text"
+                    value={newTag}
+                    onChange={(e) => {
+                      setNewTag(e.target.value);
+                      if (e.target.value.includes(",")) {
+                        const tags = e.target.value
+                          .split(",")
+                          .map((t) => t.trim())
+                          .filter((t) => t);
+                        tags.forEach((tag) => {
+                          if (tag && !formData.tags?.includes(tag)) {
+                            setFormData((prev) => ({
+                              ...prev,
+                              tags: [...(prev.tags || []), tag],
+                            }));
+                          }
+                        });
+                        setNewTag("");
+                      }
+                    }}
+                    placeholder="e.g., New, Best Seller, Limited Edition (separate with commas)"
+                    className="flex-1 bg-cream border border-warm-beige py-2 px-3 text-sm focus:border-gold outline-none rounded"
+                  />
                 </div>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {(formData.tags || []).map((tag) => (
@@ -712,7 +751,9 @@ export default function AdminProductForm() {
                   ))}
                 </div>
                 {(formData.tags || []).length === 0 && (
-                  <p className="text-[10px] text-gray-400">No tags added. Add above.</p>
+                  <p className="text-[10px] text-gray-400">
+                    No tags added. Add above.
+                  </p>
                 )}
               </div>
 
@@ -723,26 +764,35 @@ export default function AdminProductForm() {
                 </label>
                 <div className="flex gap-2">
                   <input
-  type="text"
-  value={newCountry}
-  onChange={(e) => {
-    setNewCountry(e.target.value);
-    if (e.target.value.includes(',')) {
-      const countries = e.target.value.split(',').map(c => c.trim()).filter(c => c);
-      countries.forEach(country => {
-        if (country && !formData.deliveryCountries?.includes(country)) {
-          setFormData(prev => ({
-            ...prev,
-            deliveryCountries: [...(prev.deliveryCountries || []), country]
-          }));
-        }
-      });
-      setNewCountry('');
-    }
-  }}
-  placeholder="e.g., United Kingdom, France, Germany (separate with commas)"
-  className="flex-1 bg-cream border border-warm-beige py-2 px-3 text-sm focus:border-gold outline-none rounded"
-/>
+                    type="text"
+                    value={newCountry}
+                    onChange={(e) => {
+                      setNewCountry(e.target.value);
+                      if (e.target.value.includes(",")) {
+                        const countries = e.target.value
+                          .split(",")
+                          .map((c) => c.trim())
+                          .filter((c) => c);
+                        countries.forEach((country) => {
+                          if (
+                            country &&
+                            !formData.deliveryCountries?.includes(country)
+                          ) {
+                            setFormData((prev) => ({
+                              ...prev,
+                              deliveryCountries: [
+                                ...(prev.deliveryCountries || []),
+                                country,
+                              ],
+                            }));
+                          }
+                        });
+                        setNewCountry("");
+                      }
+                    }}
+                    placeholder="e.g., United Kingdom, France, Germany (separate with commas)"
+                    className="flex-1 bg-cream border border-warm-beige py-2 px-3 text-sm focus:border-gold outline-none rounded"
+                  />
                 </div>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {(formData.deliveryCountries || []).map((country) => (
@@ -762,7 +812,9 @@ export default function AdminProductForm() {
                   ))}
                 </div>
                 {(formData.deliveryCountries || []).length === 0 && (
-                  <p className="text-[10px] text-gray-400">No delivery countries added. Add above.</p>
+                  <p className="text-[10px] text-gray-400">
+                    No delivery countries added. Add above.
+                  </p>
                 )}
               </div>
 
@@ -850,7 +902,6 @@ export default function AdminProductForm() {
                 </select>
               </div>
 
-            
               <div className="space-y-1.5">
                 <label className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-walnut block flex items-center gap-2">
                   <Shield className="w-3.5 h-3.5" /> Warranty (Years)
@@ -1057,8 +1108,8 @@ export default function AdminProductForm() {
                 {isSubmitting
                   ? "Authenticating..."
                   : isEdit
-                  ? "Archive Changes"
-                  : "Publish Entry"}
+                    ? "Archive Changes"
+                    : "Publish Entry"}
               </button>
             </div>
           </div>

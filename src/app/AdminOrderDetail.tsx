@@ -112,7 +112,7 @@ export default function AdminOrderDetail() {
             <p><strong>${order.customerInfo.fullName}</strong></p>
             <p>${order.customerInfo.email}</p>
             <p>${order.customerInfo.phone}</p>
-            ${order.customerInfo.alternativePhone ? `<p>Alt: ${order.customerInfo.alternativePhone}</p>` : ''}
+            ${order.customerInfo.alternativePhone ? `<p>Alt: ${order.customerInfo.alternativePhone}</p>` : ""}
           </div>
           <div class="info-box">
             <h3>SHIPPING ADDRESS</h3>
@@ -124,20 +124,24 @@ export default function AdminOrderDetail() {
         <table>
           <thead><tr><th>Product</th><th>Title</th><th>Options</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
           <tbody>
-            ${order.products.map(p => `
+            ${order.products
+              .map(
+                (p) => `
               <tr>
                 <td><img src="${p.image}" width="50" height="50" style="object-fit:cover" /></td>
                 <td><strong>${p.title}</strong></td>
                 <td>
-                  ${p.selectedOptions?.color ? `<div>Color: ${p.selectedOptions.color}</div>` : ''}
-                  ${p.selectedOptions?.seater ? `<div>Seater: ${p.selectedOptions.seater}</div>` : ''}
-                  ${p.dimensions ? `<div>Dimensions: ${p.dimensions}</div>` : ''}
+                  ${p.selectedOptions?.color ? `<div>Color: ${p.selectedOptions.color}</div>` : ""}
+                  ${p.selectedOptions?.seater ? `<div>Seater: ${p.selectedOptions.seater}</div>` : ""}
+                  ${p.dimensions ? `<div>Dimensions: ${p.dimensions}</div>` : ""}
                 </td>
                 <td>${p.quantity}</td>
                 <td>${formatCurrency(p.price)}</td>
                 <td>${formatCurrency(p.price * p.quantity)}</td>
               </tr>
-            `).join('')}
+            `,
+              )
+              .join("")}
           </tbody>
         </table>
         <div class="totals">
@@ -220,22 +224,18 @@ export default function AdminOrderDetail() {
           <div className="flex flex-wrap items-center gap-3 sm:gap-4 md:gap-6 text-gray-400 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest">
             <span className="flex items-center gap-1.5 sm:gap-2">
               <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-              {order.createdAt
-                ?.toDate()
-                .toLocaleDateString("en-GB", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })}
+              {order.createdAt?.toDate().toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
             </span>
             <span className="flex items-center gap-1.5 sm:gap-2">
               <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-              {order.createdAt
-                ?.toDate()
-                .toLocaleTimeString("en-GB", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
+              {order.createdAt?.toDate().toLocaleTimeString("en-GB", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
             </span>
           </div>
         </div>
@@ -297,11 +297,21 @@ export default function AdminOrderDetail() {
               <table className="w-full min-w-[700px]">
                 <thead>
                   <tr className="bg-cream/50">
-                    <th className="px-3 py-2 text-left text-[9px] font-bold uppercase">Product</th>
-                    <th className="px-3 py-2 text-left text-[9px] font-bold uppercase">Details</th>
-                    <th className="px-3 py-2 text-center text-[9px] font-bold uppercase">Qty</th>
-                    <th className="px-3 py-2 text-right text-[9px] font-bold uppercase">Price</th>
-                    <th className="px-3 py-2 text-right text-[9px] font-bold uppercase">Total</th>
+                    <th className="px-3 py-2 text-left text-[9px] font-bold uppercase">
+                      Product
+                    </th>
+                    <th className="px-3 py-2 text-left text-[9px] font-bold uppercase">
+                      Details
+                    </th>
+                    <th className="px-3 py-2 text-center text-[9px] font-bold uppercase">
+                      Qty
+                    </th>
+                    <th className="px-3 py-2 text-right text-[9px] font-bold uppercase">
+                      Price
+                    </th>
+                    <th className="px-3 py-2 text-right text-[9px] font-bold uppercase">
+                      Total
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-warm-beige">
@@ -309,53 +319,67 @@ export default function AdminOrderDetail() {
                     <tr key={idx}>
                       <td className="px-3 py-4 w-20">
                         <div className="w-14 h-14 sm:w-16 sm:h-16 bg-cream border border-warm-beige rounded overflow-hidden">
-                          <img src={p.image} alt={p.title} className="w-full h-full object-cover" />
+                          <img
+                            src={p.image}
+                            alt={p.title}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
                       </td>
                       <td className="px-3 py-4">
-                        <p className="text-sm font-bold text-near-black">{p.title}</p>
+                        <p className="text-sm font-bold text-near-black">
+                          {p.title}
+                        </p>
                         <p className="text-[10px] text-gray-400 uppercase tracking-widest mt-1">
                           ID: {p.productId.slice(-8).toUpperCase()}
                         </p>
-                        
+
                         {/* Selected Options */}
                         {p.selectedOptions && (
                           <div className="mt-2 space-y-1">
                             {p.selectedOptions.color && (
                               <p className="text-[9px] text-gray-500 flex items-center gap-1">
-                                <Palette className="w-2.5 h-2.5" /> Color: {p.selectedOptions.color}
+                                <Palette className="w-2.5 h-2.5" /> Color:{" "}
+                                {p.selectedOptions.color}
                               </p>
                             )}
                             {p.selectedOptions.seater && (
                               <p className="text-[9px] text-gray-500 flex items-center gap-1">
-                                <Sofa className="w-2.5 h-2.5" /> Seater: {p.selectedOptions.seater}
+                                <Sofa className="w-2.5 h-2.5" /> Seater:{" "}
+                                {p.selectedOptions.seater}
                               </p>
                             )}
                           </div>
                         )}
-                        
+
                         {/* Specifications */}
-                        {p.specifications && Object.keys(p.specifications).length > 0 && (
-                          <div className="mt-2 pt-2 border-t border-dashed border-warm-beige">
-                            <p className="text-[8px] font-bold text-walnut mb-1">Specifications:</p>
-                            <div className="space-y-0.5">
-                              {p.specifications.Material && (
-                                <p className="text-[9px] text-gray-500">Material: {p.specifications.Material}</p>
-                              )}
-                              {p.dimensions && (
-                                <p className="text-[9px] text-gray-500 flex items-center gap-1">
-                                  <Ruler className="w-2.5 h-2.5" /> Dimensions: {p.dimensions}
-                                </p>
-                              )}
-                              {p.weight && (
-                                <p className="text-[9px] text-gray-500 flex items-center gap-1">
-                                  <Weight className="w-2.5 h-2.5" /> Weight: {p.weight} kg
-                                </p>
-                              )}
-                              
+                        {p.specifications &&
+                          Object.keys(p.specifications).length > 0 && (
+                            <div className="mt-2 pt-2 border-t border-dashed border-warm-beige">
+                              <p className="text-[8px] font-bold text-walnut mb-1">
+                                Specifications:
+                              </p>
+                              <div className="space-y-0.5">
+                                {p.specifications.Material && (
+                                  <p className="text-[9px] text-gray-500">
+                                    Material: {p.specifications.Material}
+                                  </p>
+                                )}
+                                {p.dimensions && (
+                                  <p className="text-[9px] text-gray-500 flex items-center gap-1">
+                                    <Ruler className="w-2.5 h-2.5" />{" "}
+                                    Dimensions: {p.dimensions}
+                                  </p>
+                                )}
+                                {p.weight && (
+                                  <p className="text-[9px] text-gray-500 flex items-center gap-1">
+                                    <Weight className="w-2.5 h-2.5" /> Weight:{" "}
+                                    {p.weight} kg
+                                  </p>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
                       </td>
                       <td className="px-3 py-4 text-center">
                         <p className="text-sm font-medium">{p.quantity}</p>
@@ -364,7 +388,9 @@ export default function AdminOrderDetail() {
                         <p className="text-sm">{formatCurrency(p.price)}</p>
                       </td>
                       <td className="px-3 py-4 text-right">
-                        <p className="text-sm font-bold">{formatCurrency(p.price * p.quantity)}</p>
+                        <p className="text-sm font-bold">
+                          {formatCurrency(p.price * p.quantity)}
+                        </p>
                       </td>
                     </tr>
                   ))}
@@ -406,7 +432,8 @@ export default function AdminOrderDetail() {
               </div>
             </div>
             <div className="flex items-center gap-1.5 sm:gap-2 text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-mint-700 bg-mint-50 px-3 sm:px-4 py-1.5 sm:py-2 border border-mint-100 rounded">
-              <CheckCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Transaction Verified
+              <CheckCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> Transaction
+              Verified
             </div>
           </section>
         </div>

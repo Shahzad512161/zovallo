@@ -21,7 +21,8 @@ export default function AdminCategories() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentCategory, setCurrentCategory] = useState<Partial<Category> | null>(null);
+  const [currentCategory, setCurrentCategory] =
+    useState<Partial<Category> | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [imagePreview, setImagePreview] = useState<string>("");
@@ -46,7 +47,7 @@ export default function AdminCategories() {
 
   // Get all categories except the current one (to prevent self-parent)
   const availableParentCategories = categories.filter(
-    (cat) => cat.id !== currentCategory?.id
+    (cat) => cat.id !== currentCategory?.id,
   );
 
   const convertToBase64 = (file: File): Promise<string> => {
@@ -58,7 +59,10 @@ export default function AdminCategories() {
     });
   };
 
-  const compressImage = (file: File, maxWidth: number = 800): Promise<string> => {
+  const compressImage = (
+    file: File,
+    maxWidth: number = 800,
+  ): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -89,7 +93,7 @@ export default function AdminCategories() {
               }
             },
             file.type,
-            0.7
+            0.7,
           );
         };
         img.onerror = reject;
@@ -154,7 +158,8 @@ export default function AdminCategories() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this category?")) return;
+    if (!window.confirm("Are you sure you want to delete this category?"))
+      return;
     try {
       await categoryApi.delete(id);
       await fetchCategories();
@@ -174,7 +179,7 @@ export default function AdminCategories() {
   // Build category hierarchy display
   const getCategoryPath = (category: Category): string => {
     if (!category.parentId) return category.name;
-    const parent = categories.find(c => c.id === category.parentId);
+    const parent = categories.find((c) => c.id === category.parentId);
     if (parent) {
       return `${getCategoryPath(parent)} / ${category.name}`;
     }
@@ -184,7 +189,7 @@ export default function AdminCategories() {
   const filteredCategories = categories.filter(
     (c) =>
       c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.slug.toLowerCase().includes(searchQuery.toLowerCase())
+      c.slug.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   return (
@@ -196,7 +201,8 @@ export default function AdminCategories() {
             Product Categories
           </h1>
           <p className="text-gray-400 text-[11px] sm:text-xs md:text-sm mt-1">
-            Organize your furniture boutique's collection with parent-child hierarchy.
+            Organize your furniture boutique's collection with parent-child
+            hierarchy.
           </p>
         </div>
         <button
@@ -233,7 +239,10 @@ export default function AdminCategories() {
       {loading ? (
         <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-            <div key={i} className="bg-white border border-warm-beige overflow-hidden rounded-lg">
+            <div
+              key={i}
+              className="bg-white border border-warm-beige overflow-hidden rounded-lg"
+            >
               <Skeleton className="aspect-[4/3] w-full" />
               <div className="p-3 sm:p-4 md:p-5 lg:p-6 space-y-2 sm:space-y-3 md:space-y-4">
                 <Skeleton className="h-5 sm:h-6 w-3/4" />
@@ -279,7 +288,7 @@ export default function AdminCategories() {
                 {/* Parent Category Badge */}
                 {category.parentId && (
                   <div className="absolute top-2 left-2 bg-gold/90 text-near-black text-[8px] font-bold px-2 py-1 rounded">
-                    {categories.find(c => c.id === category.parentId)?.name}
+                    {categories.find((c) => c.id === category.parentId)?.name}
                   </div>
                 )}
                 <div className="absolute top-1 sm:top-2 md:top-4 right-1 sm:right-2 md:right-4 flex gap-1 sm:gap-2 translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300">
@@ -308,7 +317,10 @@ export default function AdminCategories() {
                     {category.parentId && (
                       <p className="text-[8px] text-gray-400 flex items-center gap-1 mt-0.5">
                         <FolderTree className="w-2.5 h-2.5" />
-                        {categories.find(c => c.id === category.parentId)?.name}
+                        {
+                          categories.find((c) => c.id === category.parentId)
+                            ?.name
+                        }
                       </p>
                     )}
                   </div>
@@ -318,7 +330,8 @@ export default function AdminCategories() {
                   /{category.slug}
                 </p>
                 <p className="text-[9px] sm:text-[10px] md:text-xs text-gray-400 line-clamp-2 leading-relaxed">
-                  {category.description || "No description provided for this collection."}
+                  {category.description ||
+                    "No description provided for this collection."}
                 </p>
               </div>
             </div>
@@ -349,12 +362,16 @@ export default function AdminCategories() {
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5 md:space-y-6">
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-4 sm:space-y-5 md:space-y-6"
+            >
               <div className="space-y-3 sm:space-y-4">
                 {/* Parent Category Dropdown */}
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-walnut block flex items-center gap-2">
-                    <FolderTree className="w-3.5 h-3.5" /> Parent Category (Optional)
+                    <FolderTree className="w-3.5 h-3.5" /> Parent Category
+                    (Optional)
                   </label>
                   <select
                     value={parentCategoryId}
@@ -369,7 +386,8 @@ export default function AdminCategories() {
                     ))}
                   </select>
                   <p className="text-[8px] text-gray-400">
-                    Select a parent category to create a subcategory (e.g., "Sofas" as parent for "L-Shape Sofas")
+                    Select a parent category to create a subcategory (e.g.,
+                    "Sofas" as parent for "L-Shape Sofas")
                   </p>
                 </div>
 
@@ -415,7 +433,11 @@ export default function AdminCategories() {
                   </label>
                   {imagePreview && (
                     <div className="relative w-full aspect-[16/9] bg-cream border border-warm-beige rounded-lg overflow-hidden">
-                      <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                      />
                       <button
                         type="button"
                         onClick={removeImage}
@@ -446,7 +468,9 @@ export default function AdminCategories() {
                       ) : (
                         <>
                           <Upload className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8" />
-                          <span>{imagePreview ? "Change Image" : "Upload Image"}</span>
+                          <span>
+                            {imagePreview ? "Change Image" : "Upload Image"}
+                          </span>
                           <span className="text-[7px] sm:text-[8px] text-gray-300">
                             (Max 500KB, JPG, PNG, GIF)
                           </span>
@@ -494,8 +518,9 @@ export default function AdminCategories() {
             </form>
 
             <div className="mt-4 p-2.5 sm:p-3 bg-mint-50 border border-mint-200 rounded text-[8px] sm:text-[9px] text-mint-700">
-              <strong className="flex items-center gap-1">💡 Tip:</strong>{" "}
-              Use parent categories to create a hierarchy (e.g., "Sofas" → "L-Shape Sofas", "Recliner Sofas")
+              <strong className="flex items-center gap-1">💡 Tip:</strong> Use
+              parent categories to create a hierarchy (e.g., "Sofas" → "L-Shape
+              Sofas", "Recliner Sofas")
             </div>
           </div>
         </div>

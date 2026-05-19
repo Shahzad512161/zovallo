@@ -30,26 +30,32 @@ export default function HomePage() {
   // Hero carousel slides
   const heroSlides = [
     {
-      image: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&q=80&w=2000",
+      image:
+        "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&q=80&w=2000",
       title: "The Walnut & Olive Edit",
       subtitle: "New Season Arrival",
-      description: "Discover our masterfully crafted autumnal collection, blending traditional joinery with modern silhouettes for the contemporary home.",
+      description:
+        "Discover our masterfully crafted autumnal collection, blending traditional joinery with modern silhouettes for the contemporary home.",
       buttonText: "Explore Collection",
       buttonLink: "/shop",
     },
     {
-      image: "https://images.unsplash.com/photo-1538688525198-9b88f6f53126?auto=format&fit=crop&q=80&w=2000",
+      image:
+        "https://images.unsplash.com/photo-1538688525198-9b88f6f53126?auto=format&fit=crop&q=80&w=2000",
       title: "Heritage Collection",
       subtitle: "Limited Edition",
-      description: "Experience timeless elegance with our Heritage Collection. Each piece tells a story of craftsmanship and dedication.",
+      description:
+        "Experience timeless elegance with our Heritage Collection. Each piece tells a story of craftsmanship and dedication.",
       buttonText: "Discover More",
       buttonLink: "/shop",
     },
     {
-      image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=2000",
+      image:
+        "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=2000",
       title: "Modern Living Redefined",
       subtitle: "Contemporary Designs",
-      description: "Transform your space with our modern furniture collection. Clean lines, premium materials, lasting comfort.",
+      description:
+        "Transform your space with our modern furniture collection. Clean lines, premium materials, lasting comfort.",
       buttonText: "Shop Now",
       buttonLink: "/shop",
     },
@@ -77,8 +83,10 @@ export default function HomePage() {
 
       // Get featured products
       const featured = productsData.filter((p) => p.featured === true);
-      setFeaturedProducts(featured.length > 0 ? featured.slice(0, 4) : productsData.slice(0, 4));
-      
+      setFeaturedProducts(
+        featured.length > 0 ? featured.slice(0, 4) : productsData.slice(0, 4),
+      );
+
       // Get recent products (last 4 added)
       const recent = [...productsData].sort((a, b) => {
         const dateA = a.createdAt?.toDate?.() || new Date(0);
@@ -86,7 +94,7 @@ export default function HomePage() {
         return dateB.getTime() - dateA.getTime();
       });
       setRecentProducts(recent.slice(0, 4));
-      
+
       setCategories(categoriesData);
     } catch (error) {
       console.error("Error fetching home data:", error);
@@ -115,7 +123,9 @@ export default function HomePage() {
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+    setCurrentSlide(
+      (prev) => (prev - 1 + heroSlides.length) % heroSlides.length,
+    );
   };
 
   const getCategoryImage = (category: Category): string => {
@@ -126,14 +136,21 @@ export default function HomePage() {
       return category.image;
     }
     const fallbackImages: Record<string, string> = {
-      "Sofa Sets": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800",
-      "Dining Tables": "https://images.unsplash.com/photo-1577146333359-39f99d73010b?auto=format&fit=crop&q=80&w=800",
+      "Sofa Sets":
+        "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800",
+      "Dining Tables":
+        "https://images.unsplash.com/photo-1577146333359-39f99d73010b?auto=format&fit=crop&q=80&w=800",
       Beds: "https://images.unsplash.com/photo-1505691938895-1758d7eaa511?auto=format&fit=crop&q=80&w=800",
-      Mattresses: "https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&q=80&w=800",
-      "Acoustic Wall Panels": "https://images.unsplash.com/photo-1615876234586-44c13824bba3?auto=format&fit=crop&q=80&w=800",
-      "Coffee Tables": "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&q=80&w=800",
-      "Office Chairs": "https://images.unsplash.com/photo-1505797149-43b00fe1eeac?auto=format&fit=crop&q=80&w=800",
-      Wardrobes: "https://images.unsplash.com/photo-1595428774223-ef52624120ec?auto=format&fit=crop&q=80&w=800",
+      Mattresses:
+        "https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&q=80&w=800",
+      "Acoustic Wall Panels":
+        "https://images.unsplash.com/photo-1615876234586-44c13824bba3?auto=format&fit=crop&q=80&w=800",
+      "Coffee Tables":
+        "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&q=80&w=800",
+      "Office Chairs":
+        "https://images.unsplash.com/photo-1505797149-43b00fe1eeac?auto=format&fit=crop&q=80&w=800",
+      Wardrobes:
+        "https://images.unsplash.com/photo-1595428774223-ef52624120ec?auto=format&fit=crop&q=80&w=800",
     };
     return (
       fallbackImages[category.name] ||
@@ -248,9 +265,8 @@ export default function HomePage() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-12 md:space-y-16">
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left">
           <div className="space-y-2 sm:space-y-3">
-            
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-display text-near-black">
-               Featured Collection
+              Featured Collection
             </h2>
             <div className="w-12 sm:w-16 h-0.5 bg-gold mx-auto sm:mx-0" />
           </div>
@@ -405,14 +421,17 @@ export default function HomePage() {
               reveals, and artisanal insights.
             </p>
           </div>
-          
+
           {newsletterSuccess && (
             <div className="bg-mint-50 text-mint-700 py-2 px-4 rounded-lg text-sm">
               ✓ Thank you for subscribing! Check your inbox soon.
             </div>
           )}
-          
-          <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-3 sm:gap-4 max-w-md mx-auto">
+
+          <form
+            onSubmit={handleNewsletterSubmit}
+            className="flex flex-col sm:flex-row gap-3 sm:gap-4 max-w-md mx-auto"
+          >
             <input
               type="email"
               value={email}
@@ -428,7 +447,7 @@ export default function HomePage() {
               Subscribe
             </button>
           </form>
-          
+
           <p className="text-[10px] text-white/40">
             No spam, just beautiful furniture inspiration. Unsubscribe anytime.
           </p>

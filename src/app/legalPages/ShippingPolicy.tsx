@@ -1,11 +1,18 @@
-import React from 'react';
-import { SEO } from '../../components/SEO';
-import { Truck, MapPin, Clock, Globe, Package, CheckCircle } from 'lucide-react';
+import React from "react";
+import { SEO } from "../../components/SEO";
+import {
+  Truck,
+  MapPin,
+  Clock,
+  Globe,
+  Package,
+  CheckCircle,
+} from "lucide-react";
 
 const ShippingPolicy = () => {
   return (
     <>
-      <SEO 
+      <SEO
         title="Shipping Policy | Free UK Delivery | LUXWOOD Furniture"
         description="Fast and reliable furniture delivery across UK, Europe, and Canada. Free UK delivery on all orders. Cash on Delivery available. Track your order in real-time."
       />
@@ -29,7 +36,8 @@ const ShippingPolicy = () => {
               Free UK Delivery
             </h2>
             <p className="text-gray-666">
-              On all orders across the United Kingdom. No minimum purchase required.
+              On all orders across the United Kingdom. No minimum purchase
+              required.
             </p>
           </div>
 
@@ -37,19 +45,27 @@ const ShippingPolicy = () => {
           <section>
             <div className="flex items-center gap-3 mb-4">
               <MapPin className="w-6 h-6 text-gold" />
-              <h2 className="text-xl sm:text-2xl font-display text-near-black">United Kingdom Delivery</h2>
+              <h2 className="text-xl sm:text-2xl font-display text-near-black">
+                United Kingdom Delivery
+              </h2>
             </div>
             <div className="grid sm:grid-cols-2 gap-6">
               <div className="bg-cream/30 p-5 rounded-lg">
                 <Clock className="w-8 h-8 text-mint-700 mb-3" />
-                <h3 className="font-bold text-near-black mb-2">Standard Delivery</h3>
+                <h3 className="font-bold text-near-black mb-2">
+                  Standard Delivery
+                </h3>
                 <p className="text-gray-666 text-sm">1-3 business days</p>
                 <p className="text-gold font-bold mt-2">FREE</p>
               </div>
               <div className="bg-cream/30 p-5 rounded-lg">
                 <Package className="w-8 h-8 text-mint-700 mb-3" />
-                <h3 className="font-bold text-near-black mb-2">Same-Day Delivery</h3>
-                <p className="text-gray-666 text-sm">Orders before 12 PM in select areas</p>
+                <h3 className="font-bold text-near-black mb-2">
+                  Same-Day Delivery
+                </h3>
+                <p className="text-gray-666 text-sm">
+                  Orders before 12 PM in select areas
+                </p>
                 <p className="text-gold font-bold mt-2">£29.99</p>
               </div>
             </div>
@@ -59,7 +75,9 @@ const ShippingPolicy = () => {
           <section>
             <div className="flex items-center gap-3 mb-4">
               <Globe className="w-6 h-6 text-gold" />
-              <h2 className="text-xl sm:text-2xl font-display text-near-black">International Delivery</h2>
+              <h2 className="text-xl sm:text-2xl font-display text-near-black">
+                International Delivery
+              </h2>
             </div>
             <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center p-4 border border-warm-beige rounded-lg">
@@ -87,27 +105,42 @@ const ShippingPolicy = () => {
 
           {/* Delivery Process */}
           <section>
-            <h2 className="text-xl sm:text-2xl font-display text-near-black mb-4">Our Delivery Process</h2>
+            <h2 className="text-xl sm:text-2xl font-display text-near-black mb-4">
+              Our Delivery Process
+            </h2>
             <div className="space-y-4">
               <div className="flex gap-4 items-start">
                 <CheckCircle className="w-5 h-5 text-mint-700 mt-0.5" />
                 <div>
-                  <h3 className="font-bold text-near-black">Order Confirmation</h3>
-                  <p className="text-gray-666 text-sm">You'll receive an email confirmation immediately after placing your order.</p>
+                  <h3 className="font-bold text-near-black">
+                    Order Confirmation
+                  </h3>
+                  <p className="text-gray-666 text-sm">
+                    You'll receive an email confirmation immediately after
+                    placing your order.
+                  </p>
                 </div>
               </div>
               <div className="flex gap-4 items-start">
                 <CheckCircle className="w-5 h-5 text-mint-700 mt-0.5" />
                 <div>
                   <h3 className="font-bold text-near-black">Processing</h3>
-                  <p className="text-gray-666 text-sm">Orders are processed within 24 hours. You'll receive a tracking number once shipped.</p>
+                  <p className="text-gray-666 text-sm">
+                    Orders are processed within 24 hours. You'll receive a
+                    tracking number once shipped.
+                  </p>
                 </div>
               </div>
               <div className="flex gap-4 items-start">
                 <CheckCircle className="w-5 h-5 text-mint-700 mt-0.5" />
                 <div>
-                  <h3 className="font-bold text-near-black">White-Glove Delivery</h3>
-                  <p className="text-gray-666 text-sm">Our team will place your furniture in your desired room and remove all packaging.</p>
+                  <h3 className="font-bold text-near-black">
+                    White-Glove Delivery
+                  </h3>
+                  <p className="text-gray-666 text-sm">
+                    Our team will place your furniture in your desired room and
+                    remove all packaging.
+                  </p>
                 </div>
               </div>
             </div>
@@ -116,24 +149,36 @@ const ShippingPolicy = () => {
           {/* Cash on Delivery */}
           <section className="bg-mint-50 p-6 sm:p-8 rounded-lg">
             <div className="flex items-center gap-3 mb-3">
-              <h2 className="text-xl sm:text-2xl font-display text-near-black">Pay After Inspection</h2>
+              <h2 className="text-xl sm:text-2xl font-display text-near-black">
+                Pay After Inspection
+              </h2>
             </div>
             <p className="text-gray-666 mb-2">
-              With our <strong>Cash on Delivery (COD)</strong> option, you can inspect your furniture before making payment.
+              With our <strong>Cash on Delivery (COD)</strong> option, you can
+              inspect your furniture before making payment.
             </p>
-            <p className="text-sm text-mint-700">✓ No hidden fees | ✓ Pay only when satisfied | ✓ Secure transaction</p>
+            <p className="text-sm text-mint-700">
+              ✓ No hidden fees | ✓ Pay only when satisfied | ✓ Secure
+              transaction
+            </p>
           </section>
 
           {/* Tracking */}
           <section>
-            <h2 className="text-xl sm:text-2xl font-display text-near-black mb-4">Track Your Order</h2>
+            <h2 className="text-xl sm:text-2xl font-display text-near-black mb-4">
+              Track Your Order
+            </h2>
             <p className="text-gray-666 mb-3">
-              Once your order ships, you'll receive a tracking number via email and SMS.
-              You can track your delivery status in real-time through our website.
+              Once your order ships, you'll receive a tracking number via email
+              and SMS. You can track your delivery status in real-time through
+              our website.
             </p>
             <div className="bg-cream/30 p-4 rounded-lg text-center">
               <p className="text-sm text-gray-500">
-                Questions about your delivery? Contact our support team at <strong className="text-near-black">support@luxwood.com</strong> or call <strong className="text-near-black">+44 20 1234 5678</strong>
+                Questions about your delivery? Contact our support team at{" "}
+                <strong className="text-near-black">support@luxwood.com</strong>{" "}
+                or call{" "}
+                <strong className="text-near-black">+44 20 1234 5678</strong>
               </p>
             </div>
           </section>

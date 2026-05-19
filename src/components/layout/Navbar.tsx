@@ -1,4 +1,12 @@
-import { ShoppingBag, User, Menu, X, Search, LogOut, ChevronDown } from "lucide-react";
+import {
+  ShoppingBag,
+  User,
+  Menu,
+  X,
+  Search,
+  LogOut,
+  ChevronDown,
+} from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
@@ -15,7 +23,9 @@ export function Navbar() {
   const { user, profile, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [openSubmenus, setOpenSubmenus] = useState<{ [key: string]: boolean }>({});
+  const [openSubmenus, setOpenSubmenus] = useState<{ [key: string]: boolean }>(
+    {},
+  );
 
   // Fetch real categories
   useEffect(() => {
@@ -34,17 +44,17 @@ export function Navbar() {
 
   // Build category hierarchy
   const getTopLevelCategories = () => {
-    return categories.filter(cat => !cat.parentId);
+    return categories.filter((cat) => !cat.parentId);
   };
 
   const getChildCategories = (parentId: string) => {
-    return categories.filter(cat => cat.parentId === parentId);
+    return categories.filter((cat) => cat.parentId === parentId);
   };
 
   const toggleSubmenu = (categoryId: string) => {
-    setOpenSubmenus(prev => ({
+    setOpenSubmenus((prev) => ({
       ...prev,
-      [categoryId]: !prev[categoryId]
+      [categoryId]: !prev[categoryId],
     }));
   };
 
@@ -69,7 +79,13 @@ export function Navbar() {
   };
 
   // Recursive component for category tree
-  const CategoryTreeItem = ({ category, level = 0 }: { category: Category; level?: number }) => {
+  const CategoryTreeItem = ({
+    category,
+    level = 0,
+  }: {
+    category: Category;
+    level?: number;
+  }) => {
     const childCategories = getChildCategories(category.id);
     const hasChildren = childCategories.length > 0;
     const isOpen = openSubmenus[category.id];
@@ -87,19 +103,21 @@ export function Navbar() {
             }
           }}
           className={`flex items-center justify-between text-[11px] font-bold text-gray-666 hover:text-near-black uppercase tracking-widest transition-colors relative group py-2 px-3 rounded-lg ${
-            level > 0 ? 'ml-4' : ''
+            level > 0 ? "ml-4" : ""
           }`}
           style={{ marginLeft: level * 12 }}
         >
           <span>{category.name}</span>
           {hasChildren && (
-            <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown
+              className={`w-3 h-3 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+            />
           )}
         </Link>
-        
+
         {hasChildren && isOpen && (
           <div className="absolute left-0 top-full mt-1 bg-white border border-warm-beige shadow-lg rounded-lg py-2 min-w-[200px] z-50">
-            {childCategories.map(child => (
+            {childCategories.map((child) => (
               <Link
                 key={child.id}
                 to={`/category/${child.slug}`}
@@ -116,7 +134,13 @@ export function Navbar() {
   };
 
   // Recursive component for mobile menu
-  const MobileCategoryItem = ({ category, level = 0 }: { category: Category; level?: number }) => {
+  const MobileCategoryItem = ({
+    category,
+    level = 0,
+  }: {
+    category: Category;
+    level?: number;
+  }) => {
     const childCategories = getChildCategories(category.id);
     const hasChildren = childCategories.length > 0;
     const isOpen = openSubmenus[category.id];
@@ -132,21 +156,27 @@ export function Navbar() {
               setIsOpen(false);
             }
           }}
-          className={`flex items-center justify-between py-2 px-3 cursor-pointer rounded-lg ${level > 0 ? 'ml-4' : ''}`}
+          className={`flex items-center justify-between py-2 px-3 cursor-pointer rounded-lg ${level > 0 ? "ml-4" : ""}`}
           style={{ marginLeft: level * 16 }}
         >
           <span className="text-sm font-medium text-near-black hover:text-gold transition-colors">
             {category.name}
           </span>
           {hasChildren && (
-            <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown
+              className={`w-3.5 h-3.5 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+            />
           )}
         </div>
-        
+
         {hasChildren && isOpen && (
           <div className="mt-1 space-y-1">
-            {childCategories.map(child => (
-              <MobileCategoryItem key={child.id} category={child} level={level + 1} />
+            {childCategories.map((child) => (
+              <MobileCategoryItem
+                key={child.id}
+                category={child}
+                level={level + 1}
+              />
             ))}
           </div>
         )}
@@ -333,7 +363,7 @@ export function Navbar() {
               {topLevelCategories.map((cat) => {
                 const childCategories = getChildCategories(cat.id);
                 const hasChildren = childCategories.length > 0;
-                
+
                 return (
                   <div key={cat.id} className="relative group">
                     <Link
@@ -344,11 +374,11 @@ export function Navbar() {
                       {hasChildren && <ChevronDown className="w-3 h-3" />}
                       <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gold transition-all duration-300 group-hover:w-full"></span>
                     </Link>
-                    
+
                     {/* Dropdown for child categories */}
                     {hasChildren && (
                       <div className="absolute left-0 top-full mt-1 bg-white border border-warm-beige shadow-lg rounded-lg py-2 min-w-[200px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                        {childCategories.map(child => (
+                        {childCategories.map((child) => (
                           <Link
                             key={child.id}
                             to={`/category/${child.slug}`}

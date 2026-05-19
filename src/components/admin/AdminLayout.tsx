@@ -13,7 +13,7 @@ import {
   ChevronRight,
   Search,
   Bell,
-  MessageCircle
+  MessageCircle,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 

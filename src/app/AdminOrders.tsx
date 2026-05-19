@@ -165,7 +165,10 @@ export default function AdminOrders() {
                 <tbody className="divide-y divide-warm-beige">
                   {loading ? (
                     <tr>
-                      <td colSpan={5} className="px-3 sm:px-4 md:px-5 lg:px-6 py-12 sm:py-16 md:py-20 lg:py-24">
+                      <td
+                        colSpan={5}
+                        className="px-3 sm:px-4 md:px-5 lg:px-6 py-12 sm:py-16 md:py-20 lg:py-24"
+                      >
                         <div className="flex flex-col items-center justify-center gap-3 sm:gap-4">
                           <LoadingSpinner />
                           <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-gold text-center">
@@ -176,7 +179,10 @@ export default function AdminOrders() {
                     </tr>
                   ) : filteredOrders.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="px-3 sm:px-4 md:px-5 lg:px-6 py-12 sm:py-16 md:py-20">
+                      <td
+                        colSpan={5}
+                        className="px-3 sm:px-4 md:px-5 lg:px-6 py-12 sm:py-16 md:py-20"
+                      >
                         <EmptyState
                           icon={Package}
                           title="No Orders Found"

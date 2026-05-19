@@ -1,11 +1,18 @@
-import React from 'react';
-import { SEO } from '../../components/SEO';
-import { RotateCcw, Calendar, Package, ShieldCheck, AlertCircle, CheckCircle } from 'lucide-react';
+import React from "react";
+import { SEO } from "../../components/SEO";
+import {
+  RotateCcw,
+  Calendar,
+  Package,
+  ShieldCheck,
+  AlertCircle,
+  CheckCircle,
+} from "lucide-react";
 
 const ReturnPolicy = () => {
   return (
     <>
-      <SEO 
+      <SEO
         title="Return Policy | 14-Day Free Returns | LUXWOOD Furniture"
         description="Hassle-free returns within 14 days. Free returns for defective items. Cash on Delivery orders can be returned easily. Customer satisfaction guaranteed."
       />
@@ -35,7 +42,9 @@ const ReturnPolicy = () => {
 
           {/* Return Conditions */}
           <section>
-            <h2 className="text-xl sm:text-2xl font-display text-near-black mb-4">Return Conditions</h2>
+            <h2 className="text-xl sm:text-2xl font-display text-near-black mb-4">
+              Return Conditions
+            </h2>
             <div className="space-y-3 text-gray-666">
               <div className="flex gap-3 items-start">
                 <CheckCircle className="w-5 h-5 text-mint-700 mt-0.5" />
@@ -47,7 +56,9 @@ const ReturnPolicy = () => {
               </div>
               <div className="flex gap-3 items-start">
                 <CheckCircle className="w-5 h-5 text-mint-700 mt-0.5" />
-                <p>Return request must be initiated within 14 days of delivery</p>
+                <p>
+                  Return request must be initiated within 14 days of delivery
+                </p>
               </div>
               <div className="flex gap-3 items-start">
                 <CheckCircle className="w-5 h-5 text-mint-700 mt-0.5" />
@@ -58,34 +69,60 @@ const ReturnPolicy = () => {
 
           {/* How to Return */}
           <section>
-            <h2 className="text-xl sm:text-2xl font-display text-near-black mb-4">How to Return an Item</h2>
+            <h2 className="text-xl sm:text-2xl font-display text-near-black mb-4">
+              How to Return an Item
+            </h2>
             <div className="space-y-5">
               <div className="flex gap-4 items-start">
-                <div className="w-8 h-8 bg-gold/10 text-gold rounded-full flex items-center justify-center font-bold">1</div>
+                <div className="w-8 h-8 bg-gold/10 text-gold rounded-full flex items-center justify-center font-bold">
+                  1
+                </div>
                 <div>
-                  <h3 className="font-bold text-near-black">Contact Our Support Team</h3>
-                  <p className="text-gray-666 text-sm">Email us at returns@luxwood.com or call +44 20 1234 5678 within 14 days of delivery.</p>
+                  <h3 className="font-bold text-near-black">
+                    Contact Our Support Team
+                  </h3>
+                  <p className="text-gray-666 text-sm">
+                    Email us at returns@luxwood.com or call +44 20 1234 5678
+                    within 14 days of delivery.
+                  </p>
                 </div>
               </div>
               <div className="flex gap-4 items-start">
-                <div className="w-8 h-8 bg-gold/10 text-gold rounded-full flex items-center justify-center font-bold">2</div>
+                <div className="w-8 h-8 bg-gold/10 text-gold rounded-full flex items-center justify-center font-bold">
+                  2
+                </div>
                 <div>
-                  <h3 className="font-bold text-near-black">Provide Order Details</h3>
-                  <p className="text-gray-666 text-sm">Share your order number, item name, and reason for return.</p>
+                  <h3 className="font-bold text-near-black">
+                    Provide Order Details
+                  </h3>
+                  <p className="text-gray-666 text-sm">
+                    Share your order number, item name, and reason for return.
+                  </p>
                 </div>
               </div>
               <div className="flex gap-4 items-start">
-                <div className="w-8 h-8 bg-gold/10 text-gold rounded-full flex items-center justify-center font-bold">3</div>
+                <div className="w-8 h-8 bg-gold/10 text-gold rounded-full flex items-center justify-center font-bold">
+                  3
+                </div>
                 <div>
-                  <h3 className="font-bold text-near-black">Pack the Item Securely</h3>
-                  <p className="text-gray-666 text-sm">Use the original packaging to ensure safe transport.</p>
+                  <h3 className="font-bold text-near-black">
+                    Pack the Item Securely
+                  </h3>
+                  <p className="text-gray-666 text-sm">
+                    Use the original packaging to ensure safe transport.
+                  </p>
                 </div>
               </div>
               <div className="flex gap-4 items-start">
-                <div className="w-8 h-8 bg-gold/10 text-gold rounded-full flex items-center justify-center font-bold">4</div>
+                <div className="w-8 h-8 bg-gold/10 text-gold rounded-full flex items-center justify-center font-bold">
+                  4
+                </div>
                 <div>
                   <h3 className="font-bold text-near-black">Schedule Pickup</h3>
-                  <p className="text-gray-666 text-sm">We'll arrange a free pickup for defective items. For other returns, you may ship at your cost.</p>
+                  <p className="text-gray-666 text-sm">
+                    We'll arrange a free pickup for defective items. For other
+                    returns, you may ship at your cost.
+                  </p>
                 </div>
               </div>
             </div>
@@ -95,19 +132,36 @@ const ReturnPolicy = () => {
           <section className="bg-mint-50 p-6 sm:p-8 rounded-lg">
             <div className="flex items-center gap-3 mb-4">
               <ShieldCheck className="w-6 h-6 text-mint-700" />
-              <h2 className="text-xl sm:text-2xl font-display text-near-black">Refund Process</h2>
+              <h2 className="text-xl sm:text-2xl font-display text-near-black">
+                Refund Process
+              </h2>
             </div>
             <div className="space-y-3 text-gray-666">
-              <p>• <strong>Cash on Delivery orders:</strong> Refund will be processed via bank transfer within 7-10 business days after inspection.</p>
-              <p>• <strong>Defective items:</strong> Full refund including original shipping costs.</p>
-              <p>• <strong>Change of mind:</strong> Refund for product value only (shipping fees are non-refundable).</p>
-              <p>• You will receive email confirmation once your refund is processed.</p>
+              <p>
+                • <strong>Cash on Delivery orders:</strong> Refund will be
+                processed via bank transfer within 7-10 business days after
+                inspection.
+              </p>
+              <p>
+                • <strong>Defective items:</strong> Full refund including
+                original shipping costs.
+              </p>
+              <p>
+                • <strong>Change of mind:</strong> Refund for product value only
+                (shipping fees are non-refundable).
+              </p>
+              <p>
+                • You will receive email confirmation once your refund is
+                processed.
+              </p>
             </div>
           </section>
 
           {/* Non-Returnable Items */}
           <section>
-            <h2 className="text-xl sm:text-2xl font-display text-near-black mb-4">Non-Returnable Items</h2>
+            <h2 className="text-xl sm:text-2xl font-display text-near-black mb-4">
+              Non-Returnable Items
+            </h2>
             <div className="space-y-2 text-gray-666">
               <p>• Custom-made or bespoke furniture</p>
               <p>• Items damaged due to misuse or improper care</p>
@@ -120,13 +174,17 @@ const ReturnPolicy = () => {
           <section className="bg-red-50 p-6 sm:p-8 rounded-lg">
             <div className="flex items-center gap-3 mb-4">
               <AlertCircle className="w-6 h-6 text-red-500" />
-              <h2 className="text-xl sm:text-2xl font-display text-near-black">Damaged or Defective Items</h2>
+              <h2 className="text-xl sm:text-2xl font-display text-near-black">
+                Damaged or Defective Items
+              </h2>
             </div>
             <p className="text-gray-666 mb-3">
               If your furniture arrives damaged or defective, please:
             </p>
             <ul className="space-y-2 text-gray-666 list-disc list-inside">
-              <li>Document the damage with photos within 48 hours of delivery</li>
+              <li>
+                Document the damage with photos within 48 hours of delivery
+              </li>
               <li>Contact us immediately at support@luxwood.com</li>
               <li>We will arrange a free replacement or full refund</li>
               <li>No return shipping costs for defective items</li>
@@ -135,9 +193,12 @@ const ReturnPolicy = () => {
 
           {/* Contact */}
           <section className="bg-cream/30 p-6 sm:p-8 rounded-lg">
-            <h2 className="text-xl sm:text-2xl font-display text-near-black mb-4">Need Help?</h2>
+            <h2 className="text-xl sm:text-2xl font-display text-near-black mb-4">
+              Need Help?
+            </h2>
             <p className="text-gray-666 mb-3">
-              Our customer service team is here to assist you with any return-related questions.
+              Our customer service team is here to assist you with any
+              return-related questions.
             </p>
             <div className="space-y-1 text-sm text-gray-666">
               <p>📧 Email: returns@luxwood.com</p>

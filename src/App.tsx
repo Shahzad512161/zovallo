@@ -218,7 +218,7 @@ export default function App() {
                 }
               />
             </Routes>
-             <WhatsAppButton phoneNumber="447529661726" />
+            <WhatsAppButton phoneNumber="447529661726" />
           </div>
         </Router>
       </CartProvider>

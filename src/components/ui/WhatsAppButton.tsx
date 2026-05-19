@@ -1,31 +1,31 @@
-import React from 'react';
-import { MessageCircle } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
+import React from "react";
+import { MessageCircle } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 interface WhatsAppButtonProps {
   phoneNumber: string;
   message?: string;
 }
 
-export default function WhatsAppButton({ 
-  phoneNumber, 
-  message = "Hello! I'm interested in your furniture collection. Can you help me?" 
+export default function WhatsAppButton({
+  phoneNumber,
+  message = "Hello! I'm interested in your furniture collection. Can you help me?",
 }: WhatsAppButtonProps) {
   const location = useLocation();
-  
+
   // Check if current path is admin route
-  const isAdminRoute = location.pathname.startsWith('/admin');
-  
+  const isAdminRoute = location.pathname.startsWith("/admin");
+
   // Don't show on admin pages
   if (isAdminRoute) {
     return null;
   }
-  
+
   const handleClick = () => {
-    const formattedNumber = phoneNumber.replace(/\D/g, '');
+    const formattedNumber = phoneNumber.replace(/\D/g, "");
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${formattedNumber}?text=${encodedMessage}`;
-    window.open(whatsappUrl, '_blank');
+    window.open(whatsappUrl, "_blank");
   };
 
   return (
@@ -38,13 +38,13 @@ export default function WhatsAppButton({
       <div className="relative">
         {/* Pulse animation ring */}
         <div className="absolute inset-0 rounded-full bg-green-500 animate-ping opacity-75"></div>
-        
+
         {/* Button background */}
         <div className="relative bg-green-500 hover:bg-green-600 text-white rounded-full p-3 sm:p-4 shadow-lg transition-all duration-300 hover:scale-110">
           <MessageCircle className="w-6 h-6 sm:w-7 sm:h-7" />
         </div>
       </div>
-      
+
       {/* Tooltip on hover */}
       <div className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-gray-800 text-white text-xs px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none">
         Chat with us on WhatsApp
