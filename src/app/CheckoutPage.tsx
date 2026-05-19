@@ -416,11 +416,11 @@ export default function CheckoutPage() {
                                 <Ruler className="w-2.5 h-2.5" /> Dimensions: {item.dimensions}
                               </p>
                             )}
-                            {item.weight && (
+                            {/* {item.weight && (
                               <p className="text-[9px] text-gray-500 flex items-center gap-1">
                                 <Weight className="w-2.5 h-2.5" /> Weight: {item.weight} kg
                               </p>
-                            )}
+                            )} */}
                            
                           </div>
                         </div>

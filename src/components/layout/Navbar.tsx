@@ -1,4 +1,4 @@
-import { ShoppingBag, User, Menu, X, Search, LogOut } from "lucide-react";
+import { ShoppingBag, User, Menu, X, Search, LogOut, ChevronDown } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
@@ -15,6 +15,7 @@ export function Navbar() {
   const { user, profile, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [openSubmenus, setOpenSubmenus] = useState<{ [key: string]: boolean }>({});
 
   // Fetch real categories
   useEffect(() => {
@@ -30,6 +31,22 @@ export function Navbar() {
     };
     fetchCategories();
   }, []);
+
+  // Build category hierarchy
+  const getTopLevelCategories = () => {
+    return categories.filter(cat => !cat.parentId);
+  };
+
+  const getChildCategories = (parentId: string) => {
+    return categories.filter(cat => cat.parentId === parentId);
+  };
+
+  const toggleSubmenu = (categoryId: string) => {
+    setOpenSubmenus(prev => ({
+      ...prev,
+      [categoryId]: !prev[categoryId]
+    }));
+  };
 
   const handleLogout = async () => {
     try {
@@ -50,6 +67,94 @@ export function Navbar() {
       setIsOpen(false);
     }
   };
+
+  // Recursive component for category tree
+  const CategoryTreeItem = ({ category, level = 0 }: { category: Category; level?: number }) => {
+    const childCategories = getChildCategories(category.id);
+    const hasChildren = childCategories.length > 0;
+    const isOpen = openSubmenus[category.id];
+
+    return (
+      <div className="relative">
+        <Link
+          to={`/category/${category.slug}`}
+          onClick={(e) => {
+            if (hasChildren) {
+              e.preventDefault();
+              toggleSubmenu(category.id);
+            } else {
+              setIsOpen(false);
+            }
+          }}
+          className={`flex items-center justify-between text-[11px] font-bold text-gray-666 hover:text-near-black uppercase tracking-widest transition-colors relative group py-2 px-3 rounded-lg ${
+            level > 0 ? 'ml-4' : ''
+          }`}
+          style={{ marginLeft: level * 12 }}
+        >
+          <span>{category.name}</span>
+          {hasChildren && (
+            <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+          )}
+        </Link>
+        
+        {hasChildren && isOpen && (
+          <div className="absolute left-0 top-full mt-1 bg-white border border-warm-beige shadow-lg rounded-lg py-2 min-w-[200px] z-50">
+            {childCategories.map(child => (
+              <Link
+                key={child.id}
+                to={`/category/${child.slug}`}
+                onClick={() => setIsOpen(false)}
+                className="block px-4 py-2 text-[11px] font-bold text-gray-666 hover:text-near-black hover:bg-cream uppercase tracking-widest transition-colors"
+              >
+                {child.name}
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Recursive component for mobile menu
+  const MobileCategoryItem = ({ category, level = 0 }: { category: Category; level?: number }) => {
+    const childCategories = getChildCategories(category.id);
+    const hasChildren = childCategories.length > 0;
+    const isOpen = openSubmenus[category.id];
+
+    return (
+      <div>
+        <div
+          onClick={() => {
+            if (hasChildren) {
+              toggleSubmenu(category.id);
+            } else {
+              navigate(`/category/${category.slug}`);
+              setIsOpen(false);
+            }
+          }}
+          className={`flex items-center justify-between py-2 px-3 cursor-pointer rounded-lg ${level > 0 ? 'ml-4' : ''}`}
+          style={{ marginLeft: level * 16 }}
+        >
+          <span className="text-sm font-medium text-near-black hover:text-gold transition-colors">
+            {category.name}
+          </span>
+          {hasChildren && (
+            <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+          )}
+        </div>
+        
+        {hasChildren && isOpen && (
+          <div className="mt-1 space-y-1">
+            {childCategories.map(child => (
+              <MobileCategoryItem key={child.id} category={child} level={level + 1} />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const topLevelCategories = getTopLevelCategories();
 
   return (
     <nav className="fixed top-0 w-full z-50 shadow-sm">
@@ -216,7 +321,7 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Header 03: Navigation Menu Bar */}
+      {/* Header 03: Navigation Menu Bar with Dropdowns */}
       <div className="bg-white border-b border-warm-beige hidden md:block">
         <div className="max-w-7xl mx-auto px-4">
           {loadingCategories ? (
@@ -224,23 +329,45 @@ export function Navbar() {
               <div className="w-5 h-5 border-2 border-gold border-t-transparent rounded-full animate-spin" />
             </div>
           ) : (
-            <div className="flex items-center justify-center space-x-8 h-12">
-              {categories.map((cat) => (
-                <Link
-                  key={cat.id}
-                  to={`/category/${cat.slug}`}
-                  className="text-[11px] font-bold text-gray-666 hover:text-near-black uppercase tracking-widest transition-colors relative group py-2"
-                >
-                  {cat.name}
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gold transition-all duration-300 group-hover:w-full"></span>
-                </Link>
-              ))}
+            <div className="flex items-center justify-center space-x-6 h-12">
+              {topLevelCategories.map((cat) => {
+                const childCategories = getChildCategories(cat.id);
+                const hasChildren = childCategories.length > 0;
+                
+                return (
+                  <div key={cat.id} className="relative group">
+                    <Link
+                      to={`/category/${cat.slug}`}
+                      className="text-[11px] font-bold text-gray-666 hover:text-near-black uppercase tracking-widest transition-colors relative py-2 flex items-center gap-1"
+                    >
+                      {cat.name}
+                      {hasChildren && <ChevronDown className="w-3 h-3" />}
+                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gold transition-all duration-300 group-hover:w-full"></span>
+                    </Link>
+                    
+                    {/* Dropdown for child categories */}
+                    {hasChildren && (
+                      <div className="absolute left-0 top-full mt-1 bg-white border border-warm-beige shadow-lg rounded-lg py-2 min-w-[200px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                        {childCategories.map(child => (
+                          <Link
+                            key={child.id}
+                            to={`/category/${child.slug}`}
+                            className="block px-4 py-2 text-[11px] font-bold text-gray-666 hover:text-near-black hover:bg-cream uppercase tracking-widest transition-colors whitespace-nowrap"
+                          >
+                            {child.name}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu with Hierarchy */}
       {isOpen && (
         <div className="md:hidden bg-white border-b border-warm-beige py-6 px-6 space-y-8 shadow-2xl overflow-y-auto max-h-[80vh]">
           {/* Mobile Search */}
@@ -287,19 +414,9 @@ export function Navbar() {
                   <div className="w-5 h-5 border-2 border-gold border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : (
-                <div className="grid grid-cols-1 gap-1">
-                  {categories.map((cat) => (
-                    <Link
-                      key={cat.id}
-                      to={`/category/${cat.slug}`}
-                      onClick={() => setIsOpen(false)}
-                      className="text-sm font-medium py-2 text-near-black hover:text-gold flex justify-between items-center group"
-                    >
-                      {cat.name}
-                      <span className="text-gray-a0 group-hover:text-gold">
-                        →
-                      </span>
-                    </Link>
+                <div className="space-y-1">
+                  {topLevelCategories.map((cat) => (
+                    <MobileCategoryItem key={cat.id} category={cat} />
                   ))}
                 </div>
               )}

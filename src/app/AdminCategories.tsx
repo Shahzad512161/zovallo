@@ -11,6 +11,7 @@ import {
   X,
   Upload,
   AlertCircle,
+  FolderTree,
 } from "lucide-react";
 import { Category } from "../types";
 import { categoryApi } from "../services/categoryApi";
@@ -20,12 +21,12 @@ export default function AdminCategories() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentCategory, setCurrentCategory] =
-    useState<Partial<Category> | null>(null);
+  const [currentCategory, setCurrentCategory] = useState<Partial<Category> | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [imagePreview, setImagePreview] = useState<string>("");
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [parentCategoryId, setParentCategoryId] = useState<string>("");
 
   useEffect(() => {
     fetchCategories();
@@ -43,6 +44,11 @@ export default function AdminCategories() {
     }
   };
 
+  // Get all categories except the current one (to prevent self-parent)
+  const availableParentCategories = categories.filter(
+    (cat) => cat.id !== currentCategory?.id
+  );
+
   const convertToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -52,10 +58,7 @@ export default function AdminCategories() {
     });
   };
 
-  const compressImage = (
-    file: File,
-    maxWidth: number = 800,
-  ): Promise<string> => {
+  const compressImage = (file: File, maxWidth: number = 800): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -86,7 +89,7 @@ export default function AdminCategories() {
               }
             },
             file.type,
-            0.7,
+            0.7
           );
         };
         img.onerror = reject;
@@ -102,8 +105,8 @@ export default function AdminCategories() {
       alert("Please upload an image file");
       return;
     }
-    if (file.size > 500 * 1024) {
-      alert("Image must be less than 500KB. Please compress your image.");
+    if (file.size > 5000 * 1024) {
+      alert("Image must be less than 5MB. Please compress your image.");
       return;
     }
     setUploadingImage(true);
@@ -129,13 +132,18 @@ export default function AdminCategories() {
     if (!currentCategory?.name || !currentCategory?.slug) return;
     setIsSubmitting(true);
     try {
+      const categoryData = {
+        ...currentCategory,
+        parentId: parentCategoryId || null,
+      };
       if (currentCategory.id) {
-        await categoryApi.update(currentCategory.id, currentCategory);
+        await categoryApi.update(currentCategory.id, categoryData);
       } else {
-        await categoryApi.create(currentCategory as Omit<Category, "id">);
+        await categoryApi.create(categoryData as Omit<Category, "id">);
       }
       setIsModalOpen(false);
       setImagePreview("");
+      setParentCategoryId("");
       await fetchCategories();
     } catch (error) {
       console.error("Error saving category:", error);
@@ -146,8 +154,7 @@ export default function AdminCategories() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this category?"))
-      return;
+    if (!window.confirm("Are you sure you want to delete this category?")) return;
     try {
       await categoryApi.delete(id);
       await fetchCategories();
@@ -160,13 +167,24 @@ export default function AdminCategories() {
   const handleEdit = (category: Category) => {
     setCurrentCategory(category);
     setImagePreview(category.image || "");
+    setParentCategoryId(category.parentId || "");
     setIsModalOpen(true);
+  };
+
+  // Build category hierarchy display
+  const getCategoryPath = (category: Category): string => {
+    if (!category.parentId) return category.name;
+    const parent = categories.find(c => c.id === category.parentId);
+    if (parent) {
+      return `${getCategoryPath(parent)} / ${category.name}`;
+    }
+    return category.name;
   };
 
   const filteredCategories = categories.filter(
     (c) =>
       c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.slug.toLowerCase().includes(searchQuery.toLowerCase()),
+      c.slug.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -178,13 +196,14 @@ export default function AdminCategories() {
             Product Categories
           </h1>
           <p className="text-gray-400 text-[11px] sm:text-xs md:text-sm mt-1">
-            Organize your furniture boutique's collection.
+            Organize your furniture boutique's collection with parent-child hierarchy.
           </p>
         </div>
         <button
           onClick={() => {
             setCurrentCategory({});
             setImagePreview("");
+            setParentCategoryId("");
             setIsModalOpen(true);
           }}
           className="bg-near-black text-white px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 hover:bg-gold transition-all duration-300 w-full sm:w-auto justify-center rounded"
@@ -214,10 +233,7 @@ export default function AdminCategories() {
       {loading ? (
         <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-            <div
-              key={i}
-              className="bg-white border border-warm-beige overflow-hidden rounded-lg"
-            >
+            <div key={i} className="bg-white border border-warm-beige overflow-hidden rounded-lg">
               <Skeleton className="aspect-[4/3] w-full" />
               <div className="p-3 sm:p-4 md:p-5 lg:p-6 space-y-2 sm:space-y-3 md:space-y-4">
                 <Skeleton className="h-5 sm:h-6 w-3/4" />
@@ -260,6 +276,12 @@ export default function AdminCategories() {
                     </span>
                   </div>
                 )}
+                {/* Parent Category Badge */}
+                {category.parentId && (
+                  <div className="absolute top-2 left-2 bg-gold/90 text-near-black text-[8px] font-bold px-2 py-1 rounded">
+                    {categories.find(c => c.id === category.parentId)?.name}
+                  </div>
+                )}
                 <div className="absolute top-1 sm:top-2 md:top-4 right-1 sm:right-2 md:right-4 flex gap-1 sm:gap-2 translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300">
                   <button
                     onClick={() => handleEdit(category)}
@@ -279,17 +301,24 @@ export default function AdminCategories() {
               </div>
               <div className="p-3 sm:p-4 md:p-5 lg:p-6">
                 <div className="flex items-center justify-between mb-1 sm:mb-2">
-                  <h3 className="text-sm sm:text-base md:text-lg font-display text-near-black uppercase tracking-tight line-clamp-1">
-                    {category.name}
-                  </h3>
+                  <div className="flex-1">
+                    <h3 className="text-sm sm:text-base md:text-lg font-display text-near-black uppercase tracking-tight line-clamp-1">
+                      {category.name}
+                    </h3>
+                    {category.parentId && (
+                      <p className="text-[8px] text-gray-400 flex items-center gap-1 mt-0.5">
+                        <FolderTree className="w-2.5 h-2.5" />
+                        {categories.find(c => c.id === category.parentId)?.name}
+                      </p>
+                    )}
+                  </div>
                   <ChevronRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 text-gray-300 flex-shrink-0" />
                 </div>
                 <p className="text-[7px] sm:text-[8px] md:text-[10px] font-mono text-walnut font-bold uppercase tracking-widest mb-2 sm:mb-3 md:mb-4 truncate">
                   /{category.slug}
                 </p>
                 <p className="text-[9px] sm:text-[10px] md:text-xs text-gray-400 line-clamp-2 leading-relaxed">
-                  {category.description ||
-                    "No description provided for this collection."}
+                  {category.description || "No description provided for this collection."}
                 </p>
               </div>
             </div>
@@ -297,7 +326,7 @@ export default function AdminCategories() {
         </div>
       )}
 
-      {/* Modal */}
+      {/* Modal with Parent Category Selection */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center px-3 sm:px-4">
           <div
@@ -316,18 +345,37 @@ export default function AdminCategories() {
                 {currentCategory?.id ? "Edit Category" : "New Category"}
               </h2>
               <p className="text-gray-400 text-xs sm:text-sm mt-1">
-                Define a new curated collection.
+                Define a new curated collection with parent-child relationship.
               </p>
             </div>
 
-            <form
-              onSubmit={handleSubmit}
-              className="space-y-4 sm:space-y-5 md:space-y-6"
-            >
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5 md:space-y-6">
               <div className="space-y-3 sm:space-y-4">
+                {/* Parent Category Dropdown */}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-walnut block flex items-center gap-2">
+                    <FolderTree className="w-3.5 h-3.5" /> Parent Category (Optional)
+                  </label>
+                  <select
+                    value={parentCategoryId}
+                    onChange={(e) => setParentCategoryId(e.target.value)}
+                    className="w-full bg-cream border border-warm-beige py-2 sm:py-2.5 md:py-3 px-3 sm:px-4 text-sm focus:border-gold outline-none rounded"
+                  >
+                    <option value="">-- No Parent (Top Level) --</option>
+                    {availableParentCategories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {getCategoryPath(cat)}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-[8px] text-gray-400">
+                    Select a parent category to create a subcategory (e.g., "Sofas" as parent for "L-Shape Sofas")
+                  </p>
+                </div>
+
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-walnut block">
-                    Category Name
+                    Category Name *
                   </label>
                   <input
                     required
@@ -338,14 +386,14 @@ export default function AdminCategories() {
                         name: e.target.value,
                       }))
                     }
-                    className="w-full bg-cream border border-warm-beige py-2 sm:py-2.5 md:py-3 px-3 sm:px-4 text-sm focus:border-gold outline-none transition-colors rounded"
+                    className="w-full bg-cream border border-warm-beige py-2 sm:py-2.5 md:py-3 px-3 sm:px-4 text-sm focus:border-gold outline-none rounded"
                     placeholder="e.g. Sofa Sets"
                   />
                 </div>
 
                 <div className="space-y-1">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-walnut block">
-                    Slug (URL Path)
+                    Slug (URL Path) *
                   </label>
                   <input
                     required
@@ -356,7 +404,7 @@ export default function AdminCategories() {
                         slug: e.target.value.toLowerCase().replace(/\s+/g, "-"),
                       }))
                     }
-                    className="w-full bg-cream border border-warm-beige py-2 sm:py-2.5 md:py-3 px-3 sm:px-4 text-sm font-mono focus:border-gold outline-none transition-colors rounded"
+                    className="w-full bg-cream border border-warm-beige py-2 sm:py-2.5 md:py-3 px-3 sm:px-4 text-sm font-mono focus:border-gold outline-none rounded"
                     placeholder="e.g. sofa-sets"
                   />
                 </div>
@@ -367,11 +415,7 @@ export default function AdminCategories() {
                   </label>
                   {imagePreview && (
                     <div className="relative w-full aspect-[16/9] bg-cream border border-warm-beige rounded-lg overflow-hidden">
-                      <img
-                        src={imagePreview}
-                        alt="Preview"
-                        className="w-full h-full object-cover"
-                      />
+                      <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                       <button
                         type="button"
                         onClick={removeImage}
@@ -402,9 +446,7 @@ export default function AdminCategories() {
                       ) : (
                         <>
                           <Upload className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8" />
-                          <span>
-                            {imagePreview ? "Change Image" : "Upload Image"}
-                          </span>
+                          <span>{imagePreview ? "Change Image" : "Upload Image"}</span>
                           <span className="text-[7px] sm:text-[8px] text-gray-300">
                             (Max 500KB, JPG, PNG, GIF)
                           </span>
@@ -453,8 +495,7 @@ export default function AdminCategories() {
 
             <div className="mt-4 p-2.5 sm:p-3 bg-mint-50 border border-mint-200 rounded text-[8px] sm:text-[9px] text-mint-700">
               <strong className="flex items-center gap-1">💡 Tip:</strong>{" "}
-              Images are stored directly in Firestore. Keep images under 500KB
-              for best performance.
+              Use parent categories to create a hierarchy (e.g., "Sofas" → "L-Shape Sofas", "Recliner Sofas")
             </div>
           </div>
         </div>

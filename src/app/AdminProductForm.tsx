@@ -568,20 +568,26 @@ export default function AdminProductForm() {
                 </label>
                 <div className="flex gap-2">
                   <input
-                    type="text"
-                    value={newSeater}
-                    onChange={(e) => setNewSeater(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleAddSeater()}
-                    placeholder="e.g., 2 Seater, L-Shape, Recliner..."
-                    className="flex-1 bg-cream border border-warm-beige py-2 px-3 text-sm focus:border-gold outline-none rounded"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAddSeater}
-                    className="px-3 py-2 bg-gold text-near-black rounded hover:bg-gold/80 transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
+  type="text"
+  value={newSeater}
+  onChange={(e) => {
+    setNewSeater(e.target.value);
+    if (e.target.value.includes(',')) {
+      const seaters = e.target.value.split(',').map(s => s.trim()).filter(s => s);
+      seaters.forEach(seater => {
+        if (seater && !formData.seaterCount?.includes(seater)) {
+          setFormData(prev => ({
+            ...prev,
+            seaterCount: [...(prev.seaterCount || []), seater]
+          }));
+        }
+      });
+      setNewSeater('');
+    }
+  }}
+  placeholder="e.g., 2 Seater, L-Shape, Recliner (separate with commas)"
+  className="flex-1 bg-cream border border-warm-beige py-2 px-3 text-sm focus:border-gold outline-none rounded"
+/>
                 </div>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {(formData.seaterCount || []).map((seater) => (
@@ -612,20 +618,26 @@ export default function AdminProductForm() {
                 </label>
                 <div className="flex gap-2">
                   <input
-                    type="text"
-                    value={newColor}
-                    onChange={(e) => setNewColor(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleAddColor()}
-                    placeholder="e.g., Black, Walnut, Navy Blue..."
-                    className="flex-1 bg-cream border border-warm-beige py-2 px-3 text-sm focus:border-gold outline-none rounded"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAddColor}
-                    className="px-3 py-2 bg-gold text-near-black rounded hover:bg-gold/80 transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
+  type="text"
+  value={newColor}
+  onChange={(e) => {
+    setNewColor(e.target.value);
+    if (e.target.value.includes(',')) {
+      const colors = e.target.value.split(',').map(c => c.trim()).filter(c => c);
+      colors.forEach(color => {
+        if (color && !formData.colors?.includes(color)) {
+          setFormData(prev => ({
+            ...prev,
+            colors: [...(prev.colors || []), color]
+          }));
+        }
+      });
+      setNewColor('');
+    }
+  }}
+  placeholder="e.g., Black, Walnut, Navy Blue (separate with commas)"
+  className="flex-1 bg-cream border border-warm-beige py-2 px-3 text-sm focus:border-gold outline-none rounded"
+/>
                 </div>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {(formData.colors || []).map((color) => (
@@ -661,20 +673,26 @@ export default function AdminProductForm() {
                 </label>
                 <div className="flex gap-2">
                   <input
-                    type="text"
-                    value={newTag}
-                    onChange={(e) => setNewTag(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
-                    placeholder="e.g., New, Best Seller, Limited Edition..."
-                    className="flex-1 bg-cream border border-warm-beige py-2 px-3 text-sm focus:border-gold outline-none rounded"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAddTag}
-                    className="px-3 py-2 bg-gold text-near-black rounded hover:bg-gold/80 transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
+  type="text"
+  value={newTag}
+  onChange={(e) => {
+    setNewTag(e.target.value);
+    if (e.target.value.includes(',')) {
+      const tags = e.target.value.split(',').map(t => t.trim()).filter(t => t);
+      tags.forEach(tag => {
+        if (tag && !formData.tags?.includes(tag)) {
+          setFormData(prev => ({
+            ...prev,
+            tags: [...(prev.tags || []), tag]
+          }));
+        }
+      });
+      setNewTag('');
+    }
+  }}
+  placeholder="e.g., New, Best Seller, Limited Edition (separate with commas)"
+  className="flex-1 bg-cream border border-warm-beige py-2 px-3 text-sm focus:border-gold outline-none rounded"
+/>
                 </div>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {(formData.tags || []).map((tag) => (
@@ -705,20 +723,26 @@ export default function AdminProductForm() {
                 </label>
                 <div className="flex gap-2">
                   <input
-                    type="text"
-                    value={newCountry}
-                    onChange={(e) => setNewCountry(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleAddCountry()}
-                    placeholder="e.g., United Kingdom, France, Germany..."
-                    className="flex-1 bg-cream border border-warm-beige py-2 px-3 text-sm focus:border-gold outline-none rounded"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAddCountry}
-                    className="px-3 py-2 bg-gold text-near-black rounded hover:bg-gold/80 transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
+  type="text"
+  value={newCountry}
+  onChange={(e) => {
+    setNewCountry(e.target.value);
+    if (e.target.value.includes(',')) {
+      const countries = e.target.value.split(',').map(c => c.trim()).filter(c => c);
+      countries.forEach(country => {
+        if (country && !formData.deliveryCountries?.includes(country)) {
+          setFormData(prev => ({
+            ...prev,
+            deliveryCountries: [...(prev.deliveryCountries || []), country]
+          }));
+        }
+      });
+      setNewCountry('');
+    }
+  }}
+  placeholder="e.g., United Kingdom, France, Germany (separate with commas)"
+  className="flex-1 bg-cream border border-warm-beige py-2 px-3 text-sm focus:border-gold outline-none rounded"
+/>
                 </div>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {(formData.deliveryCountries || []).map((country) => (

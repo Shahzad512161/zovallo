@@ -409,13 +409,13 @@ export default function ProductPage() {
                 )}
 
                 {/* Weight */}
-                {product.weight && product.weight > 0 && (
+                {/* {product.weight && product.weight >= 0 && (
                   <div className="flex items-center gap-2">
                     <Weight className="w-3.5 h-3.5 text-gold" />
                     <span className="text-xs text-gray-600">Weight:</span>
                     <span className="text-xs font-medium text-near-black">{product.weight} kg</span>
                   </div>
-                )}
+                )} */}
 
                
 
