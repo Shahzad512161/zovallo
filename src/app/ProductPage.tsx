@@ -9,7 +9,23 @@ import {
   ShieldCheck,
   RotateCcw,
   Star,
-  CheckCircle,
+  ShoppingCart,
+  ShoppingBag,
+  Ruler,
+  Weight,
+  Palette,
+  Sofa,
+  Wrench,
+  Shield,
+  Globe,
+  Clock,
+  Tag,
+  X,
+  Mail,
+  Facebook,
+  Twitter,
+  MessageCircle,
+  Check,
 } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { productApi } from "../services/productApi";
@@ -25,6 +41,15 @@ export default function ProductPage() {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
+  const [addingToCart, setAddingToCart] = useState(false);
+  const [orderingNow, setOrderingNow] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [showShareOptions, setShowShareOptions] = useState(false);
+  
+  // Selected options for the product
+  const [selectedColor, setSelectedColor] = useState<string>("");
+  const [selectedSeater, setSelectedSeater] = useState<string>("");
+  
   const { addToCart } = useCart();
 
   useEffect(() => {
@@ -42,8 +67,14 @@ export default function ProductPage() {
       }
       if (productData) {
         setProduct(productData);
-      } else {
-        console.error("Product not found:", productId);
+        setQuantity(1);
+        // Set default selections
+        if (productData.colors && productData.colors.length > 0) {
+          setSelectedColor(productData.colors[0]);
+        }
+        if (productData.seaterCount && productData.seaterCount.length > 0) {
+          setSelectedSeater(productData.seaterCount[0]);
+        }
       }
     } catch (error) {
       console.error("Error fetching product:", error);
@@ -52,19 +83,157 @@ export default function ProductPage() {
     }
   };
 
-  const handleAddToCart = () => {
-    if (product) {
-      addToCart(product, quantity);
+  const handleAddToCartOnly = () => {
+    if (!product) return;
+    
+    if (product.stock === 0) {
+      alert("This product is out of stock.");
+      return;
     }
+    
+    if (quantity > product.stock) {
+      alert(`Sorry, only ${product.stock} items available in stock.`);
+      return;
+    }
+    
+    // Validate required selections
+    if (product.colors && product.colors.length > 0 && !selectedColor) {
+      alert("Please select a color");
+      return;
+    }
+    if (product.seaterCount && product.seaterCount.length > 0 && !selectedSeater) {
+      alert("Please select a seater option");
+      return;
+    }
+    
+    setAddingToCart(true);
+    
+    // Add to cart with selected options
+    addToCart(product, quantity, {
+  color: selectedColor,
+  seater: selectedSeater,
+});
+    
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 2000);
+    setAddingToCart(false);
+  };
+
+  const handleOrderNow = () => {
+    if (!product) return;
+    
+    if (product.stock === 0) {
+      alert("This product is out of stock.");
+      return;
+    }
+    
+    if (quantity > product.stock) {
+      alert(`Sorry, only ${product.stock} items available in stock.`);
+      return;
+    }
+    
+    // Validate required selections
+    if (product.colors && product.colors.length > 0 && !selectedColor) {
+      alert("Please select a color");
+      return;
+    }
+    if (product.seaterCount && product.seaterCount.length > 0 && !selectedSeater) {
+      alert("Please select a seater option");
+      return;
+    }
+    
+    setOrderingNow(true);
+    
+    // Add to cart with selected options
+    addToCart(product, quantity, {
+      color: selectedColor,
+      seater: selectedSeater,
+    });
+    
+    setTimeout(() => {
+      navigate('/cart');
+    }, 100);
   };
 
   const handleQuantityChange = (type: "increase" | "decrease") => {
+    if (!product) return;
+    
     if (type === "increase") {
-      setQuantity((prev) => Math.min(prev + 1, product?.stock || 10));
+      if (quantity + 1 <= product.stock) {
+        setQuantity(prev => prev + 1);
+      } else {
+        alert(`Only ${product.stock} items available in stock.`);
+      }
     } else {
-      setQuantity((prev) => Math.max(prev - 1, 1));
+      setQuantity(prev => Math.max(prev - 1, 1));
     }
   };
+
+  const handleContactUs = () => {
+    navigate('/contact');
+  };
+
+  const handleAddToWishlist = () => {
+    const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+    if (!wishlist.includes(product?.id)) {
+      wishlist.push(product?.id);
+      localStorage.setItem('wishlist', JSON.stringify(wishlist));
+      alert('✓ Product added to your wishlist!');
+    } else {
+      alert('This product is already in your wishlist.');
+    }
+  };
+
+  const handleShare = async () => {
+    const shareUrl = window.location.href;
+    const shareTitle = product?.title;
+    const shareText = `Check out ${product?.title} at Zovallo!`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: shareTitle,
+          text: shareText,
+          url: shareUrl,
+        });
+      } catch (error) {
+        console.log('Error sharing:', error);
+      }
+    } else {
+      await navigator.clipboard.writeText(shareUrl);
+      setShowShareOptions(true);
+    }
+  };
+
+  const shareToPlatform = (platform: string) => {
+    const url = encodeURIComponent(window.location.href);
+    const title = encodeURIComponent(product?.title || '');
+    let shareUrl = '';
+
+    switch (platform) {
+      case 'facebook':
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+        break;
+      case 'twitter':
+        shareUrl = `https://twitter.com/intent/tweet?text=${title}&url=${url}`;
+        break;
+      case 'whatsapp':
+        shareUrl = `https://wa.me/?text=${title}%20${url}`;
+        break;
+      case 'email':
+        shareUrl = `mailto:?subject=${title}&body=Check out this product: ${url}`;
+        break;
+      default:
+        return;
+    }
+
+    window.open(shareUrl, '_blank', 'width=600,height=400');
+    setShowShareOptions(false);
+  };
+
+  const discountPercent = product?.compareAtPrice && product?.price && product.compareAtPrice > product.price
+    ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)
+    : 0;
 
   if (loading) {
     return (
@@ -81,107 +250,89 @@ export default function ProductPage() {
     return (
       <div className="max-w-7xl mx-auto px-4 py-16 sm:py-24 md:py-32 text-center space-y-4 sm:space-y-6">
         <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-cream rounded-full mb-4">
-          <svg
-            className="w-8 h-8 sm:w-10 sm:h-10 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
+          <svg className="w-8 h-8 sm:w-10 sm:h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
-        <h2 className="text-xl sm:text-2xl font-display text-near-black">
-          Product Not Found
-        </h2>
+        <h2 className="text-xl sm:text-2xl font-display text-near-black">Product Not Found</h2>
         <p className="text-gray-500 text-sm sm:text-base max-w-md mx-auto px-4">
-          The product you're looking for doesn't exist or has been removed from
-          our collection.
+          The product you're looking for doesn't exist or has been removed from our collection.
         </p>
-        <Link
-          to="/shop"
-          className="inline-block bg-near-black text-white px-6 sm:px-8 py-2.5 sm:py-3 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest hover:bg-gold transition-colors"
-        >
+        <Link to="/shop" className="inline-block bg-near-black text-white px-6 sm:px-8 py-2.5 sm:py-3 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest hover:bg-gold transition-colors rounded">
           Back to Shop
         </Link>
       </div>
     );
   }
 
+  const isOutOfStock = product.stock === 0;
+  const hasOptions = (product.colors && product.colors.length > 0) || (product.seaterCount && product.seaterCount.length > 0);
+
   return (
     <>
-      <SEO
-        title={product.title}
-        description={product.description.substring(0, 160)}
-      />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-12">
-        {/* Breadcrumb - Responsive */}
-        <div className="mb-6 sm:mb-8 overflow-x-auto">
-          <div className="flex items-center gap-1 sm:gap-2 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-gray-400 whitespace-nowrap">
-            <Link to="/" className="hover:text-gold transition-colors">
-              Home
-            </Link>
+      <SEO title={product.title} description={product.description.substring(0, 160)} />
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-6 pt-24 sm:py-8 md:py-12">
+        
+        {/* Success Toast Message */}
+        {showSuccess && (
+          <div className="fixed top-24 right-4 z-50 bg-mint-50 border border-mint-200 text-mint-700 px-4 py-2 rounded-lg shadow-lg animate-slide-in-right">
+            <div className="flex items-center gap-2">
+              <ShoppingCart className="w-4 h-4" />
+              <span className="text-sm font-medium">Added to cart successfully!</span>
+            </div>
+          </div>
+        )}
+
+        {/* Breadcrumb */}
+        <div className="mb-2 sm:mb-8 overflow-x-auto">
+          <div className="flex items-center gap-1 sm:gap-2 text-[8px] sm:text-[10px] font-bold uppercase tracking-widest text-gray-400 whitespace-nowrap">
+            <Link to="/" className="hover:text-gold transition-colors">Home</Link>
             <span>/</span>
-            <Link to="/shop" className="hover:text-gold transition-colors">
-              Shop
-            </Link>
+            <Link to="/shop" className="hover:text-gold transition-colors">Shop</Link>
             <span>/</span>
-            <Link
-              to={`/category/${product.category.toLowerCase().replace(/ /g, "-")}`}
-              className="hover:text-gold transition-colors"
-            >
+            <Link to={`/category/${product.category.toLowerCase().replace(/ /g, "-")}`} className="hover:text-gold transition-colors">
               {product.category}
             </Link>
             <span>/</span>
-            <span className="text-gold truncate max-w-[150px] sm:max-w-none">
-              {product.title}
-            </span>
+            <span className="text-gold truncate max-w-[120px] sm:max-w-none">{product.title}</span>
           </div>
         </div>
 
-        {/* Main Content - Responsive Grid */}
+        {/* Main Content */}
         <div className="flex flex-col lg:flex-row gap-6 sm:gap-8 md:gap-12">
-          {/* Image Gallery - Responsive */}
+          
+          {/* Image Gallery */}
           <div className="lg:w-1/2 space-y-3 sm:space-y-4">
-            {/* Main Image */}
-            <div className="aspect-square bg-cream border border-warm-beige overflow-hidden rounded-lg">
-              <img
-                src={product.images[selectedImage]}
-                alt={product.title}
-                className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
-              />
+            <div className="aspect-square bg-cream border border-warm-beige overflow-hidden rounded-lg relative">
+              {isOutOfStock && (
+                <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10 rounded-lg">
+                  <span className="bg-red-500 text-white px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold uppercase tracking-widest rounded">
+                    Out of Stock
+                  </span>
+                </div>
+              )}
+              <img src={product.images[selectedImage]} alt={product.title} className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" />
             </div>
-
-            {/* Thumbnails - Responsive Grid/Scroll */}
             {product.images.length > 1 && (
-              <div className="flex gap-2 sm:gap-3 md:gap-4 overflow-x-auto pb-2 scrollbar-thin">
+              <div className="flex gap-2 sm:gap-3 md:gap-4 overflow-x-auto pb-2">
                 {product.images.map((img, idx) => (
                   <button
                     key={idx}
                     onClick={() => setSelectedImage(idx)}
                     className={`w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 bg-cream border transition-all rounded-lg overflow-hidden ${
-                      selectedImage === idx
-                        ? "border-gold ring-2 ring-gold/20"
-                        : "border-warm-beige hover:border-gold"
+                      selectedImage === idx ? "border-gold ring-2 ring-gold/20" : "border-warm-beige hover:border-gold"
                     }`}
                   >
-                    <img
-                      src={img}
-                      alt={`${product.title} view ${idx + 1}`}
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={img} alt={`${product.title} view ${idx + 1}`} className="w-full h-full object-cover" />
                   </button>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Product Info - Responsive */}
-          <div className="lg:w-1/2 space-y-5 sm:space-y-6 md:space-y-8">
+          {/* Product Info */}
+          <div className="lg:w-1/2 space-y-4 sm:space-y-5 md:space-y-6">
+            
             {/* Badges */}
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               <span className="text-[8px] sm:text-[10px] font-bold uppercase tracking-widest text-walnut bg-cream px-2 sm:px-3 py-1 rounded">
@@ -192,15 +343,16 @@ export default function ProductPage() {
                   Featured
                 </span>
               )}
-              {product.stock > 0 ? (
-                <span className="text-[8px] sm:text-[10px] font-bold uppercase tracking-widest text-mint-700 bg-mint-50 px-2 sm:px-3 py-1 rounded">
-                  In Stock ({product.stock})
-                </span>
-              ) : (
-                <span className="text-[8px] sm:text-[10px] font-bold uppercase tracking-widest text-red-500 bg-red-50 px-2 sm:px-3 py-1 rounded">
-                  Out of Stock
+              {!isOutOfStock && product.stock < 10 && (
+                <span className="text-[8px] sm:text-[10px] font-bold uppercase tracking-widest text-gold bg-gold/10 px-2 sm:px-3 py-1 rounded">
+                  Only {product.stock} left!
                 </span>
               )}
+              {product.tags && product.tags.slice(0, 2).map((tag) => (
+                <span key={tag} className="text-[8px] sm:text-[10px] font-bold uppercase tracking-widest bg-near-black text-white px-2 sm:px-3 py-1 rounded">
+                  {tag}
+                </span>
+              ))}
             </div>
 
             {/* Title */}
@@ -208,135 +360,242 @@ export default function ProductPage() {
               {product.title}
             </h1>
 
-            {/* Rating */}
-            <div className="flex flex-wrap items-center gap-2 sm:gap-4">
-              <div className="flex items-center gap-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star
-                    key={star}
-                    className="w-3 h-3 sm:w-4 sm:h-4 fill-gold text-gold"
-                  />
-                ))}
-              </div>
-              <span className="text-[8px] sm:text-[10px] text-gray-400 uppercase tracking-widest">
-                {product.reviews?.length || 0} Reviews
-              </span>
+            {/* Price with Discount */}
+            <div className="flex items-center gap-3 flex-wrap">
+              <p className="text-2xl sm:text-3xl font-light text-near-black">
+                {formatCurrency(product.price)}
+              </p>
+              {product.compareAtPrice && product.compareAtPrice > product.price && (
+                <>
+                  <p className="text-lg sm:text-xl text-gray-400 line-through">
+                    {formatCurrency(product.compareAtPrice)}
+                  </p>
+                  <span className="bg-red-500 text-white text-xs px-2 py-1 rounded">
+                    Save {discountPercent}%
+                  </span>
+                </>
+              )}
             </div>
 
-            {/* Price */}
-            <p className="text-2xl sm:text-3xl font-light text-near-black">
-              {formatCurrency(product.price)}
-            </p>
+            {/* Stock Status Bar */}
+            {!isOutOfStock && product.stock < 5 && (
+              <div className="bg-gold/10 border border-gold/20 p-3 rounded-lg">
+                <p className="text-center text-walnut text-sm font-bold">
+                  ⚠️ Only {product.stock} items left! Order soon.
+                </p>
+              </div>
+            )}
 
-            {/* Description */}
-            <p className="text-gray-666 leading-relaxed text-sm sm:text-base border-t border-warm-beige pt-4 sm:pt-6">
-              {product.description}
-            </p>
-
-            {/* Specifications - Responsive Grid */}
-            {product.specifications &&
-              Object.keys(product.specifications).length > 0 && (
-                <div className="space-y-3 sm:space-y-4">
-                  <h3 className="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.2em] text-walnut">
-                    Specifications
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
-                    {Object.entries(product.specifications).map(
-                      ([key, value]) => (
-                        <div
-                          key={key}
-                          className="flex flex-col sm:flex-row border-b border-warm-beige pb-2"
-                        >
-                          <span className="font-bold text-near-black sm:w-1/3 mb-1 sm:mb-0">
-                            {key}:
-                          </span>
-                          <span className="text-gray-666 sm:w-2/3">
-                            {value as string}
-                          </span>
-                        </div>
-                      ),
-                    )}
+            {/* Product Specifications Grid - Clean Layout */}
+            <div className="border border-warm-beige rounded-lg p-4 bg-cream/20">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-walnut mb-3">Product Details</h3>
+              <div className="flex flex-col gap-y-3 gap-x-4">
+                {/* Material */}
+                {product.material && (
+                  <div className="flex items-center gap-2">
+                    <Tag className="w-3.5 h-3.5 text-gold" />
+                    <span className="text-xs text-gray-600">Material:</span>
+                    <span className="text-xs font-medium text-near-black truncate">{product.material}</span>
                   </div>
-                </div>
-              )}
+                )}
 
-            {/* Quantity & Add to Cart - Responsive */}
-            <div className="space-y-4 sm:space-y-6">
-              <div className="flex flex-wrap items-center gap-3 sm:gap-6">
-                {/* Quantity Selector */}
-                <div className="flex items-center border border-warm-beige h-10 sm:h-12 rounded">
-                  <button
-                    onClick={() => handleQuantityChange("decrease")}
-                    disabled={quantity <= 1}
-                    className="w-8 sm:w-12 h-full flex items-center justify-center hover:bg-cream transition-colors disabled:opacity-50"
-                  >
-                    <Minus className="w-3 h-3 sm:w-4 sm:h-4" />
-                  </button>
-                  <span className="w-10 sm:w-16 text-center text-sm sm:text-base font-bold">
-                    {quantity}
-                  </span>
-                  <button
-                    onClick={() => handleQuantityChange("increase")}
-                    disabled={quantity >= (product.stock || 10)}
-                    className="w-8 sm:w-12 h-full flex items-center justify-center hover:bg-cream transition-colors disabled:opacity-50"
-                  >
-                    <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
-                  </button>
-                </div>
+                {/* Dimensions */}
+                {product.dimensions && (
+                  <div className="flex items-center gap-2">
+                    <Ruler className="w-3.5 h-3.5 text-gold" />
+                    <span className="text-xs text-gray-600">Dimensions:</span>
+                    <span className="text-xs font-medium text-near-black truncate">{product.dimensions}</span>
+                  </div>
+                )}
 
-                {/* Add to Cart Button */}
-                <button
-                  onClick={handleAddToCart}
-                  disabled={product.stock === 0}
-                  className="flex-1 bg-near-black text-white py-2.5 sm:py-3 px-4 sm:px-6 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest hover:bg-gold transition-colors disabled:opacity-50 disabled:cursor-not-allowed rounded"
-                >
-                  Add to Cart
-                </button>
+                {/* Weight */}
+                {product.weight && product.weight > 0 && (
+                  <div className="flex items-center gap-2">
+                    <Weight className="w-3.5 h-3.5 text-gold" />
+                    <span className="text-xs text-gray-600">Weight:</span>
+                    <span className="text-xs font-medium text-near-black">{product.weight} kg</span>
+                  </div>
+                )}
 
-                {/* Wishlist & Share Buttons */}
-                <div className="flex gap-2 sm:gap-3">
-                  <button className="w-9 h-9 sm:w-10 sm:h-10 border border-warm-beige flex items-center justify-center hover:bg-cream transition-colors group rounded">
-                    <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-hover:text-red-500 transition-colors" />
-                  </button>
-                  <button className="w-9 h-9 sm:w-10 sm:h-10 border border-warm-beige flex items-center justify-center hover:bg-cream transition-colors group rounded">
-                    <Share2 className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-hover:text-gold transition-colors" />
-                  </button>
+               
+
+                {/* Warranty */}
+                {/* {product.warrantyYears && product.warrantyYears > 0 && (
+                  <div className="flex items-center gap-2">
+                    <Shield className="w-3.5 h-3.5 text-gold" />
+                    <span className="text-xs text-gray-600">Warranty:</span>
+                    <span className="text-xs font-medium text-near-black">{product.warrantyYears} years</span>
+                  </div>
+                )} */}
+
+                {/* Delivery */}
+                {product.estimatedDelivery && (
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-3.5 h-3.5 text-gold" />
+                    <span className="text-xs text-gray-600">Delivery:</span>
+                    <span className="text-xs font-medium text-near-black">{product.estimatedDelivery}</span>
+                  </div>
+                )}
+
+                {/* Ships to */}
+                {product.deliveryCountries && product.deliveryCountries.length > 0 && (
+                  <div className="flex items-center gap-2 col-span-2">
+                    <Globe className="w-3.5 h-3.5 text-gold" />
+                    <span className="text-xs text-gray-600">Ships to:</span>
+                    <span className="text-xs font-medium text-near-black truncate">{product.deliveryCountries.join(", ")}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Color Selection */}
+            {product.colors && product.colors.length > 0 && (
+              <div className="space-y-2">
+                <label className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-walnut block">
+                  Select Color <span className="text-red-500">*</span>
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {product.colors.map((color) => (
+                    <button
+                      key={color}
+                      onClick={() => setSelectedColor(color)}
+                      className={`px-4 py-2 text-sm rounded-full transition-all flex items-center gap-2 ${
+                        selectedColor === color
+                          ? "bg-gold text-near-black font-bold ring-2 ring-gold/50"
+                          : "bg-cream text-gray-700 hover:bg-gold/20"
+                      }`}
+                    >
+                      <div 
+                        className="w-4 h-4 rounded-full border border-gray-300"
+                        style={{ backgroundColor: color.toLowerCase() }}
+                      />
+                      {color}
+                      {selectedColor === color && <Check className="w-3 h-3" />}
+                    </button>
+                  ))}
                 </div>
               </div>
+            )}
 
-              {/* Delivery Info - Responsive */}
-              <div className="space-y-3 sm:space-y-4 p-4 sm:p-6 bg-cream/30 border border-warm-beige rounded-lg">
+            {/* Seater Selection */}
+            {product.seaterCount && product.seaterCount.length > 0 && (
+              <div className="space-y-2">
+                <label className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-walnut block">
+                  Select Seater <span className="text-red-500">*</span>
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {product.seaterCount.map((seater) => (
+                    <button
+                      key={seater}
+                      onClick={() => setSelectedSeater(seater)}
+                      className={`px-4 py-2 text-sm rounded-full transition-all flex items-center gap-2 ${
+                        selectedSeater === seater
+                          ? "bg-gold text-near-black font-bold ring-2 ring-gold/50"
+                          : "bg-cream text-gray-700 hover:bg-gold/20"
+                      }`}
+                    >
+                      <Sofa className="w-3.5 h-3.5" />
+                      {seater}
+                      {selectedSeater === seater && <Check className="w-3 h-3" />}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Description - Clean with preserved formatting */}
+            <div className="border-t border-warm-beige pt-4">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-walnut mb-2">Description</h3>
+              <div className="text-gray-666 text-sm leading-relaxed space-y-2">
+                {product.description.split('\n').map((paragraph, idx) => (
+                  <p key={idx}>{paragraph}</p>
+                ))}
+              </div>
+            </div>
+
+            {/* Quantity & Action Buttons */}
+            <div className="space-y-4 pt-2">
+              {!isOutOfStock ? (
+                <>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center border border-warm-beige h-10 rounded">
+                      <button
+                        onClick={() => handleQuantityChange("decrease")}
+                        disabled={quantity <= 1}
+                        className="w-10 h-full flex items-center justify-center hover:bg-cream transition-colors disabled:opacity-50 rounded-l"
+                      >
+                        <Minus className="w-3 h-3" />
+                      </button>
+                      <span className="w-12 text-center text-sm font-bold">{quantity}</span>
+                      <button
+                        onClick={() => handleQuantityChange("increase")}
+                        disabled={quantity >= product.stock}
+                        className="w-10 h-full flex items-center justify-center hover:bg-cream transition-colors disabled:opacity-50 rounded-r"
+                      >
+                        <Plus className="w-3 h-3" />
+                      </button>
+                    </div>
+                    <p className="text-xs text-gray-500">{product.stock} items available</p>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <button
+                      onClick={handleAddToCartOnly}
+                      disabled={addingToCart || (hasOptions && (!selectedColor || (product.seaterCount && product.seaterCount.length > 0 && !selectedSeater)))}
+                      className="flex-1 bg-cream border-2 border-near-black text-near-black py-3 text-[11px] font-bold uppercase tracking-widest hover:bg-gold hover:border-gold transition-all duration-300 flex items-center justify-center gap-2 rounded"
+                    >
+                      <ShoppingCart className="w-4 h-4" />
+                      {addingToCart ? 'Adding...' : 'Add to Cart'}
+                    </button>
+                    <button
+                      onClick={handleOrderNow}
+                      disabled={orderingNow || (hasOptions && (!selectedColor || (product.seaterCount && product.seaterCount.length > 0 && !selectedSeater)))}
+                      className="flex-1 bg-near-black text-white py-3 text-[11px] font-bold uppercase tracking-widest hover:bg-gold hover:text-near-black transition-all duration-300 flex items-center justify-center gap-2 rounded"
+                    >
+                      <ShoppingBag className="w-4 h-4" />
+                      {orderingNow ? 'Processing...' : 'Order Now'}
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <button onClick={handleContactUs} className="w-full bg-gray-200 text-gray-600 py-3 text-[11px] font-bold uppercase tracking-widest hover:bg-gold hover:text-near-black transition-all duration-300 rounded">
+                  Contact Us for Availability
+                </button>
+              )}
+
+              {/* Wishlist & Share */}
+              <div className="flex gap-3">
+                <button onClick={handleAddToWishlist} className="flex-1 border border-warm-beige py-2.5 text-[10px] font-bold uppercase tracking-widest hover:bg-cream transition-colors flex items-center justify-center gap-2 rounded">
+                  <Heart className="w-3.5 h-3.5" />
+                  Add to Wishlist
+                </button>
+                <button onClick={handleShare} className="flex-1 border border-warm-beige py-2.5 text-[10px] font-bold uppercase tracking-widest hover:bg-cream transition-colors flex items-center justify-center gap-2 rounded">
+                  <Share2 className="w-3.5 h-3.5" />
+                  Share
+                </button>
+              </div>
+
+              {/* Delivery Info */}
+              <div className="space-y-3 p-4 bg-cream/30 border border-warm-beige rounded-lg">
                 <div className="flex items-center gap-3">
-                  <Truck className="w-4 h-4 sm:w-5 sm:h-5 text-gold flex-shrink-0" />
+                  <Truck className="w-4 h-4 text-gold" />
                   <div>
-                    <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-near-black">
-                      Free UK Delivery
-                    </p>
-                    <p className="text-[9px] sm:text-[10px] text-gray-500">
-                      Estimated delivery: 3-5 business days
-                    </p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-near-black">Free UK Delivery</p>
+                    <p className="text-[9px] text-gray-500">Estimated delivery: 1-3 business days</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-gold flex-shrink-0" />
+                  <ShieldCheck className="w-4 h-4 text-gold" />
                   <div>
-                    <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-near-black">
-                      Secure Checkout
-                    </p>
-                    <p className="text-[9px] sm:text-[10px] text-gray-500">
-                      Cash on Delivery available
-                    </p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-near-black">Cash on Delivery</p>
+                    <p className="text-[9px] text-gray-500">Pay when your furniture arrives</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5 text-gold flex-shrink-0" />
+                  <RotateCcw className="w-4 h-4 text-gold" />
                   <div>
-                    <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-near-black">
-                      14-Day Returns
-                    </p>
-                    <p className="text-[9px] sm:text-[10px] text-gray-500">
-                      Hassle-free returns policy
-                    </p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-near-black">14-Day Returns</p>
+                    <p className="text-[9px] text-gray-500">Hassle-free returns policy</p>
                   </div>
                 </div>
               </div>
@@ -344,49 +603,86 @@ export default function ProductPage() {
           </div>
         </div>
 
-        {/* Reviews Section - Responsive */}
+        {/* Reviews Section */}
         {product.reviews && product.reviews.length > 0 && (
-          <div className="mt-12 sm:mt-16 md:mt-20 pt-8 sm:pt-10 md:pt-12 border-t border-warm-beige">
-            <h3 className="text-lg sm:text-xl font-display text-near-black mb-6 sm:mb-8">
-              Customer Reviews ({product.reviews.length})
-            </h3>
-            <div className="space-y-4 sm:space-y-6">
+          <div className="mt-12 pt-8 border-t border-warm-beige">
+            <h3 className="text-lg font-display text-near-black mb-6">Customer Reviews ({product.reviews.length})</h3>
+            <div className="space-y-4">
               {product.reviews.map((review) => (
-                <div
-                  key={review.id}
-                  className="border-b border-warm-beige pb-4 sm:pb-6"
-                >
+                <div key={review.id} className="border-b border-warm-beige pb-4">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
                     <div>
-                      <p className="font-bold text-near-black text-sm sm:text-base">
-                        {review.userName}
-                      </p>
-                      <p className="text-[8px] sm:text-[10px] text-gray-400">
-                        {review.date}
-                      </p>
+                      <p className="font-bold text-near-black text-sm">{review.userName}</p>
+                      <p className="text-[8px] text-gray-400">{review.date}</p>
                     </div>
-                    <div className="flex gap-1">
+                    <div className="flex gap-0.5">
                       {[1, 2, 3, 4, 5].map((star) => (
-                        <Star
-                          key={star}
-                          className={`w-2.5 h-2.5 sm:w-3 sm:h-3 ${
-                            star <= review.rating
-                              ? "fill-gold text-gold"
-                              : "text-gray-300"
-                          }`}
-                        />
+                        <Star key={star} className={`w-2.5 h-2.5 ${star <= review.rating ? "fill-gold text-gold" : "text-gray-300"}`} />
                       ))}
                     </div>
                   </div>
-                  <p className="text-xs sm:text-sm text-gray-666 leading-relaxed">
-                    {review.comment}
-                  </p>
+                  <p className="text-xs text-gray-666">{review.comment}</p>
                 </div>
               ))}
             </div>
           </div>
         )}
       </div>
+
+      {/* Share Options Modal */}
+      {showShareOptions && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+          <div className="absolute inset-0 bg-near-black/80 backdrop-blur-sm" onClick={() => setShowShareOptions(false)} />
+          <div className="bg-white max-w-sm w-full relative z-10 shadow-2xl border border-warm-beige rounded-lg overflow-hidden">
+            <div className="p-4 border-b border-warm-beige flex justify-between items-center">
+              <h3 className="text-lg font-display text-near-black">Share this product</h3>
+              <button onClick={() => setShowShareOptions(false)} className="text-gray-400 hover:text-near-black">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-4 space-y-3">
+              <div className="grid grid-cols-2 gap-2">
+                <button onClick={() => shareToPlatform('facebook')} className="flex items-center gap-2 p-2 bg-[#1877f2] text-white rounded-lg text-sm">
+                  <Facebook className="w-4 h-4" /> Facebook
+                </button>
+                <button onClick={() => shareToPlatform('twitter')} className="flex items-center gap-2 p-2 bg-[#1da1f2] text-white rounded-lg text-sm">
+                  <Twitter className="w-4 h-4" /> Twitter
+                </button>
+                <button onClick={() => shareToPlatform('whatsapp')} className="flex items-center gap-2 p-2 bg-[#25d366] text-white rounded-lg text-sm">
+                  <MessageCircle className="w-4 h-4" /> WhatsApp
+                </button>
+                <button onClick={() => shareToPlatform('email')} className="flex items-center gap-2 p-2 bg-gray-600 text-white rounded-lg text-sm">
+                  <Mail className="w-4 h-4" /> Email
+                </button>
+              </div>
+              <div className="pt-2">
+                <p className="text-xs text-gray-500 mb-1">Or copy link:</p>
+                <div className="flex gap-2">
+                  <input type="text" readOnly value={window.location.href} className="flex-1 bg-cream border border-warm-beige py-1.5 px-2 text-xs rounded" />
+                  <button
+                    onClick={async () => {
+                      await navigator.clipboard.writeText(window.location.href);
+                      alert('Link copied!');
+                      setShowShareOptions(false);
+                    }}
+                    className="px-3 py-1.5 bg-near-black text-white text-[10px] font-bold rounded"
+                  >
+                    Copy
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes slideInRight {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        .animate-slide-in-right { animation: slideInRight 0.3s ease-out; }
+      `}</style>
     </>
   );
 }

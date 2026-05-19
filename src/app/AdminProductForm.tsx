@@ -13,7 +13,18 @@ import {
   Upload,
   Trash2,
   AlertCircle,
-  Move,
+  Ruler,
+  Weight,
+  Palette,
+  Sofa,
+  Truck,
+  Shield,
+  Wrench,
+  DollarSign,
+  Globe,
+  Clock,
+  Filter,
+  PlusCircle,
 } from "lucide-react";
 import { Product, Category } from "../types";
 import { productApi } from "../services/productApi";
@@ -31,18 +42,36 @@ export default function AdminProductForm() {
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [categories, setCategories] = useState<Category[]>([]);
 
+  // Dynamic input states
+  const [newSeater, setNewSeater] = useState("");
+  const [newColor, setNewColor] = useState("");
+  const [newTag, setNewTag] = useState("");
+  const [newCountry, setNewCountry] = useState("");
+
   const [formData, setFormData] = useState<Partial<Product>>({
     title: "",
     slug: "",
     description: "",
     price: 0,
+    compareAtPrice: 0,
     category: "",
     images: [],
     stock: 0,
+    seaterCount: [] as string[],
+    colors: [] as string[],
+    material: "",
+    dimensions: "",
+    weight: 0,
+    warrantyYears: 0,
+    deliveryCountries: [] as string[],
+    estimatedDelivery: "",
+    tags: [] as string[],
     specifications: {
       Material: "",
       Dimensions: "",
-      Assembly: "No assembly required",
+      Weight: "",
+      Warranty: "",
+      CareInstructions: "",
     },
     featured: false,
   });
@@ -69,7 +98,7 @@ export default function AdminProductForm() {
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
+    >
   ) => {
     const { name, value, type } = e.target;
     setFormData((prev) => ({
@@ -85,6 +114,78 @@ export default function AdminProductForm() {
         ...(prev.specifications || {}),
         [key]: value,
       },
+    }));
+  };
+
+  // Dynamic add for Seater Count
+  const handleAddSeater = () => {
+    if (newSeater.trim() && !formData.seaterCount?.includes(newSeater.trim())) {
+      setFormData((prev) => ({
+        ...prev,
+        seaterCount: [...(prev.seaterCount || []), newSeater.trim()],
+      }));
+      setNewSeater("");
+    }
+  };
+
+  const handleRemoveSeater = (seater: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      seaterCount: (prev.seaterCount || []).filter((s) => s !== seater),
+    }));
+  };
+
+  // Dynamic add for Colors
+  const handleAddColor = () => {
+    if (newColor.trim() && !formData.colors?.includes(newColor.trim())) {
+      setFormData((prev) => ({
+        ...prev,
+        colors: [...(prev.colors || []), newColor.trim()],
+      }));
+      setNewColor("");
+    }
+  };
+
+  const handleRemoveColor = (color: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      colors: (prev.colors || []).filter((c) => c !== color),
+    }));
+  };
+
+  // Dynamic add for Tags
+  const handleAddTag = () => {
+    if (newTag.trim() && !formData.tags?.includes(newTag.trim())) {
+      setFormData((prev) => ({
+        ...prev,
+        tags: [...(prev.tags || []), newTag.trim()],
+      }));
+      setNewTag("");
+    }
+  };
+
+  const handleRemoveTag = (tag: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      tags: (prev.tags || []).filter((t) => t !== tag),
+    }));
+  };
+
+  // Dynamic add for Delivery Countries
+  const handleAddCountry = () => {
+    if (newCountry.trim() && !formData.deliveryCountries?.includes(newCountry.trim())) {
+      setFormData((prev) => ({
+        ...prev,
+        deliveryCountries: [...(prev.deliveryCountries || []), newCountry.trim()],
+      }));
+      setNewCountry("");
+    }
+  };
+
+  const handleRemoveCountry = (country: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      deliveryCountries: (prev.deliveryCountries || []).filter((c) => c !== country),
     }));
   };
 
@@ -128,7 +229,7 @@ export default function AdminProductForm() {
               }
             },
             file.type,
-            0.7,
+            0.7
           );
         };
         img.onerror = reject;
@@ -144,7 +245,7 @@ export default function AdminProductForm() {
 
     if (filesArray.length > remainingSlots) {
       alert(
-        `You can only add ${remainingSlots} more image(s). Maximum 5 images allowed.`,
+        `You can only add ${remainingSlots} more image(s). Maximum 5 images allowed.`
       );
       return;
     }
@@ -203,7 +304,7 @@ export default function AdminProductForm() {
     e.preventDefault();
 
     const validImages = (formData.images || []).filter(
-      (img) => img && img.trim() !== "",
+      (img) => img && img.trim() !== ""
     );
     if (validImages.length === 0) {
       alert("Please add at least one product image");
@@ -212,11 +313,11 @@ export default function AdminProductForm() {
 
     const totalSize = validImages.reduce(
       (sum, img) => sum + (img.length || 0),
-      0,
+      0
     );
     if (totalSize > 900 * 1024) {
       alert(
-        "Total image size is too large. Please use smaller images or reduce number of images.",
+        "Total image size is too large. Please use smaller images or reduce number of images."
       );
       return;
     }
@@ -254,11 +355,15 @@ export default function AdminProductForm() {
   }
 
   const imageCount = (formData.images || []).filter(
-    (img) => img && img.trim() !== "",
+    (img) => img && img.trim() !== ""
   ).length;
 
+  const discountPercent = formData.compareAtPrice && formData.price && formData.compareAtPrice > formData.price
+    ? Math.round(((formData.compareAtPrice - formData.price) / formData.compareAtPrice) * 100)
+    : 0;
+
   return (
-    <div className="max-w-5xl mx-auto px-3 sm:px-4 md:px-5 lg:px-0 space-y-5 sm:space-y-6 md:space-y-8 lg:space-y-12">
+    <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-5 lg:px-0 space-y-5 sm:space-y-6 md:space-y-8 lg:space-y-12">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-warm-beige pb-4 sm:pb-6 md:pb-8 gap-4 sm:gap-6">
         <div className="flex items-center gap-3 sm:gap-4 md:gap-5 lg:gap-6">
@@ -306,7 +411,7 @@ export default function AdminProductForm() {
                   htmlFor="title"
                   className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-walnut block"
                 >
-                  Master Title
+                  Master Title *
                 </label>
                 <input
                   id="title"
@@ -347,7 +452,7 @@ export default function AdminProductForm() {
                     htmlFor="category"
                     className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-walnut block"
                   >
-                    Collection Hierarchy
+                    Collection Hierarchy *
                   </label>
                   <div className="relative">
                     <select
@@ -377,7 +482,7 @@ export default function AdminProductForm() {
                   htmlFor="description"
                   className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-walnut block"
                 >
-                  Physical Narrative
+                  Physical Narrative *
                 </label>
                 <textarea
                   id="description"
@@ -388,6 +493,352 @@ export default function AdminProductForm() {
                   rows={5}
                   className="w-full bg-cream border border-warm-beige py-2.5 sm:py-3 md:py-4 px-4 sm:px-5 md:px-6 text-xs sm:text-sm leading-relaxed focus:border-gold outline-none resize-none transition-colors rounded"
                   placeholder="Describe the craftsmanship, material, and soul of this piece..."
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* Pricing Section */}
+          <section className="bg-white border border-warm-beige p-4 sm:p-5 md:p-6 lg:p-8 xl:p-10 space-y-4 sm:space-y-6 md:space-y-8 shadow-sm rounded-lg">
+            <div className="flex items-center gap-2 sm:gap-3 border-l-4 border-gold pl-3 sm:pl-4">
+              <DollarSign className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5 text-gold" />
+              <h2 className="text-sm sm:text-base md:text-lg font-display text-near-black uppercase">
+                Pricing
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
+              <div className="space-y-1.5 sm:space-y-2">
+                <label className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-walnut block">
+                  Sale Price (GBP) *
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gold font-bold">£</span>
+                  <input
+                    required
+                    type="number"
+                    name="price"
+                    value={formData.price}
+                    onChange={handleChange}
+                    className="w-full bg-cream border border-warm-beige py-2.5 pl-7 pr-3 text-sm focus:border-gold outline-none rounded"
+                    step="0.01"
+                    min="0"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5 sm:space-y-2">
+                <label className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-walnut block">
+                  Compare at Price (Original Price)
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold">£</span>
+                  <input
+                    type="number"
+                    name="compareAtPrice"
+                    value={formData.compareAtPrice || ""}
+                    onChange={handleChange}
+                    className="w-full bg-cream border border-warm-beige py-2.5 pl-7 pr-3 text-sm focus:border-gold outline-none rounded"
+                    step="0.01"
+                    min="0"
+                  />
+                </div>
+                {discountPercent > 0 && (
+                  <p className="text-[10px] text-mint-700 mt-1">Save {discountPercent}%</p>
+                )}
+              </div>
+            </div>
+          </section>
+
+          {/* Filterable Attributes Section - Dynamic */}
+          <section className="bg-white border border-warm-beige p-4 sm:p-5 md:p-6 lg:p-8 xl:p-10 space-y-4 sm:space-y-6 md:space-y-8 shadow-sm rounded-lg">
+            <div className="flex items-center gap-2 sm:gap-3 border-l-4 border-gold pl-3 sm:pl-4">
+              <Filter className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5 text-gold" />
+              <h2 className="text-sm sm:text-base md:text-lg font-display text-near-black uppercase">
+                Filterable Attributes
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+              
+              {/* Seater Count - Dynamic */}
+              <div className="space-y-2">
+                <label className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-walnut block flex items-center gap-2">
+                  <Sofa className="w-3.5 h-3.5" /> Seater Options
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newSeater}
+                    onChange={(e) => setNewSeater(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleAddSeater()}
+                    placeholder="e.g., 2 Seater, L-Shape, Recliner..."
+                    className="flex-1 bg-cream border border-warm-beige py-2 px-3 text-sm focus:border-gold outline-none rounded"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddSeater}
+                    className="px-3 py-2 bg-gold text-near-black rounded hover:bg-gold/80 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {(formData.seaterCount || []).map((seater) => (
+                    <span
+                      key={seater}
+                      className="inline-flex items-center gap-1 px-2 py-1 bg-cream text-gray-700 rounded-full text-xs"
+                    >
+                      {seater}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveSeater(seater)}
+                        className="hover:text-red-500 transition-colors"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+                {(formData.seaterCount || []).length === 0 && (
+                  <p className="text-[10px] text-gray-400">No seater options added. Add above.</p>
+                )}
+              </div>
+
+              {/* Colors - Dynamic */}
+              <div className="space-y-2">
+                <label className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-walnut block flex items-center gap-2">
+                  <Palette className="w-3.5 h-3.5" /> Available Colors
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newColor}
+                    onChange={(e) => setNewColor(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleAddColor()}
+                    placeholder="e.g., Black, Walnut, Navy Blue..."
+                    className="flex-1 bg-cream border border-warm-beige py-2 px-3 text-sm focus:border-gold outline-none rounded"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddColor}
+                    className="px-3 py-2 bg-gold text-near-black rounded hover:bg-gold/80 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {(formData.colors || []).map((color) => (
+                    <span
+                      key={color}
+                      className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs"
+                      style={{ backgroundColor: '#f5f5f2', color: '#1a1a1a' }}
+                    >
+                      <div 
+                        className="w-3 h-3 rounded-full border border-gray-300"
+                        style={{ backgroundColor: color.toLowerCase() }}
+                      />
+                      {color}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveColor(color)}
+                        className="hover:text-red-500 transition-colors ml-1"
+                      >
+                        <X className="w-2.5 h-2.5" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+                {(formData.colors || []).length === 0 && (
+                  <p className="text-[10px] text-gray-400">No colors added. Add above.</p>
+                )}
+              </div>
+
+              {/* Tags - Dynamic */}
+              <div className="space-y-2">
+                <label className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-walnut block flex items-center gap-2">
+                  <Tag className="w-3.5 h-3.5" /> Product Tags
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newTag}
+                    onChange={(e) => setNewTag(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
+                    placeholder="e.g., New, Best Seller, Limited Edition..."
+                    className="flex-1 bg-cream border border-warm-beige py-2 px-3 text-sm focus:border-gold outline-none rounded"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddTag}
+                    className="px-3 py-2 bg-gold text-near-black rounded hover:bg-gold/80 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {(formData.tags || []).map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center gap-1 px-2 py-1 bg-near-black text-white rounded-full text-xs"
+                    >
+                      {tag}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveTag(tag)}
+                        className="hover:text-red-400 transition-colors"
+                      >
+                        <X className="w-2.5 h-2.5" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+                {(formData.tags || []).length === 0 && (
+                  <p className="text-[10px] text-gray-400">No tags added. Add above.</p>
+                )}
+              </div>
+
+              {/* Delivery Countries - Dynamic */}
+              <div className="space-y-2">
+                <label className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-walnut block flex items-center gap-2">
+                  <Globe className="w-3.5 h-3.5" /> Delivery Countries
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newCountry}
+                    onChange={(e) => setNewCountry(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleAddCountry()}
+                    placeholder="e.g., United Kingdom, France, Germany..."
+                    className="flex-1 bg-cream border border-warm-beige py-2 px-3 text-sm focus:border-gold outline-none rounded"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddCountry}
+                    className="px-3 py-2 bg-gold text-near-black rounded hover:bg-gold/80 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {(formData.deliveryCountries || []).map((country) => (
+                    <span
+                      key={country}
+                      className="inline-flex items-center gap-1 px-2 py-1 bg-cream text-gray-700 rounded-full text-xs"
+                    >
+                      {country}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveCountry(country)}
+                        className="hover:text-red-500 transition-colors"
+                      >
+                        <X className="w-2.5 h-2.5" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+                {(formData.deliveryCountries || []).length === 0 && (
+                  <p className="text-[10px] text-gray-400">No delivery countries added. Add above.</p>
+                )}
+              </div>
+
+              {/* Material */}
+              <div className="space-y-1.5">
+                <label className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-walnut block flex items-center gap-2">
+                  <Layers className="w-3.5 h-3.5" /> Material
+                </label>
+                <input
+                  name="material"
+                  value={formData.material || ""}
+                  onChange={handleChange}
+                  placeholder="e.g., Solid Oak, Velvet, Marble"
+                  className="w-full bg-cream border border-warm-beige py-2 px-3 text-sm focus:border-gold outline-none rounded"
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* Dimensions & Weight Section */}
+          <section className="bg-white border border-warm-beige p-4 sm:p-5 md:p-6 lg:p-8 xl:p-10 space-y-4 sm:space-y-6 md:space-y-8 shadow-sm rounded-lg">
+            <div className="flex items-center gap-2 sm:gap-3 border-l-4 border-gold pl-3 sm:pl-4">
+              <Ruler className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5 text-gold" />
+              <h2 className="text-sm sm:text-base md:text-lg font-display text-near-black uppercase">
+                Dimensions & Weight
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+              <div className="space-y-1.5">
+                <label className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-walnut block">
+                  Dimensions (L x W x H)
+                </label>
+                <input
+                  name="dimensions"
+                  value={formData.dimensions || ""}
+                  onChange={handleChange}
+                  placeholder="e.g., 180cm x 90cm x 85cm"
+                  className="w-full bg-cream border border-warm-beige py-2 px-3 text-sm focus:border-gold outline-none rounded"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-walnut block flex items-center gap-2">
+                  <Weight className="w-3.5 h-3.5" /> Weight (kg)
+                </label>
+                <input
+                  type="number"
+                  name="weight"
+                  value={formData.weight || ""}
+                  onChange={handleChange}
+                  placeholder="e.g., 25.5"
+                  step="0.1"
+                  min="0"
+                  className="w-full bg-cream border border-warm-beige py-2 px-3 text-sm focus:border-gold outline-none rounded"
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* Shipping Section */}
+          <section className="bg-white border border-warm-beige p-4 sm:p-5 md:p-6 lg:p-8 xl:p-10 space-y-4 sm:space-y-6 md:space-y-8 shadow-sm rounded-lg">
+            <div className="flex items-center gap-2 sm:gap-3 border-l-4 border-gold pl-3 sm:pl-4">
+              <Truck className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5 text-gold" />
+              <h2 className="text-sm sm:text-base md:text-lg font-display text-near-black uppercase">
+                Shipping & Delivery
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+              <div className="space-y-1.5">
+                <label className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-walnut block flex items-center gap-2">
+                  <Clock className="w-3.5 h-3.5" /> Estimated Delivery
+                </label>
+                <select
+                  name="estimatedDelivery"
+                  value={formData.estimatedDelivery || ""}
+                  onChange={handleChange}
+                  className="w-full bg-cream border border-warm-beige py-2 px-3 text-sm focus:border-gold outline-none rounded"
+                >
+                  <option value="">Select delivery time</option>
+                  <option value="1-3 days">1-3 days (UK Express)</option>
+                  <option value="3-5 days">3-5 days (Standard UK)</option>
+                  <option value="5-7 days">5-7 days (International)</option>
+                </select>
+              </div>
+
+            
+              <div className="space-y-1.5">
+                <label className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-walnut block flex items-center gap-2">
+                  <Shield className="w-3.5 h-3.5" /> Warranty (Years)
+                </label>
+                <input
+                  type="number"
+                  name="warrantyYears"
+                  value={formData.warrantyYears || ""}
+                  onChange={handleChange}
+                  placeholder="e.g., 2"
+                  min="0"
+                  className="w-full bg-cream border border-warm-beige py-2 px-3 text-sm focus:border-gold outline-none rounded"
                 />
               </div>
             </div>
@@ -525,83 +976,6 @@ export default function AdminProductForm() {
               )}
             </div>
           </section>
-
-          {/* Precise Specifications */}
-          <section className="bg-white border border-warm-beige p-4 sm:p-5 md:p-6 lg:p-8 xl:p-10 space-y-4 sm:space-y-6 md:space-y-8 shadow-sm rounded-lg">
-            <div className="flex items-center gap-2 sm:gap-3 border-l-4 border-gold pl-3 sm:pl-4">
-              <Layers className="w-4 h-4 sm:w-4.5 sm:h-4.5 md:w-5 md:h-5 text-gold" />
-              <h2 className="text-sm sm:text-base md:text-lg font-display text-near-black uppercase">
-                Precise Specifications
-              </h2>
-            </div>
-
-            <div className="space-y-4 sm:space-y-5 md:space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 md:gap-6 lg:gap-8">
-                {Object.entries(formData.specifications || {}).map(
-                  ([key, value]) => (
-                    <div key={key} className="space-y-1 relative group">
-                      <div className="flex justify-between items-center">
-                        <label className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-walnut">
-                          {key}
-                        </label>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const newSpecs = { ...formData.specifications };
-                            delete (newSpecs as any)[key];
-                            setFormData((prev) => ({
-                              ...prev,
-                              specifications: newSpecs,
-                            }));
-                          }}
-                          className="text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <X className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                        </button>
-                      </div>
-                      <input
-                        value={value as string}
-                        onChange={(e) => handleSpecChange(key, e.target.value)}
-                        className="w-full bg-cream border border-warm-beige py-2 sm:py-2.5 md:py-3 px-3 sm:px-4 text-xs sm:text-sm focus:border-gold outline-none rounded"
-                      />
-                    </div>
-                  ),
-                )}
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 p-4 sm:p-5 md:p-6 bg-cream/30 border border-warm-beige border-dashed rounded">
-                <input
-                  type="text"
-                  id="new-spec-key"
-                  placeholder="Spec Name (e.g. Weight)"
-                  className="flex-1 bg-white border border-warm-beige py-2 sm:py-2.5 px-3 sm:px-4 text-xs sm:text-sm outline-none focus:border-gold rounded"
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    const input = document.getElementById(
-                      "new-spec-key",
-                    ) as HTMLInputElement;
-                    if (
-                      input.value &&
-                      !formData.specifications?.[input.value]
-                    ) {
-                      handleSpecChange(input.value, "");
-                      input.value = "";
-                    } else if (
-                      input.value &&
-                      formData.specifications?.[input.value]
-                    ) {
-                      alert("Specification already exists");
-                    }
-                  }}
-                  className="bg-near-black text-white px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest hover:bg-gold transition-colors rounded"
-                >
-                  Add Spec
-                </button>
-              </div>
-            </div>
-          </section>
         </div>
 
         {/* Right Column - Commercial Intel Sidebar */}
@@ -617,28 +991,7 @@ export default function AdminProductForm() {
             <div className="space-y-4 sm:space-y-5 md:space-y-6">
               <div className="space-y-1">
                 <label className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                  List Price (GBP)
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-gold font-bold text-sm sm:text-base">
-                    £
-                  </span>
-                  <input
-                    required
-                    type="number"
-                    name="price"
-                    value={formData.price}
-                    onChange={handleChange}
-                    className="w-full bg-white/10 border border-white/20 py-3 sm:py-3.5 md:py-4 pl-7 sm:pl-8 md:pl-10 pr-4 sm:pr-5 md:pr-6 text-base sm:text-lg md:text-xl font-display outline-none focus:border-gold rounded"
-                    step="0.01"
-                    min="0"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                  Inventory volume
+                  Inventory Stock *
                 </label>
                 <input
                   required
@@ -680,8 +1033,8 @@ export default function AdminProductForm() {
                 {isSubmitting
                   ? "Authenticating..."
                   : isEdit
-                    ? "Archive Changes"
-                    : "Publish Entry"}
+                  ? "Archive Changes"
+                  : "Publish Entry"}
               </button>
             </div>
           </div>

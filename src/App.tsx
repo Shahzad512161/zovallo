@@ -31,6 +31,13 @@ import { CartProvider } from "./context/CartContext";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { AdminLayout } from "./components/admin/AdminLayout";
 import UserProfile from "./app/UserProfile";
+import TermsConditions from "./app/legalPages/TermsConditions";
+import ShippingPolicy from "./app/legalPages/ShippingPolicy";
+import ReturnPolicy from "./app/legalPages/ReturnPolicy";
+import PrivacyPolicy from "./app/legalPages/PrivacyPolicy";
+import ContactUs from "./app/ContactUs";
+import AdminMessages from "./app/AdminMessages";
+import WhatsAppButton from "./components/ui/WhatsAppButton";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -149,7 +156,15 @@ export default function App() {
                 }
               />
 
-              {/* Customer Routes Area - with wildcard */}
+              <Route
+                path="/admin/messages"
+                element={
+                  <AdminRoute>
+                    <AdminMessages />
+                  </AdminRoute>
+                }
+              />
+
               <Route
                 path="*"
                 element={
@@ -157,6 +172,11 @@ export default function App() {
                     <Navbar />
                     <main className="flex-grow pt-20 md:pt-38">
                       <Routes>
+                        <Route path="/terms" element={<TermsConditions />} />
+                        <Route path="/shipping" element={<ShippingPolicy />} />
+                        <Route path="/returns" element={<ReturnPolicy />} />
+                        <Route path="/privacy" element={<PrivacyPolicy />} />
+                        <Route path="/contact" element={<ContactUs />} />
                         <Route path="/" element={<HomePage />} />
                         <Route path="/shop" element={<ShopPage />} />
                         <Route
@@ -198,6 +218,7 @@ export default function App() {
                 }
               />
             </Routes>
+             <WhatsAppButton phoneNumber="447529661726" />
           </div>
         </Router>
       </CartProvider>

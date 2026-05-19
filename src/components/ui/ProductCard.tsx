@@ -1,68 +1,134 @@
-import { Link } from 'react-router-dom';
-import { Product } from '../../types';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ShoppingBag, ShoppingCart, Eye } from 'lucide-react';
 import { formatCurrency } from '../../lib/utils';
+import { Product } from '../../types';
 import { useCart } from '../../context/CartContext';
 
 interface ProductCardProps {
   product: Product;
-  key?: string | number;
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const navigate = useNavigate();
   const { addToCart } = useCart();
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [isOrderNow, setIsOrderNow] = useState(false);
+
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (product.stock === 0) return;
+    
+    setIsAddingToCart(true);
+    const success = addToCart(product, 1);
+    if (success as any) {
+      // Optional: Show a quick success message or animation
+      const btn = e.currentTarget;
+      btn.classList.add('bg-green-500');
+      setTimeout(() => btn.classList.remove('bg-green-500'), 500);
+    }
+    setIsAddingToCart(false);
+  };
+
+  const handleOrderNow = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (product.stock === 0) return;
+    
+    setIsOrderNow(true);
+    const success = addToCart(product, 1);
+   
+     setTimeout(() => {
+      navigate('/cart');
+    }, 100);
+
+    setIsOrderNow(false);
+
+
+  };
+
+  const handleContactUs = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigate('/contact');
+  };
+
   return (
-    <div className="group bg-white border border-warm-beige p-4 flex flex-col h-full hover:shadow-xl transition-all duration-500">
-      <Link 
-        to={`/product/${product.id}`}
-        className="bg-cream aspect-square w-full mb-4 flex items-center justify-center relative overflow-hidden"
-        aria-label={`View details for ${product.title}`}
-      >
-        <img 
-          src={product.images[0]} 
+    <Link 
+      to={`/product/${product.id}`} 
+      className="group block bg-white border border-warm-beige overflow-hidden transition-all duration-300 hover:shadow-lg rounded-lg"
+    >
+      {/* Product Image */}
+      <div className="aspect-square bg-cream overflow-hidden relative">
+        <img
+          src={product.images[0]}
           alt={product.title}
-          className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           loading="lazy"
         />
-        {product.featured && (
-          <span className="absolute top-2 left-2 bg-white px-2 py-0.5 text-[9px] font-bold uppercase tracking-tighter text-near-black border border-warm-beige shadow-sm z-10">
-            Best Seller
-          </span>
+        
+        {/* Stock Badge */}
+        {product.stock === 0 ? (
+          <div className="absolute top-2 right-2 bg-red-500 text-white text-[8px] sm:text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded">
+            Out of Stock
+          </div>
+        ) : product.stock < 5 ? (
+          <div className="absolute top-2 right-2 bg-gold text-near-black text-[8px] sm:text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded">
+            Only {product.stock} left
+          </div>
+        ) : null}
+        
+        {/* Low Stock Warning Bar */}
+        {product.stock > 0 && product.stock < 5 && (
+          <div className="absolute bottom-0 left-0 right-0 bg-gold/90 text-near-black text-[8px] font-bold uppercase tracking-wider py-1 text-center">
+            Hurry! Only {product.stock} left in stock
+          </div>
         )}
-      </Link>
-      
-      <div className="flex justify-between items-start mb-2">
-        <div className="flex-1 min-w-0 pr-2">
-          <p className="text-[10px] text-gray-a0 uppercase tracking-widest mb-1 font-bold">{product.category}</p>
-          <Link to={`/product/${product.id}`}>
-            <h4 className="text-sm font-bold text-near-black group-hover:text-gold transition-colors truncate">
-              {product.title}
-            </h4>
-          </Link>
-        </div>
-        <span className="text-sm font-bold text-near-black whitespace-nowrap">
-          {formatCurrency(product.price)}
-        </span>
       </div>
 
-      <p className="text-[11px] text-gray-666 line-clamp-2 min-h-[32px] mb-6 font-light leading-relaxed">
-        {product.description}
-      </p>
-      
-      <div className="mt-auto flex flex-col gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <button 
-          onClick={() => addToCart(product, 1)}
-          className="w-full bg-near-black text-white py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-gold transition-all duration-300"
-          aria-label={`Add ${product.title} to cart`}
-        >
-          Add to Cart
-        </button>
-        <Link 
-          to={`/product/${product.id}`}
-          className="block w-full border border-warm-beige py-3 text-[10px] font-bold uppercase tracking-widest text-center hover:bg-cream transition-all duration-300"
-        >
-          View Details
-        </Link>
+      {/* Product Info */}
+      <div className="p-3 sm:p-4">
+        <p className="text-[9px] sm:text-[10px] font-bold text-gray-a0 uppercase tracking-widest mb-1">
+          {product.category}
+        </p>
+        <h3 className="text-sm sm:text-base font-display text-near-black group-hover:text-gold transition-colors line-clamp-1 mb-2">
+          {product.title}
+        </h3>
+        <p className="text-base sm:text-lg font-light text-near-black mb-3">
+          {formatCurrency(product.price)}
+        </p>
+        
+        {/* Action Buttons */}
+        {product.stock === 0 ? (
+          <button
+            onClick={handleContactUs}
+            className="w-full bg-gray-200 text-gray-600 py-2 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest rounded transition-colors"
+          >
+            Contact Us
+          </button>
+        ) : (
+          <div className="flex gap-2">
+            <button
+              onClick={handleAddToCart}
+              disabled={isAddingToCart}
+              className="flex-1 bg-cream border border-warm-beige text-near-black py-2 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest hover:bg-gold hover:text-near-black hover:border-gold transition-all duration-300 flex items-center justify-center gap-1.5 rounded"
+            >
+              <ShoppingCart className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+              {isAddingToCart ? 'Adding...' : 'Add to Cart'}
+            </button>
+            <Link
+              to={`/product/${product.id}`}
+              className="flex-1 bg-near-black text-white py-2 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest hover:bg-gold hover:text-near-black transition-all duration-300 flex items-center justify-center gap-1.5 rounded"
+            >
+              <ShoppingBag className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+              {isOrderNow ? 'Processing...' : 'Order Now'}
+            </Link>
+          </div>
+        )}
       </div>
-    </div>
+    </Link>
   );
 }

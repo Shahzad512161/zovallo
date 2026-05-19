@@ -138,7 +138,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Stat Cards - Responsive Grid */}
-      <div className="grid grid-cols-1 xs:grid-cols-2 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
+      <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
         {cards.map((card, idx) => (
           <div
             key={idx}

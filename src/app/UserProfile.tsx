@@ -326,7 +326,7 @@ export default function UserProfile() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8 md:py-12">
+    <div className="max-w-full mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8 md:py-12">
       <SEO
         title="My Profile"
         description="Manage your account, view orders, and update personal information"

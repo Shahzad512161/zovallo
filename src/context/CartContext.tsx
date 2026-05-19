@@ -1,15 +1,20 @@
+// context/CartContext.tsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Product } from '../types';
 
 interface CartItem extends Product {
   quantity: number;
+  selectedOptions?: {
+    color?: string;
+    seater?: string;
+  };
 }
 
 interface CartContextType {
   cart: CartItem[];
-  addToCart: (product: Product, quantity: number) => void;
+  addToCart: (product: Product, quantity?: number, options?: { color?: string; seater?: string }) => boolean;
   removeFromCart: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  updateQuantity: (productId: string, quantity: number) => boolean;
   clearCart: () => void;
   totalItems: number;
   subtotal: number;
@@ -18,57 +23,93 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [cart, setCart] = useState<CartItem[]>(() => {
+  const [cart, setCart] = useState<CartItem[]>([]);
+
+  useEffect(() => {
     const savedCart = localStorage.getItem('cart');
-    return savedCart ? JSON.parse(savedCart) : [];
-  });
+    if (savedCart) {
+      setCart(JSON.parse(savedCart));
+    }
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
 
-  const addToCart = (product: Product, quantity: number) => {
+  const addToCart = (product: Product, quantity: number = 1, options?: { color?: string; seater?: string }): boolean => {
+    if (product.stock < quantity) {
+      alert(`Sorry, only ${product.stock} items available in stock.`);
+      return false;
+    }
+
     setCart(prevCart => {
-      const existingItem = prevCart.find(item => item.id === product.id);
-      if (existingItem) {
-        return prevCart.map(item =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + quantity }
-            : item
-        );
+      // Check if same product with same options already exists
+      const existingItemIndex = prevCart.findIndex(item => 
+        item.id === product.id && 
+        JSON.stringify(item.selectedOptions) === JSON.stringify(options)
+      );
+      
+      if (existingItemIndex !== -1) {
+        const newQuantity = prevCart[existingItemIndex].quantity + quantity;
+        if (product.stock < newQuantity) {
+          alert(`Sorry, only ${product.stock} items available.`);
+          return prevCart;
+        }
+        const updatedCart = [...prevCart];
+        updatedCart[existingItemIndex] = { 
+          ...updatedCart[existingItemIndex], 
+          quantity: newQuantity 
+        };
+        return updatedCart;
       }
-      return [...prevCart, { ...product, quantity }];
+      
+      return [...prevCart, { ...product, quantity, selectedOptions: options }];
     });
+    return true;
   };
 
   const removeFromCart = (productId: string) => {
-    setCart(prevCart => prevCart.filter(item => item.id !== productId));
+    setCart(prev => prev.filter(item => item.id !== productId));
   };
 
-  const updateQuantity = (productId: string, quantity: number) => {
-    if (quantity < 1) return;
-    setCart(prevCart =>
-      prevCart.map(item =>
-        item.id === productId ? { ...item, quantity } : item
-      )
-    );
+  const updateQuantity = (productId: string, quantity: number): boolean => {
+    const product = cart.find(item => item.id === productId);
+    if (product && product.stock < quantity) {
+      alert(`Sorry, only ${product.stock} items available in stock.`);
+      return false;
+    }
+    
+    if (quantity <= 0) {
+      removeFromCart(productId);
+    } else {
+      setCart(prev =>
+        prev.map(item =>
+          item.id === productId ? { ...item, quantity } : item
+        )
+      );
+    }
+    return true;
   };
 
-  const clearCart = () => setCart([]);
+  const clearCart = () => {
+    setCart([]);
+  };
 
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   return (
-    <CartContext.Provider value={{ 
-      cart, 
-      addToCart, 
-      removeFromCart, 
-      updateQuantity, 
-      clearCart,
-      totalItems,
-      subtotal
-    }}>
+    <CartContext.Provider
+      value={{
+        cart,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart,
+        totalItems,
+        subtotal,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );

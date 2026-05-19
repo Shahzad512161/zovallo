@@ -19,9 +19,23 @@ export interface Product {
   slug: string;
   description: string;
   price: number;
+  compareAtPrice?: number;   
   category: string;
   images: string[];
   stock: number;
+  
+  
+  seaterCount?: string[];   
+  colors?: string[];       
+  material?: string;
+  dimensions?: string;
+  weight?: number;
+  assemblyRequired?: boolean;
+  warrantyYears?: number;
+  deliveryCountries?: string[];
+  estimatedDelivery?: string;
+  tags?: string[]; 
+  
   specifications?: Record<string, string>;
   featured: boolean;
   createdAt?: any;
@@ -53,6 +67,7 @@ export interface Order {
     fullName: string;
     email: string;
     phone: string;
+    alternativePhone?: string;
     address: string;
     city: string;
     postalCode: string;
@@ -65,9 +80,30 @@ export interface Order {
     price: number;
     quantity: number;
     image: string;
+    // Extended fields for order details
+    selectedOptions?: {
+      color?: string;
+      seater?: string;
+    };
+    specifications?: Record<string, string>;
+    dimensions?: string;
+    weight?: number;
   }>;
   totalPrice: number;
   orderStatus: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   paymentMethod: string;
   createdAt?: any;
+}
+
+
+export interface ContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  status: 'unread' | 'read' | 'replied';
+  createdAt: any;
+  repliedAt?: any;
+  replyMessage?: string;
 }

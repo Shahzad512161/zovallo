@@ -13,6 +13,7 @@ import {
   ChevronRight,
   Search,
   Bell,
+  MessageCircle
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
@@ -32,6 +33,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     { icon: Package, label: "Products", path: "/admin/products" },
     { icon: ShoppingBag, label: "Orders", path: "/admin/orders" },
     { icon: Users, label: "Customers", path: "/admin/customers" },
+    { icon: MessageCircle, label: "Messages", path: "/admin/messages" },
     { icon: Settings, label: "Settings", path: "/admin/settings" },
   ];
 

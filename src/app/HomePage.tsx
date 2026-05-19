@@ -9,6 +9,8 @@ import {
   Award,
   Star,
   Quote,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { SEO } from "../components/SEO";
 import { productApi } from "../services/productApi";
@@ -18,13 +20,52 @@ import { LoadingSpinner } from "../components/ui/Loading";
 
 export default function HomePage() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [recentProducts, setRecentProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [email, setEmail] = useState("");
+  const [newsletterSuccess, setNewsletterSuccess] = useState(false);
+
+  // Hero carousel slides
+  const heroSlides = [
+    {
+      image: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&q=80&w=2000",
+      title: "The Walnut & Olive Edit",
+      subtitle: "New Season Arrival",
+      description: "Discover our masterfully crafted autumnal collection, blending traditional joinery with modern silhouettes for the contemporary home.",
+      buttonText: "Explore Collection",
+      buttonLink: "/shop",
+    },
+    {
+      image: "https://images.unsplash.com/photo-1538688525198-9b88f6f53126?auto=format&fit=crop&q=80&w=2000",
+      title: "Heritage Collection",
+      subtitle: "Limited Edition",
+      description: "Experience timeless elegance with our Heritage Collection. Each piece tells a story of craftsmanship and dedication.",
+      buttonText: "Discover More",
+      buttonLink: "/shop",
+    },
+    {
+      image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=2000",
+      title: "Modern Living Redefined",
+      subtitle: "Contemporary Designs",
+      description: "Transform your space with our modern furniture collection. Clean lines, premium materials, lasting comfort.",
+      buttonText: "Shop Now",
+      buttonLink: "/shop",
+    },
+  ];
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Auto-slide carousel
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [heroSlides.length]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -34,17 +75,47 @@ export default function HomePage() {
         categoryApi.getAllCategories(),
       ]);
 
-      setAllProducts(productsData);
+      // Get featured products
       const featured = productsData.filter((p) => p.featured === true);
-      setFeaturedProducts(
-        featured.length > 0 ? featured : productsData.slice(0, 4),
-      );
+      setFeaturedProducts(featured.length > 0 ? featured.slice(0, 4) : productsData.slice(0, 4));
+      
+      // Get recent products (last 4 added)
+      const recent = [...productsData].sort((a, b) => {
+        const dateA = a.createdAt?.toDate?.() || new Date(0);
+        const dateB = b.createdAt?.toDate?.() || new Date(0);
+        return dateB.getTime() - dateA.getTime();
+      });
+      setRecentProducts(recent.slice(0, 4));
+      
       setCategories(categoriesData);
     } catch (error) {
       console.error("Error fetching home data:", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleNewsletterSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (email) {
+      // Here you can add API call to save email
+      console.log("Newsletter signup:", email);
+      setNewsletterSuccess(true);
+      setEmail("");
+      setTimeout(() => setNewsletterSuccess(false), 3000);
+    }
+  };
+
+  const goToSlide = (index: number) => {
+    setCurrentSlide(index);
+  };
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
   };
 
   const getCategoryImage = (category: Category): string => {
@@ -55,21 +126,14 @@ export default function HomePage() {
       return category.image;
     }
     const fallbackImages: Record<string, string> = {
-      "Sofa Sets":
-        "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800",
-      "Dining Tables":
-        "https://images.unsplash.com/photo-1577146333359-39f99d73010b?auto=format&fit=crop&q=80&w=800",
+      "Sofa Sets": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800",
+      "Dining Tables": "https://images.unsplash.com/photo-1577146333359-39f99d73010b?auto=format&fit=crop&q=80&w=800",
       Beds: "https://images.unsplash.com/photo-1505691938895-1758d7eaa511?auto=format&fit=crop&q=80&w=800",
-      Mattresses:
-        "https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&q=80&w=800",
-      "Acoustic Wall Panels":
-        "https://images.unsplash.com/photo-1615876234586-44c13824bba3?auto=format&fit=crop&q=80&w=800",
-      "Coffee Tables":
-        "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&q=80&w=800",
-      "Office Chairs":
-        "https://images.unsplash.com/photo-1505797149-43b00fe1eeac?auto=format&fit=crop&q=80&w=800",
-      Wardrobes:
-        "https://images.unsplash.com/photo-1595428774223-ef52624120ec?auto=format&fit=crop&q=80&w=800",
+      Mattresses: "https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&q=80&w=800",
+      "Acoustic Wall Panels": "https://images.unsplash.com/photo-1615876234586-44c13824bba3?auto=format&fit=crop&q=80&w=800",
+      "Coffee Tables": "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&q=80&w=800",
+      "Office Chairs": "https://images.unsplash.com/photo-1505797149-43b00fe1eeac?auto=format&fit=crop&q=80&w=800",
+      Wardrobes: "https://images.unsplash.com/photo-1595428774223-ef52624120ec?auto=format&fit=crop&q=80&w=800",
     };
     return (
       fallbackImages[category.name] ||
@@ -109,60 +173,84 @@ export default function HomePage() {
         description="Discover our masterfully crafted autumnal collection, blending traditional joinery with modern silhouettes for the contemporary home."
       />
 
-      {/* Hero Section - Responsive */}
-      <section className="relative h-[70vh] sm:h-[80vh] lg:h-[85vh] flex items-center justify-start overflow-hidden">
-        <img
-          src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&q=80&w=2000"
-          alt="Home Hero"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
-        <div className="relative z-10 space-y-4 sm:space-y-6 md:space-y-8 px-4 sm:px-8 lg:px-16 xl:px-24 max-w-full sm:max-w-lg md:max-w-2xl">
-          <div className="space-y-2 sm:space-y-3 md:space-y-4">
-            <span className="text-[8px] sm:text-[10px] md:text-[11px] font-bold text-white uppercase tracking-[0.2em] sm:tracking-[0.3em] block underline decoration-gold underline-offset-4 sm:underline-offset-8">
-              New Season Arrival
-            </span>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-white font-display font-medium leading-[1.1] sm:leading-[1.05]">
-              The Walnut <br className="hidden sm:block" /> &{" "}
-              <span className="text-gold italic">Olive</span> Edit
-            </h1>
-            <p className="text-sm sm:text-base md:text-lg text-cream/80 max-w-sm sm:max-w-md font-light leading-relaxed">
-              Discover our masterfully crafted autumnal collection, blending
-              traditional joinery with modern silhouettes for the contemporary
-              home.
-            </p>
+      {/* Hero Carousel Section */}
+      <section className="relative h-[70vh] sm:h-[80vh] lg:h-[85vh] overflow-hidden">
+        {heroSlides.map((slide, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+              currentSlide === index ? "opacity-100 z-10" : "opacity-0 z-0"
+            }`}
+          >
+            <img
+              src={slide.image}
+              alt={slide.title}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
+            <div className="relative z-10 h-full flex items-center justify-start px-4 sm:px-8 lg:px-16 xl:px-24">
+              <div className="space-y-4 sm:space-y-6 md:space-y-8 max-w-full sm:max-w-lg md:max-w-2xl">
+                <span className="text-[8px] sm:text-[10px] md:text-[11px] font-bold text-white uppercase tracking-[0.2em] sm:tracking-[0.3em] block underline decoration-gold underline-offset-4 sm:underline-offset-8">
+                  {slide.subtitle}
+                </span>
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-white font-display font-medium leading-[1.1] sm:leading-[1.05]">
+                  {slide.title}
+                </h1>
+                <p className="text-sm sm:text-base md:text-lg text-cream/80 max-w-sm sm:max-w-md font-light leading-relaxed">
+                  {slide.description}
+                </p>
+                <div className="flex flex-wrap gap-3 sm:gap-4 pt-2 sm:pt-4">
+                  <Link to={slide.buttonLink}>
+                    <Button
+                      size="lg"
+                      className="bg-white text-near-black hover:bg-gold px-6 sm:px-8 md:px-10 py-2 sm:py-3 text-[10px] sm:text-[11px] border-none shadow-xl"
+                    >
+                      {slide.buttonText}
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="flex flex-wrap gap-3 sm:gap-4 pt-2 sm:pt-4">
-            <Link to="/shop">
-              <Button
-                size="lg"
-                className="bg-white text-near-black hover:bg-gold px-6 sm:px-8 md:px-10 py-2 sm:py-3 text-[10px] sm:text-[11px] border-none shadow-xl"
-              >
-                Explore Collection
-              </Button>
-            </Link>
-            <Link to="/about">
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-white text-white hover:bg-white hover:text-near-black px-6 sm:px-8 md:px-10 py-2 sm:py-3 text-[10px] sm:text-[11px]"
-              >
-                View Lookbook
-              </Button>
-            </Link>
-          </div>
+        ))}
+
+        {/* Carousel Navigation Buttons */}
+        <button
+          onClick={prevSlide}
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 hover:bg-white/40 text-white p-2 rounded-full backdrop-blur-sm transition-all duration-300"
+        >
+          <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+        </button>
+        <button
+          onClick={nextSlide}
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 hover:bg-white/40 text-white p-2 rounded-full backdrop-blur-sm transition-all duration-300"
+        >
+          <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+        </button>
+
+        {/* Carousel Dots */}
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+          {heroSlides.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => goToSlide(index)}
+              className={`transition-all duration-300 rounded-full ${
+                currentSlide === index
+                  ? "w-8 h-2 bg-gold"
+                  : "w-2 h-2 bg-white/50 hover:bg-white/80"
+              }`}
+            />
+          ))}
         </div>
       </section>
 
-      {/* Featured Products / Best Sellers - Responsive Grid */}
+      {/* Featured Products Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-12 md:space-y-16">
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left">
           <div className="space-y-2 sm:space-y-3">
-            <h3 className="text-[10px] sm:text-[12px] font-bold uppercase tracking-[0.2em] text-gray-a0">
-              Best Selling Products
-            </h3>
+            
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-display text-near-black">
-              Pieces Destined to Last
+               Featured Collection
             </h2>
             <div className="w-12 sm:w-16 h-0.5 bg-gold mx-auto sm:mx-0" />
           </div>
@@ -170,7 +258,7 @@ export default function HomePage() {
             to="/shop"
             className="text-[10px] sm:text-[12px] font-bold uppercase tracking-widest text-walnut hover:text-gold transition-colors underline underline-offset-4"
           >
-            Shop All Collections →
+            Shop All →
           </Link>
         </div>
 
@@ -182,14 +270,43 @@ export default function HomePage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
-            {featuredProducts.slice(0, 4).map((product) => (
+            {featuredProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
         )}
       </section>
 
-      {/* Why Choose Us - Responsive Icons */}
+      {/* Recently Added Section */}
+      {recentProducts.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-12 md:space-y-16">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left">
+            <div className="space-y-2 sm:space-y-3">
+              <h3 className="text-[10px] sm:text-[12px] font-bold uppercase tracking-[0.2em] text-gray-a0">
+                Just Arrived
+              </h3>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-display text-near-black">
+                Newest Additions
+              </h2>
+              <div className="w-12 sm:w-16 h-0.5 bg-gold mx-auto sm:mx-0" />
+            </div>
+            <Link
+              to="/shop?sort=latest"
+              className="text-[10px] sm:text-[12px] font-bold uppercase tracking-widest text-walnut hover:text-gold transition-colors underline underline-offset-4"
+            >
+              View All New →
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
+            {recentProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Why Choose Us */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 md:gap-12 text-center">
           <div className="space-y-3 sm:space-y-4">
@@ -239,15 +356,15 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Categories Grid - Responsive */}
+      {/* Categories Grid */}
       <section className="bg-warm-beige/30 py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 border-y border-warm-beige">
         <div className="max-w-7xl mx-auto space-y-8 sm:space-y-12 md:space-y-16">
           <div className="text-center space-y-2 sm:space-y-3">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-display text-near-black tracking-tight">
-              Featured Collections
+              Shop by Category
             </h2>
             <p className="text-gray-666 font-light text-sm sm:text-base">
-              Explore a world of textures, finishes, and timeless designs.
+              Explore our curated collections
             </p>
           </div>
 
@@ -273,32 +390,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Featured Collection Banner - Responsive */}
-      <section className="relative h-[40vh] sm:h-[50vh] md:h-[60vh] flex items-center justify-center overflow-hidden mx-4 sm:mx-6 lg:mx-8 bg-walnut rounded-xl sm:rounded-2xl">
-        <img
-          src="https://images.unsplash.com/photo-1538688525198-9b88f6f53126?auto=format&fit=crop&q=80&w=2000"
-          alt="Collection Banner"
-          className="absolute inset-0 w-full h-full object-cover opacity-60 grayscale"
-        />
-        <div className="relative z-10 text-center space-y-4 sm:space-y-5 md:space-y-6 px-4">
-          <span className="text-[9px] sm:text-[10px] md:text-[11px] font-bold text-gold uppercase tracking-[0.3em] sm:tracking-[0.4em] block">
-            Limited Edition
-          </span>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-white font-display font-medium leading-tight max-w-3xl mx-auto px-2">
-            The Heritage Walnut <br className="hidden sm:block" />{" "}
-            <span className="italic">Artisan</span> Collection
-          </h2>
-          <Button
-            size="lg"
-            className="bg-white text-near-black hover:bg-gold px-8 sm:px-10 md:px-12 py-2 sm:py-3 text-[10px] sm:text-[11px] border-none"
-          >
-            DISCOVER THE STORY
-          </Button>
-        </div>
-      </section>
-
-      {/* Newsletter Section - Responsive */}
-      {/* <section className="bg-near-black text-white py-16 sm:py-20 md:py-24 px-4 sm:px-6 lg:px-8">
+      {/* Newsletter Section */}
+      <section className="bg-near-black text-white py-16 sm:py-20 md:py-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto text-center space-y-6 sm:space-y-7 md:space-y-8">
           <div className="space-y-2 sm:space-y-3">
             <h3 className="text-[9px] sm:text-[10px] md:text-[11px] font-bold uppercase tracking-[0.3em] sm:tracking-[0.4em] text-gold">
@@ -312,18 +405,35 @@ export default function HomePage() {
               reveals, and artisanal insights.
             </p>
           </div>
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 max-w-md mx-auto border-b border-white/20 pb-2 focus-within:border-gold transition-colors">
+          
+          {newsletterSuccess && (
+            <div className="bg-mint-50 text-mint-700 py-2 px-4 rounded-lg text-sm">
+              ✓ Thank you for subscribing! Check your inbox soon.
+            </div>
+          )}
+          
+          <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-3 sm:gap-4 max-w-md mx-auto">
             <input
               type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="Your email address"
-              className="bg-transparent px-2 sm:px-0 py-2 sm:py-3 text-sm sm:text-[14px] outline-none flex-grow placeholder:text-white/20 font-light text-center sm:text-left"
+              required
+              className="flex-1 bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-sm outline-none focus:border-gold focus:bg-white/20 transition-all placeholder:text-white/40"
             />
-            <button className="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.2em] text-gold hover:text-white transition-colors">
-              SUBSCRIBE
+            <button
+              type="submit"
+              className="bg-gold text-near-black px-6 py-3 text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-white transition-colors rounded-lg whitespace-nowrap"
+            >
+              Subscribe
             </button>
-          </div>
+          </form>
+          
+          <p className="text-[10px] text-white/40">
+            No spam, just beautiful furniture inspiration. Unsubscribe anytime.
+          </p>
         </div>
-      </section> */}
+      </section>
     </div>
   );
 }
